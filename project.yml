@@ -1,0 +1,47 @@
+name: LockCode
+options:
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    ENABLE_HARDENED_RUNTIME: YES
+    CODE_SIGN_STYLE: Automatic
+    CURRENT_PROJECT_VERSION: 2
+    MARKETING_VERSION: 0.2.0
+
+targets:
+  LockCode:
+    type: application
+    platform: macOS
+    sources:
+      - path: LockCode
+        excludes:
+          - Resources/Info.plist
+          - Resources/LockCode.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.LockCode
+        PRODUCT_NAME: LockCode
+        INFOPLIST_FILE: LockCode/Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: LockCode/Resources/LockCode.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+    scheme:
+      testTargets:
+        - LockCodeTests
+
+  LockCodeTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: LockCodeTests
+    dependencies:
+      - target: LockCode
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.LockCodeTests
+        GENERATE_INFOPLIST_FILE: YES
