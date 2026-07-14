@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using LockCode.Windows.Services;
+using System.Windows.Media.Imaging;
 
 namespace LockCode.Windows;
 
@@ -15,6 +16,7 @@ public sealed class CodeDialog : Window
     {
         Title = title; Width = 390; Height = confirm ? 260 : 220; WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Topmost = true; ResizeMode = ResizeMode.NoResize;
+        Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Assets/LockCode.png"));
         _confirmation = confirm ? new PasswordBox() : null;
         var panel = new StackPanel { Margin = new Thickness(22) };
         panel.Children.Add(new TextBlock { Text = "Código (4–64 caracteres, admite letras y símbolos):", TextWrapping = TextWrapping.Wrap });

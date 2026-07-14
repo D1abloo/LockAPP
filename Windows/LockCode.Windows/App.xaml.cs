@@ -17,10 +17,11 @@ public partial class App : System.Windows.Application
         if (!first) { Shutdown(); return; }
 
         _window = new MainWindow();
+        var appIcon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!);
         _tray = new System.Windows.Forms.NotifyIcon
         {
             Text = "LockCode",
-            Icon = System.Drawing.SystemIcons.Shield,
+            Icon = appIcon ?? System.Drawing.SystemIcons.Shield,
             Visible = true,
             ContextMenuStrip = BuildMenu()
         };

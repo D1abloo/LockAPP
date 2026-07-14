@@ -10,5 +10,14 @@
     <AssemblyName>LockCode</AssemblyName>
     <RootNamespace>LockCode.Windows</RootNamespace>
     <Version>0.1.0</Version>
+    <ApplicationIcon>Assets\LockCode.ico</ApplicationIcon>
+    <Company>Isaac Silva Jiménez</Company>
+    <Product>LockCode para Windows</Product>
+    <Description>Protección de privacidad de aplicaciones mediante código o Windows Hello.</Description>
+    <Copyright>Copyright © 2026 Isaac Silva Jiménez</Copyright>
   </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Assets\LockCode.ico" />
+    <Resource Include="Assets\LockCode.png" />
+  </ItemGroup>
 </Project>

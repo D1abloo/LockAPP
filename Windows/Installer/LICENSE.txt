@@ -1,0 +1,15 @@
+CONDICIONES DE USO DE LOCKCODE PARA WINDOWS
+
+1. LockCode es software gratuito. No es necesario realizar ninguna donación para instalarlo o utilizarlo.
+
+2. LockCode proporciona una protección de privacidad de tipo «best effort». No garantiza impedir por completo la ejecución de procesos ni sustituye los controles de seguridad del sistema operativo.
+
+3. El código configurado no se almacena en texto plano. La credencial derivada se conserva mediante Windows Credential Manager. Los datos biométricos son gestionados exclusivamente por Windows Hello.
+
+4. El usuario es responsable de guardar su trabajo. LockCode solicita el cierre normal de aplicaciones protegidas y no usa terminación forzada, pero el comportamiento final depende de cada aplicación y de Windows.
+
+5. El software se proporciona sin garantías, dentro de los límites permitidos por la legislación aplicable. Puedes rechazar estas condiciones y cancelar la instalación sin modificar el equipo.
+
+6. Autor: Isaac Silva Jiménez. Soporte: kin_coriano14@hotmail.com
+
+Al marcar «Acepto las condiciones» y continuar, confirmas que has leído y aceptas este texto.
