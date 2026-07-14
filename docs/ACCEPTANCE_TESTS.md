@@ -65,3 +65,5 @@
 3. Cerrar sesión y volver a entrar.
 4. Verificar que el icono aparece en la barra de menús sin abrir LockCode manualmente.
 5. Dejar una aplicación protegida abierta antes de reiniciar LockCode y comprobar que el monitor restaura el bloqueo.
+6. Reiniciar el Mac y verificar que LockCode aparece en la barra de menús y bloquea una aplicación protegida sin abrirlo manualmente.
+7. Apagar o reiniciar el Mac y comprobar que LockCode no solicita su código ni Touch ID para permitir la operación.

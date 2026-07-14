@@ -219,7 +219,10 @@ final class AppModel: ObservableObject {
     }
 
     private func configureLaunchAtLogin() async {
-        await launchAtLoginService.setEnabled(true)
+        // Refresh an existing registration once after each installed build.
+        // This repairs stale Background Task Management records left by an
+        // in-place replacement or a change from ad-hoc to stable signing.
+        await launchAtLoginService.setEnabled(true, repairAfterUpdate: true)
         if let lastError = launchAtLoginService.lastError, isConfigured {
             errorMessage = "No se pudo activar el inicio automático: \(lastError)"
         } else if launchAtLoginService.state == .requiresApproval, isConfigured {

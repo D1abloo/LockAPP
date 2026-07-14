@@ -19,6 +19,7 @@ LockCode es un MVP nativo para macOS que protege la apertura o activación de ap
 - Bloqueo al cerrar la aplicación protegida, intervalos predefinidos o minutos personalizados.
 - Bloqueo inmediato de todas las sesiones concedidas.
 - Inicio automático con macOS mediante `SMAppService`, solicitado por defecto en la primera ejecución.
+- Renovación automática del registro de inicio tras instalar una nueva compilación y salida sin autenticación durante apagado, reinicio o cierre de sesión.
 - Aplicación de barra de menús y ventana de gestión.
 - Acceso a la configuración protegido por el código.
 - Salida normal de LockCode protegida por autenticación.

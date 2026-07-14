@@ -14,9 +14,12 @@
 - Enlace directo con `swiftc` del ejecutable completo: correcto en `x86_64` y `arm64`.
 - Verificador ejecutable de reglas de dominio: 28 comprobaciones correctas para código con símbolos, credencial PBKDF2 sin texto plano, penalizaciones, bloqueo al terminar, expiración por minutos, solicitud pendiente, deduplicación, inicio automático, registro persistente/borrable y validación de URL de actualización.
 - GitHub Releases devuelve el 404 esperado mientras no existan releases; la interfaz muestra ese estado y no genera una notificación falsa.
-- Bundle 0.3.1 (compilación 5) universal, firmado localmente, instalado y ejecutándose desde `/Applications/LockCode.app`; incorpora ocultado/cierre normal de aplicaciones restauradas y supervisión continua de todas las aplicaciones protegidas.
+- Bundle 0.3.2 (compilación 6) universal, firmado localmente, instalado y ejecutándose desde `/Applications/LockCode.app`; incorpora ocultado/cierre normal de aplicaciones restauradas y supervisión continua de todas las aplicaciones protegidas.
+- La versión 0.3.2 se enlazó con Swift 6.3.3, concurrencia estricta y advertencias tratadas como errores para `x86_64-apple-macosx13.0` y `arm64-apple-macosx13.0`.
 - Se sustituyó la firma ad hoc por la identidad estable `LockCode Local Signing`. El requisito designado resultante es el identificador `com.example.LockCode` unido al certificado raíz local `B6B43B1032FFE0624A6192E2F9B976709BAB2F00`, por lo que futuras compilaciones firmadas con esa identidad conservan la autorización «Permitir siempre» de Keychain.
 - `SMAppService.mainApp` registró LockCode como ítem de inicio; System Events confirma `name: LockCode` y `path: /Applications/LockCode.app`.
+- El registro se renovó tras actualizar la compilación (`Generation: 8`, estado habilitado). Una apertura real de la aplicación protegida configurada confirmó que el supervisor la ocultó y solicitó su terminación normal.
+- El delegado permite terminar inmediatamente durante apagado, reinicio o cierre de sesión, pero conserva la autenticación para una salida manual.
 - Prueba gráfica del reinicio con WhatsApp protegida: antes de arrancar LockCode estaba en ejecución y visible; al iniciar LockCode permaneció en ejecución pero `NSRunningApplication.isHidden` pasó a `true`.
 - Prueba gráfica de solicitud pendiente: dos intentos consecutivos de activar WhatsApp mantuvieron `isHidden == true` y no dejaron visible la aplicación mientras esperaba autenticación.
 - Diagnóstico de reinicio 0.3.1: se detectó y eliminó una espera de inicialización que consultaba Keychain y servicios auxiliares antes de iniciar el monitor. La protección ahora arranca primero; Keychain, `SMAppService` y las notificaciones se inicializan después.
