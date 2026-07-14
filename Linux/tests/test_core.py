@@ -1,11 +1,13 @@
 import tempfile
 import unittest
+import subprocess
 from pathlib import Path
+from unittest.mock import patch
 
 from lockcode.audit import AuditStore
 from lockcode.policy import AttemptLimiter, GrantState, PendingRequestState, valid_code
 from lockcode.settings import SettingsStore
-from lockcode.secure_store import derive_credential, verify_credential
+from lockcode.secure_store import SecretStore, derive_credential, verify_credential
 
 
 class PolicyTests(unittest.TestCase):
@@ -21,6 +23,12 @@ class PolicyTests(unittest.TestCase):
         self.assertNotIn("Clave !segura#", credential)
         self.assertTrue(verify_credential("Clave !segura#", credential))
         self.assertFalse(verify_credential("Clave incorrecta", credential))
+
+    def test_locked_keyring_does_not_wait_forever(self):
+        with patch("lockcode.secure_store.subprocess.run", side_effect=subprocess.TimeoutExpired("secret-tool", 1)):
+            self.assertIsNone(SecretStore()._lookup())
+            with self.assertRaisesRegex(RuntimeError, "llavero GNOME"):
+                SecretStore().set_code("Clave !segura#")
 
     def test_progressive_penalty(self):
         limiter = AttemptLimiter()

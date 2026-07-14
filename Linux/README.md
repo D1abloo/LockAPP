@@ -30,6 +30,8 @@ python3 -m compileall -q lockcode
 
 Tras instalar, ejecuta `lockcode`. Para la huella, registra primero el dedo con `fprintd-enroll`. La aplicación se mantiene en segundo plano; el apagado no requiere autenticación.
 
+Si usas inicio de sesión automático, GNOME Keyring puede permanecer bloqueado. Desbloquéalo cuando Ubuntu lo solicite. LockCode guarda el código en segundo plano y muestra un error tras una espera limitada, por lo que la interfaz no queda congelada.
+
 ## Limitaciones
 
 Es una protección *best effort*. Linux no ofrece una API universal para impedir la ejecución de otra aplicación en X11 y Wayland. Un módulo LSM o una política del sistema sería necesario para control previo a ejecución y requeriría administración específica de cada distribución.

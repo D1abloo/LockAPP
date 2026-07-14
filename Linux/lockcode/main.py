@@ -139,7 +139,32 @@ class LockCodeApplication(Gtk.Application):
         if first is None: return False
         second = self._code_dialog("Confirmar código", "Repite el código")
         if first != second: self._message("Los códigos no coinciden.", Gtk.MessageType.ERROR); return False
-        self.secrets.set_code(first); return True
+        return self._store_code(first)
+
+    def _store_code(self, code: str) -> bool:
+        result: list[str | None] = [None]
+        dialog = Gtk.MessageDialog(
+            transient_for=self.window, modal=True, message_type=Gtk.MessageType.INFO,
+            buttons=Gtk.ButtonsType.NONE,
+            text="Guardando el código de forma segura…",
+        )
+        dialog.format_secondary_text(
+            "Si Ubuntu lo solicita, desbloquea el llavero GNOME. LockCode seguirá respondiendo."
+        )
+
+        def store() -> None:
+            try:
+                self.secrets.set_code(code)
+            except RuntimeError as error:
+                result[0] = str(error)
+            GLib.idle_add(dialog.response, Gtk.ResponseType.OK)
+
+        threading.Thread(target=store, daemon=True).start()
+        dialog.run(); dialog.destroy()
+        if result[0] is not None:
+            self._message(result[0], Gtk.MessageType.ERROR)
+            return False
+        return True
 
     def _code_dialog(self, title: str, prompt: str) -> str | None:
         dialog = Gtk.Dialog(title=title, transient_for=self.window, modal=True)

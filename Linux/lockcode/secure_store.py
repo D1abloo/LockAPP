@@ -11,6 +11,7 @@ from .policy import valid_code
 
 ITERATIONS = 210_000
 ATTRIBUTES = ["application", "lockcode-linux", "type", "primary-code"]
+SECRET_TOOL_TIMEOUT = 20
 
 
 class SecretStore:
@@ -30,14 +31,20 @@ class SecretStore:
         if not valid_code(code):
             raise ValueError("El código debe tener entre 4 y 64 caracteres imprimibles.")
         payload = derive_credential(code)
-        result = subprocess.run(
-            ["secret-tool", "store", "--label=LockCode", *ATTRIBUTES],
-            input=payload,
-            text=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.PIPE,
-            check=False,
-        )
+        try:
+            result = subprocess.run(
+                ["secret-tool", "store", "--label=LockCode", *ATTRIBUTES],
+                input=payload,
+                text=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
+                check=False,
+                timeout=SECRET_TOOL_TIMEOUT,
+            )
+        except subprocess.TimeoutExpired as error:
+            raise RuntimeError(
+                "El llavero GNOME está bloqueado. Desbloquéalo y vuelve a intentarlo."
+            ) from error
         if result.returncode:
             raise RuntimeError("Secret Service no pudo guardar la credencial.")
 
@@ -53,9 +60,13 @@ class SecretStore:
             return False
 
     def _lookup(self) -> str | None:
-        result = subprocess.run(
-            ["secret-tool", "lookup", *ATTRIBUTES], capture_output=True, text=True, check=False
-        )
+        try:
+            result = subprocess.run(
+                ["secret-tool", "lookup", *ATTRIBUTES], capture_output=True, text=True,
+                check=False, timeout=5,
+            )
+        except subprocess.TimeoutExpired:
+            return None
         return result.stdout.rstrip("\n") if result.returncode == 0 and result.stdout else None
 
 
