@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+gtk-update-icon-cache -q /usr/share/icons/hicolor 2>/dev/null || true
+if [ -n "${SUDO_USER:-}" ] && command -v runuser >/dev/null 2>&1; then
+  runuser -u "$SUDO_USER" -- systemctl --user daemon-reload 2>/dev/null || true
+  runuser -u "$SUDO_USER" -- systemctl --user enable --now lockcode.service 2>/dev/null || true
+fi
+exit 0

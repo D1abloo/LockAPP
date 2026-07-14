@@ -139,6 +139,13 @@ No cambies la identidad de firma entre actualizaciones: la autorización del ele
 
 Consulta `docs/SECURITY_MODEL.md` antes de prometer un nivel de protección comercial.
 
+## Ediciones independientes
+
+- `Windows/`: aplicación WPF, pruebas, publicación autocontenida e instalador NSIS propios.
+- `Linux/`: aplicación GTK, pruebas e instalador Debian propios.
+
+Cada edición mantiene su configuración, almacén seguro, inicio automático y sistema biométrico. No se mezclan binarios ni instaladores con la edición macOS.
+
 ## Ayuda, actualizaciones y donaciones
 
 - La aplicación incluye una guía de uso y soporte redactada en español.

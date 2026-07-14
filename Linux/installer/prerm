@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+if [ -n "${SUDO_USER:-}" ] && command -v runuser >/dev/null 2>&1; then
+  runuser -u "$SUDO_USER" -- systemctl --user disable --now lockcode.service 2>/dev/null || true
+fi
+exit 0

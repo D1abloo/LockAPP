@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lockcode-linux"
+version = "0.1.0"
+description = "Protección de privacidad de aplicaciones para Linux"
+requires-python = ">=3.10"
+
+[project.scripts]
+lockcode = "lockcode.main:main"
+
+[tool.setuptools]
+packages = ["lockcode"]

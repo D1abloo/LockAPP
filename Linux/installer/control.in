@@ -1,0 +1,11 @@
+Package: lockcode-linux
+Version: @VERSION@
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: Isaac Silva Jiménez <kin_coriano14@hotmail.com>
+Depends: python3 (>= 3.10), python3-gi, gir1.2-gtk-3.0, libsecret-tools, fprintd
+Recommends: gir1.2-ayatanaappindicator3-0.1
+Description: Protección de privacidad de aplicaciones para Linux
+ Oculta y pausa aplicaciones seleccionadas hasta autenticación mediante código
+ o huella. Es una protección best effort y no un control previo a ejecución.

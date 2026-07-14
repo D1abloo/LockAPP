@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=LockCode
+Comment=Protección de privacidad de aplicaciones
+Exec=/usr/bin/lockcode
+Icon=com.lockcode.Linux
+Terminal=false
+Categories=Utility;Security;
