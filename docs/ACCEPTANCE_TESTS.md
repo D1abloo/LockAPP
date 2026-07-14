@@ -3,7 +3,7 @@
 ## Instalación y onboarding
 
 1. Ejecutar sin entrada previa de Keychain.
-2. Verificar que acepta entre 4 y 16 letras o números y rechaza símbolos.
+2. Verificar que acepta entre 4 y 64 caracteres, incluidos espacios y símbolos, y rechaza saltos de línea o caracteres de control.
 3. Verificar que la confirmación debe coincidir.
 4. Cerrar y abrir; comprobar que vuelve a pedir autenticación de gestión.
 
@@ -31,10 +31,21 @@
 
 ## Ayuda y actualizaciones
 
-1. Abrir Ayuda y soporte y verificar los textos de uso, privacidad, autoría y gratuidad.
-2. Abrir el enlace de PayPal y comprobar que apunta a la cuenta indicada.
-3. Abrir Actualizaciones y comprobar la respuesta cuando no existen releases.
-4. Publicar una release de prueba y verificar que se muestra su versión, notas y enlace.
+1. Verificar que Ayuda y soporte aparece al final del sidebar izquierdo junto a Acerca de.
+2. Abrir Ayuda y soporte y verificar instalación, uso, registro, actualizaciones, autoría, gratuidad y correo de contacto.
+3. Comprobar que el botón de PayPal funciona sin mostrar en pantalla la cuenta de donación.
+4. Abrir Actualizaciones y comprobar la respuesta cuando no existen releases.
+5. Publicar una release de prueba y verificar que se muestra su versión, notas y enlace.
+6. Reiniciar LockCode con una release posterior publicada y comprobar la notificación con «Sí, actualizar» y «No ahora».
+7. Elegir «Sí, actualizar» y comprobar que solo abre una URL HTTPS bajo `github.com/D1abloo/LockAPP/`.
+
+## Registro
+
+1. Fallar un código válido y comprobar que aparece un intento fallido con fecha y hora.
+2. Desbloquear una aplicación y comprobar que aparece el desbloqueo con fecha y hora.
+3. Verificar que el registro no muestra código, método biométrico ni nombre de aplicación.
+4. Reiniciar LockCode y comprobar que el historial se conserva.
+5. Borrar el registro y confirmar que queda vacío después de reiniciar.
 
 ## Gestión y salida
 

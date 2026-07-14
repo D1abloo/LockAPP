@@ -21,6 +21,8 @@ Un usuario comparte o deja temporalmente su Mac desbloqueado y quiere impedir el
 7. Como usuario, hago que LockCode se inicie con mi sesión.
 8. Como propietario, debo autenticarme antes de cambiar la configuración o salir normalmente.
 9. Como usuario, consulto ayuda, soporte y futuras actualizaciones desde la propia aplicación.
+10. Como usuario, consulto un registro local de desbloqueos e intentos fallidos sin exponer qué aplicación estaba usando.
+11. Como usuario, recibo una notificación cuando existe una versión nueva y decido si abrir su página oficial.
 
 ## Fuera de alcance del MVP
 
@@ -39,3 +41,4 @@ Un usuario comparte o deja temporalmente su Mac desbloqueado y quiere impedir el
 - Cero almacenamiento del código fuera de Keychain.
 - Todas las rutas de cancelación dejan la app privada oculta o cerrada.
 - Al restaurarse LockCode, las aplicaciones protegidas que ya estén en ejecución se ocultan antes de admitir nuevas activaciones.
+- Las URL de actualización se limitan a HTTPS y al repositorio oficial.

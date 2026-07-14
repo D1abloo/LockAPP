@@ -4,6 +4,18 @@ import XCTest
 @testable import LockCode
 
 final class GitHubReleaseTests: XCTestCase {
+    func testOnlyOfficialRepositoryReleaseURLsAreTrusted() {
+        XCTAssertTrue(UpdateService.isTrustedReleaseURL(
+            URL(string: "https://github.com/D1abloo/LockAPP/releases/tag/v0.3.0")!
+        ))
+        XCTAssertFalse(UpdateService.isTrustedReleaseURL(
+            URL(string: "http://github.com/D1abloo/LockAPP/releases/tag/v0.3.0")!
+        ))
+        XCTAssertFalse(UpdateService.isTrustedReleaseURL(
+            URL(string: "https://example.com/D1abloo/LockAPP/releases/tag/v0.3.0")!
+        ))
+    }
+
     func testDecodesLatestReleaseResponse() throws {
         let payload = Data(#"""
         {

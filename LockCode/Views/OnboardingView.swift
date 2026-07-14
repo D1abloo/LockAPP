@@ -19,7 +19,7 @@ struct OnboardingView: View {
             VStack(spacing: 8) {
                 Text("Configura LockCode")
                     .font(.largeTitle.bold())
-                Text("Crea un código de 4 a 16 letras o números para proteger tus aplicaciones y la configuración.")
+                Text("Crea un código de 4 a 64 caracteres. Puedes combinar letras, números, espacios y símbolos.")
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 480)
@@ -29,7 +29,7 @@ struct OnboardingView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Código")
                         .font(.headline)
-                    SecureField("Introduce de 4 a 16 letras o números", text: $pin)
+                    SecureField("Introduce de 4 a 64 caracteres", text: $pin)
                         .textFieldStyle(.roundedBorder)
                         .controlSize(.large)
                         .focused($focusedField, equals: .pin)
@@ -68,7 +68,7 @@ struct OnboardingView: View {
             Text("El código se guarda en el Keychain de macOS.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
-            Text("El código distingue entre mayúsculas y minúsculas.")
+            Text("El código distingue entre mayúsculas y minúsculas y admite símbolos.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }
@@ -78,7 +78,7 @@ struct OnboardingView: View {
 
     private func createProtection() {
         guard PINPolicy.isValid(pin) else {
-            localError = "El código debe contener entre 4 y 16 letras o números."
+            localError = "El código debe contener entre 4 y 64 caracteres y no puede incluir saltos de línea."
             focusedField = .pin
             return
         }

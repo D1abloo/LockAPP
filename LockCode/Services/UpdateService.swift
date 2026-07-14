@@ -29,7 +29,13 @@ final class UpdateService: ObservableObject {
     init(bundle: Bundle = .main) {
         self.installedVersion = bundle.object(
             forInfoDictionaryKey: "CFBundleShortVersionString"
-        ) as? String ?? "0.2.1"
+        ) as? String ?? "0.3.0"
+    }
+
+    nonisolated static func isTrustedReleaseURL(_ url: URL) -> Bool {
+        url.scheme?.lowercased() == "https"
+            && url.host?.lowercased() == "github.com"
+            && url.path.hasPrefix("/D1abloo/LockAPP/")
     }
 
     func checkForUpdates() async {
@@ -71,6 +77,12 @@ final class UpdateService: ObservableObject {
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
             let release = try decoder.decode(GitHubRelease.self, from: data)
+            guard Self.isTrustedReleaseURL(release.htmlURL) else {
+                latestRelease = nil
+                updateAvailable = false
+                statusMessage = "GitHub devolvió un enlace de actualización no válido."
+                return
+            }
             latestRelease = release
             updateAvailable = AppVersion(installedVersion) < AppVersion(release.tagName)
             statusMessage = updateAvailable

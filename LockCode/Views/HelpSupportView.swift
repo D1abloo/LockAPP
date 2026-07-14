@@ -13,9 +13,9 @@ struct HelpSupportView: View {
                 header
 
                 HelpCard(title: "Primeros pasos", systemImage: "1.circle.fill") {
-                    Text("Crea un código de 4 a 16 letras o números. Después abre Aplicaciones, busca cada app privada y activa su interruptor de protección.")
-                    Text("El código distingue entre mayúsculas y minúsculas; combina ambas con números para hacerlo más resistente.")
-                    Text("LockCode debe permanecer abierto. El icono de la barra de menús permite pausar la protección, bloquear todas las autorizaciones o volver a los ajustes.")
+                    Text("Crea un código de 4 a 64 caracteres. Admite letras, números, espacios y símbolos, y distingue entre mayúsculas y minúsculas.")
+                    Text("Abre Aplicaciones y activa la protección en cada programa que quieras controlar. Si ya está abierto, LockCode lo ocultará.")
+                    Text("Mantén LockCode en ejecución. Desde su icono de la barra de menús puedes abrir la gestión, pausar la protección o usar «Bloquear ahora».")
                 }
 
                 HelpCard(title: "Desbloqueo y Touch ID", systemImage: "touchid") {
@@ -23,25 +23,30 @@ struct HelpSupportView: View {
                 }
 
                 HelpCard(title: "Cuándo vuelve a bloquearse", systemImage: "timer") {
-                    Text("El modo «Al cerrar la aplicación» mantiene el acceso únicamente mientras esa aplicación siga abierta. Los intervalos por minutos conservan la autorización hasta que se cumpla el tiempo elegido, aunque cambies de aplicación.")
+                    Text("El modo «Al cerrar la aplicación» conserva el acceso solamente mientras esa aplicación siga abierta. Los intervalos por minutos mantienen la autorización hasta que termine el tiempo elegido.")
                     Text("«Bloquear ahora» invalida inmediatamente todas las autorizaciones, independientemente del modo seleccionado.")
+                }
+
+                HelpCard(title: "Registro de acceso", systemImage: "list.bullet.clipboard") {
+                    Text("La sección Registro muestra la fecha y hora de los desbloqueos y de los intentos fallidos. Puedes borrar todo el historial cuando quieras.")
+                    Text("Para reducir la información almacenada, no se incluyen códigos, datos biométricos ni nombres de aplicaciones.")
                 }
 
                 HelpCard(title: "Inicio con macOS", systemImage: "power") {
                     Text("Activa «Iniciar LockCode con macOS» en Ajustes. Si macOS solicita aprobación, abre Ítems de inicio y permite LockCode. La aplicación debe estar instalada en /Applications y correctamente firmada.")
                 }
 
-                HelpCard(title: "Privacidad y límites", systemImage: "exclamationmark.shield") {
-                    Text("LockCode es una protección de privacidad de tipo best effort. Reacciona después de que macOS lanza o activa una aplicación; no sustituye controles parentales, una cuenta separada ni una solución basada en Endpoint Security.")
-                    Text("El código no se guarda en texto plano: solo se conserva en Keychain una credencial derivada con sal aleatoria.")
+                HelpCard(title: "Actualizaciones", systemImage: "arrow.triangle.2.circlepath") {
+                    Text("LockCode comprueba GitHub Releases al iniciarse. Si existe una versión posterior, macOS mostrará una notificación con las opciones «Sí, actualizar» y «No ahora».")
+                    Text("Al aceptar se abre la página oficial de la versión. La aplicación nunca sustituye archivos ni instala una descarga sin tu intervención.")
                 }
 
                 HelpCard(title: "Ayuda y soporte", systemImage: "questionmark.bubble") {
-                    Text("Si encuentras un error, describe qué aplicación estabas protegiendo, la versión de macOS y los pasos para reproducirlo. No incluyas tu código ni nombres de aplicaciones privadas si no es necesario.")
-                    HStack {
-                        Link("Abrir incidencias en GitHub", destination: supportURL)
-                        Spacer()
-                        Link("Contactar por correo", destination: emailURL)
+                    Text("Si encuentras un problema, indica la versión de macOS, la versión de LockCode y los pasos necesarios para reproducirlo. Nunca envíes tu código de acceso.")
+                    Link("Abrir una incidencia en GitHub", destination: supportURL)
+                    HStack(spacing: 6) {
+                        Text("Correo de contacto:")
+                        Link("kin_coriano14@hotmail.com", destination: emailURL)
                     }
                 }
 
@@ -52,9 +57,6 @@ struct HelpSupportView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.red)
-                    Text("Cuenta de donación: kin_coriano14@hotmail.com")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                     Text("Software realizado por Isaac Silva Jiménez.")
                         .fontWeight(.semibold)
                 }
@@ -71,7 +73,7 @@ struct HelpSupportView: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text("Ayuda y soporte")
                     .font(.largeTitle.bold())
-                Text("Guía rápida para configurar y utilizar LockCode con seguridad.")
+                Text("Guía de instalación, configuración, registro y actualizaciones.")
                     .foregroundStyle(.secondary)
             }
         }

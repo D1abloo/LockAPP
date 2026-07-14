@@ -9,7 +9,7 @@ enum AuthenticationError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidPINFormat:
-            return "El código debe contener entre 4 y 16 letras o números."
+            return "El código debe contener entre 4 y 64 caracteres. Puedes usar letras, números, espacios y símbolos."
         case .biometricsUnavailable:
             return "Touch ID no está disponible."
         case .authenticationFailed:

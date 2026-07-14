@@ -27,6 +27,8 @@ Una persona con acceso físico temporal a una sesión de macOS ya iniciada, sin 
 - Las concesiones se borran al solicitarlo y ante eventos de suspensión/cambio de sesión observables.
 - Al arrancar el monitor se ocultan las aplicaciones protegidas que ya estén ejecutándose; una aplicación se vuelve a ocultar ante activaciones repetidas mientras su autenticación está pendiente.
 - Las respuestas tardías de una autenticación cancelada se descartan mediante un identificador único de presentación.
+- El registro local conserva únicamente tipo de evento, fecha y un UUID aleatorio; no contiene el código, el resultado detallado de Touch ID, bundle identifiers ni nombres de aplicaciones.
+- Las notificaciones de actualización solo abren enlaces HTTPS cuyo host y ruta corresponden al repositorio oficial.
 - El MVP no fuerza la terminación de apps ya abiertas para evitar pérdida de datos.
 
 ## Riesgos aceptados
@@ -36,6 +38,7 @@ Una persona con acceso físico temporal a una sesión de macOS ya iniciada, sin 
 3. Una app puede rechazar una solicitud de terminación normal.
 4. LockCode puede ser terminado externamente.
 5. `SMAppService` requiere aprobación del usuario en determinados estados.
+6. El registro local es informativo y borrable; no es un registro forense resistente a manipulación.
 
 ## Camino a una edición reforzada
 

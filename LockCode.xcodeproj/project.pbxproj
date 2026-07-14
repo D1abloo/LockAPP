@@ -11,6 +11,7 @@
 		0B94B4FC7010E7CF0302B7DA /* AccessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4474A54AFF3E1907A7AF6F6 /* AccessRequest.swift */; };
 		0E92BFC2B2060A66780AE1FE /* AppCatalogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A0371BE937989FB44F5C18 /* AppCatalogService.swift */; };
 		0ED5646688FC81D149C6A7BC /* ApplicationAccessStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49AA190DD7077F1F1F65E8D /* ApplicationAccessStateTests.swift */; };
+		1AF9783C5CC4F2CD0E7E52B6 /* UpdateNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59278AB69DA058F674DFDD9E /* UpdateNotificationService.swift */; };
 		2D0E6C35F6940DE7CF5B2270 /* UnlockDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CE587A8F7DDD07F882115 /* UnlockDuration.swift */; };
 		338F0BC27C7E1AE30CE3060F /* UpdatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB7C51E6E17B4E4E839C22B /* UpdatesView.swift */; };
 		35E26F4120E2C81C4E51918A /* SettingsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB598582EC5BA56C96AF036 /* SettingsStoreTests.swift */; };
@@ -28,17 +29,21 @@
 		774E4ABEFFAB7F847D839F23 /* AppProtectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C34EFF6E5EB3DAC29E45700F /* AppProtectionService.swift */; };
 		78E0F8FFB53C87CD45AA60F5 /* PINPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA6ACF66D8F8B0BD5DD9A47 /* PINPolicyTests.swift */; };
 		7C834057EA6BDEEBA0F6A5E8 /* PINPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDA4A69B367639A16EE903FC /* PINPolicy.swift */; };
+		8287FB8405E172FE9895B62D /* AuditLogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B04A76431F2F2016762A2F0 /* AuditLogStoreTests.swift */; };
 		842DAC1D8494C6376E464161 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82DDF6761E1FC683FB0B7E2 /* SettingsStore.swift */; };
 		8532B27ADFA9731ADA63E319 /* ApplicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C9ED7560E7F6EDCAD23257 /* ApplicationsView.swift */; };
 		856E59C1D75251EE15995CE1 /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E222CAB958FABBAD0ED4352C /* MenuBarContentView.swift */; };
 		89BB51AB16E0B3E0FD617D56 /* PINCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3E1229590947D1563D0E587 /* PINCredential.swift */; };
 		92ABD69C8058C68D2E6F34DD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55918CB0A992A821E21537B /* SettingsView.swift */; };
+		94A7CCF7E1105EEA0A97FA62 /* AuditLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFACF37DBA6F9F96917018 /* AuditLogStore.swift */; };
 		A4F4858F72D45D41DA68D8F7 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548D2358E1F8C79ABDF90B86 /* RootView.swift */; };
 		AA81B63F23A35E5E349FF42A /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5498DD20A38EF36CB308CD73 /* AuthenticationService.swift */; };
 		AC6866B4148613FE282B7841 /* ApplicationAccessState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88738638B265233EE70EBDF /* ApplicationAccessState.swift */; };
 		B4E278731BD762B1328F7E19 /* AuthenticationAttemptLimiterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AE2FC68F0013A68F085A98 /* AuthenticationAttemptLimiterTests.swift */; };
+		B579F80B4C27E1673C171860 /* AuditEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801865A3FACE533F711123AC /* AuditEvent.swift */; };
 		B8D2E4B1D2EDCE9F23B8C83C /* LockCode.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8C6EEBB2BF3A5B512963C089 /* LockCode.icns */; };
 		BD2DD652D10AE5D69D62AB85 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 256265BE23FCBF6C3594568E /* AboutView.swift */; };
+		C44F3E6EE11C8507063E2BCA /* AuditLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DD8143B3F5D68595E1DF28B /* AuditLogView.swift */; };
 		C6CE8B7CEE3BBC82B0FBC300 /* LaunchAtLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30B73C1D572CB44ADCD3502 /* LaunchAtLoginService.swift */; };
 		CFCE3145911EA63A5AA8F0B6 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA9E3C301D674E4D0E06AFB /* AppModel.swift */; };
 		D0C230CC037F991BBC16E739 /* AppVersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0711B99962DCECA20B2813 /* AppVersionTests.swift */; };
@@ -65,14 +70,19 @@
 		0D2395BE749A9822A6A6CAD0 /* AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
 		188FFB6C8DDD2053F11EA602 /* LockCode.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LockCode.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		256265BE23FCBF6C3594568E /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		28AFACF37DBA6F9F96917018 /* AuditLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditLogStore.swift; sourceTree = "<group>"; };
 		29C9ED7560E7F6EDCAD23257 /* ApplicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationsView.swift; sourceTree = "<group>"; };
+		2DD8143B3F5D68595E1DF28B /* AuditLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditLogView.swift; sourceTree = "<group>"; };
 		349D8057664E3F4BDAEEA214 /* LockCodeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockCodeApp.swift; sourceTree = "<group>"; };
 		36BA7BA520510CD3D90F49B6 /* UnlockDurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockDurationTests.swift; sourceTree = "<group>"; };
 		3E18FC8E336FE4FABEA69C10 /* PINCredentialTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PINCredentialTests.swift; sourceTree = "<group>"; };
 		512182A7FFF0D106BC34CE2F /* BrandLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandLogoView.swift; sourceTree = "<group>"; };
 		548D2358E1F8C79ABDF90B86 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		5498DD20A38EF36CB308CD73 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
+		59278AB69DA058F674DFDD9E /* UpdateNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateNotificationService.swift; sourceTree = "<group>"; };
 		66491F7D3F3A722B70923186 /* LockCodeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LockCodeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B04A76431F2F2016762A2F0 /* AuditLogStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditLogStoreTests.swift; sourceTree = "<group>"; };
+		801865A3FACE533F711123AC /* AuditEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditEvent.swift; sourceTree = "<group>"; };
 		84BBB29D0AC1C83CCB6BD659 /* LockCodeLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LockCodeLogo.png; sourceTree = "<group>"; };
 		8C6EEBB2BF3A5B512963C089 /* LockCode.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = LockCode.icns; sourceTree = "<group>"; };
 		8DB7C51E6E17B4E4E839C22B /* UpdatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatesView.swift; sourceTree = "<group>"; };
@@ -134,6 +144,7 @@
 				A49AA190DD7077F1F1F65E8D /* ApplicationAccessStateTests.swift */,
 				9FEDE75B4AAC66BD4286BBD1 /* AppProtectionServiceTests.swift */,
 				CE0711B99962DCECA20B2813 /* AppVersionTests.swift */,
+				6B04A76431F2F2016762A2F0 /* AuditLogStoreTests.swift */,
 				07AE2FC68F0013A68F085A98 /* AuthenticationAttemptLimiterTests.swift */,
 				9F8D3405D5CD106B3ECC9DC9 /* GitHubReleaseTests.swift */,
 				3E18FC8E336FE4FABEA69C10 /* PINCredentialTests.swift */,
@@ -149,6 +160,7 @@
 			children = (
 				256265BE23FCBF6C3594568E /* AboutView.swift */,
 				29C9ED7560E7F6EDCAD23257 /* ApplicationsView.swift */,
+				2DD8143B3F5D68595E1DF28B /* AuditLogView.swift */,
 				512182A7FFF0D106BC34CE2F /* BrandLogoView.swift */,
 				CBDD7171B16FAFB63618AA02 /* HelpSupportView.swift */,
 				DD61933AD4B6A01C131585B9 /* ManagementUnlockView.swift */,
@@ -195,11 +207,13 @@
 			children = (
 				D2A0371BE937989FB44F5C18 /* AppCatalogService.swift */,
 				C34EFF6E5EB3DAC29E45700F /* AppProtectionService.swift */,
+				28AFACF37DBA6F9F96917018 /* AuditLogStore.swift */,
 				5498DD20A38EF36CB308CD73 /* AuthenticationService.swift */,
 				F3A77F17730C5CA934A1D7C7 /* KeychainPINStore.swift */,
 				B30B73C1D572CB44ADCD3502 /* LaunchAtLoginService.swift */,
 				C82DDF6761E1FC683FB0B7E2 /* SettingsStore.swift */,
 				F891DC3889A87228BC35466E /* UnlockPanelController.swift */,
+				59278AB69DA058F674DFDD9E /* UpdateNotificationService.swift */,
 				DF6C86F64D4179D7616D0207 /* UpdateService.swift */,
 			);
 			path = Services;
@@ -211,6 +225,7 @@
 				E4474A54AFF3E1907A7AF6F6 /* AccessRequest.swift */,
 				B88738638B265233EE70EBDF /* ApplicationAccessState.swift */,
 				0D2395BE749A9822A6A6CAD0 /* AppVersion.swift */,
+				801865A3FACE533F711123AC /* AuditEvent.swift */,
 				97FC13718C6AFD8D46D2175F /* AuthenticationAttemptLimiter.swift */,
 				DB90E1C75FAB1CB189C0D61A /* InstalledApplication.swift */,
 				A3E1229590947D1563D0E587 /* PINCredential.swift */,
@@ -321,6 +336,9 @@
 				74B80C8AE32AC92609A34278 /* AppVersion.swift in Sources */,
 				AC6866B4148613FE282B7841 /* ApplicationAccessState.swift in Sources */,
 				8532B27ADFA9731ADA63E319 /* ApplicationsView.swift in Sources */,
+				B579F80B4C27E1673C171860 /* AuditEvent.swift in Sources */,
+				94A7CCF7E1105EEA0A97FA62 /* AuditLogStore.swift in Sources */,
+				C44F3E6EE11C8507063E2BCA /* AuditLogView.swift in Sources */,
 				62355B427DA866B1BF0FBCA2 /* AuthenticationAttemptLimiter.swift in Sources */,
 				AA81B63F23A35E5E349FF42A /* AuthenticationService.swift in Sources */,
 				39FDD93739D260960D2C6598 /* BrandLogoView.swift in Sources */,
@@ -341,6 +359,7 @@
 				2D0E6C35F6940DE7CF5B2270 /* UnlockDuration.swift in Sources */,
 				4087614EE0EE45E5AB415C7B /* UnlockPanelController.swift in Sources */,
 				FFE823256780E6B76BDC8C8C /* UnlockPromptView.swift in Sources */,
+				1AF9783C5CC4F2CD0E7E52B6 /* UpdateNotificationService.swift in Sources */,
 				077F52D40636D5F52AC1D1BD /* UpdateService.swift in Sources */,
 				338F0BC27C7E1AE30CE3060F /* UpdatesView.swift in Sources */,
 			);
@@ -353,6 +372,7 @@
 				549C35740C0F0135437BB29E /* AppProtectionServiceTests.swift in Sources */,
 				D0C230CC037F991BBC16E739 /* AppVersionTests.swift in Sources */,
 				0ED5646688FC81D149C6A7BC /* ApplicationAccessStateTests.swift in Sources */,
+				8287FB8405E172FE9895B62D /* AuditLogStoreTests.swift in Sources */,
 				B4E278731BD762B1328F7E19 /* AuthenticationAttemptLimiterTests.swift in Sources */,
 				FE8B68C689F02A5664466F9E /* GitHubReleaseTests.swift in Sources */,
 				FE58D01C4FF45E7851273FAA /* PINCredentialTests.swift in Sources */,
@@ -461,7 +481,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -475,7 +495,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.2.1;
+				MARKETING_VERSION = 0.3.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -539,7 +559,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -559,7 +579,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.2.1;
+				MARKETING_VERSION = 0.3.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

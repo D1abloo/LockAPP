@@ -31,6 +31,7 @@ private struct ManagementView: View {
     enum Section: String, CaseIterable, Identifiable {
         case applications = "Aplicaciones"
         case settings = "Ajustes"
+        case audit = "Registro"
         case help = "Ayuda y soporte"
         case updates = "Actualizaciones"
         case about = "Acerca de"
@@ -40,6 +41,7 @@ private struct ManagementView: View {
             switch self {
             case .applications: return "square.grid.2x2"
             case .settings: return "gearshape"
+            case .audit: return "list.bullet.clipboard"
             case .help: return "questionmark.circle"
             case .updates: return "arrow.triangle.2.circlepath"
             case .about: return "info.circle"
@@ -49,12 +51,21 @@ private struct ManagementView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(Section.allCases, selection: $selection) { section in
-                Label(section.rawValue, systemImage: section.systemImage)
-                    .tag(section)
-            }
-            .navigationTitle("LockCode")
-            .safeAreaInset(edge: .bottom) {
+            VStack(spacing: 0) {
+                List([Section.applications, .settings, .audit, .updates], selection: $selection) { section in
+                    Label(section.rawValue, systemImage: section.systemImage)
+                        .tag(section)
+                }
+
+                Divider()
+
+                VStack(spacing: 4) {
+                    sidebarButton(for: .help)
+                    sidebarButton(for: .about)
+                }
+                .padding(.horizontal, 10)
+                .padding(.top, 8)
+
                 VStack(spacing: 8) {
                     Button("Bloquear ahora") { model.lockNow() }
                         .buttonStyle(.borderedProminent)
@@ -63,12 +74,15 @@ private struct ManagementView: View {
                 }
                 .padding()
             }
+            .navigationTitle("LockCode")
         } detail: {
             switch selection {
             case .applications:
                 ApplicationsView()
             case .settings:
                 SettingsView()
+            case .audit:
+                AuditLogView(auditLog: model.auditLog)
             case .help:
                 HelpSupportView()
             case .updates:
@@ -77,5 +91,24 @@ private struct ManagementView: View {
                 AboutView()
             }
         }
+    }
+
+    private func sidebarButton(for section: Section) -> some View {
+        Button {
+            selection = section
+        } label: {
+            HStack {
+                Label(section.rawValue, systemImage: section.systemImage)
+                Spacer()
+            }
+            .contentShape(Rectangle())
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .background(
+                selection == section ? Color.accentColor.opacity(0.16) : Color.clear,
+                in: RoundedRectangle(cornerRadius: 6)
+            )
+        }
+        .buttonStyle(.plain)
     }
 }

@@ -12,11 +12,14 @@ final class AppModel: ObservableObject {
 
     let settings: SettingsStore
     let launchAtLoginService: LaunchAtLoginService
+    let auditLog: AuditLogStore
+    let updateService: UpdateService
 
     private let authenticationService: AuthenticationService
     private let catalogService = AppCatalogService()
     private let protectionService: AppProtectionService
     private let unlockPanelController = UnlockPanelController()
+    private let updateNotificationService: UpdateNotificationService
     private var queuedRequests: [AccessRequest] = []
     private var isStarted = false
     private var isQuitAuthorized = false
@@ -30,6 +33,9 @@ final class AppModel: ObservableObject {
         self.authenticationService = authenticationService
         self.settings = settings
         self.launchAtLoginService = LaunchAtLoginService()
+        self.auditLog = AuditLogStore()
+        self.updateService = UpdateService()
+        self.updateNotificationService = UpdateNotificationService()
         self.protectionService = AppProtectionService(
             settings: settings,
             ownBundleIdentifier: ownBundleIdentifier
@@ -51,6 +57,12 @@ final class AppModel: ObservableObject {
         Task { await refreshApplications() }
         if settings.launchAtLoginEnabled {
             Task { await configureLaunchAtLogin() }
+        }
+        Task {
+            await updateService.checkForUpdates()
+            if updateService.updateAvailable, let release = updateService.latestRelease {
+                await updateNotificationService.notifyIfNeeded(for: release)
+            }
         }
     }
 
@@ -82,7 +94,11 @@ final class AppModel: ObservableObject {
 
     func authenticateManagement(pin: String) -> Bool {
         let valid = authenticationService.validatePIN(pin)
-        if valid { isManagementUnlocked = true }
+        if valid {
+            isManagementUnlocked = true
+        } else {
+            auditLog.record(.failedAttempt)
+        }
         return valid
     }
 
@@ -161,7 +177,10 @@ final class AppModel: ObservableObject {
             touchIDEnabled: settings.touchIDEnabled,
             touchIDAvailable: authenticationService.canUseBiometrics(),
             verifyPIN: { [weak self] pin in
-                self?.authenticationService.validatePIN(pin) ?? false
+                guard let self else { return false }
+                let valid = self.authenticationService.validatePIN(pin)
+                if !valid { self.auditLog.record(.failedAttempt) }
+                return valid
             },
             pinFailureMessage: { [weak self] in
                 self?.authenticationService.pinFailureMessage() ?? "Código incorrecto."
@@ -217,7 +236,10 @@ final class AppModel: ObservableObject {
             touchIDEnabled: settings.touchIDEnabled,
             touchIDAvailable: authenticationService.canUseBiometrics(),
             verifyPIN: { [weak self] pin in
-                self?.authenticationService.validatePIN(pin) ?? false
+                guard let self else { return false }
+                let valid = self.authenticationService.validatePIN(pin)
+                if !valid { self.auditLog.record(.failedAttempt) }
+                return valid
             },
             pinFailureMessage: { [weak self] in
                 self?.authenticationService.pinFailureMessage() ?? "Código incorrecto."
@@ -236,6 +258,7 @@ final class AppModel: ObservableObject {
             onApproved: { [weak self] in
                 guard let self else { return }
                 self.queuedRequests.removeAll { $0.id == request.id }
+                self.auditLog.record(.unlocked)
                 self.protectionService.approve(request)
                 self.presentNextRequestIfNeeded()
             },

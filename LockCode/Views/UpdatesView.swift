@@ -1,7 +1,15 @@
 import SwiftUI
 
 struct UpdatesView: View {
-    @StateObject private var updateService = UpdateService()
+    @EnvironmentObject private var model: AppModel
+
+    var body: some View {
+        UpdatesContent(updateService: model.updateService)
+    }
+}
+
+private struct UpdatesContent: View {
+    @ObservedObject var updateService: UpdateService
 
     private let releasesURL = URL(string: "https://github.com/D1abloo/LockAPP/releases")!
 
@@ -74,6 +82,7 @@ struct UpdatesView: View {
                 GroupBox("Canal de actualizaciones") {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Las futuras versiones y mejoras se publicarán en GitHub Releases. LockCode solo comprueba la versión y abre la página oficial; nunca instala código sin tu confirmación.")
+                        Text("Cuando exista una versión posterior, macOS mostrará una notificación con «Sí, actualizar» y «No ahora». El aviso de una misma versión se limita a una vez cada 24 horas.")
                         Link("Ver todas las versiones", destination: releasesURL)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)

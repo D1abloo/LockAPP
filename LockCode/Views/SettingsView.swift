@@ -87,6 +87,9 @@ private struct SettingsContentView: View {
             }
 
             Section("Cambiar código") {
+                Text("Usa entre 4 y 64 caracteres. Se admiten letras, números, espacios y símbolos.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 SecureField("Código actual", text: $currentPIN)
                     .onChange(of: currentPIN) { currentPIN = PINPolicy.normalized($0) }
                 SecureField("Código nuevo", text: $newPIN)

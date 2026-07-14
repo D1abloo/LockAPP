@@ -6,7 +6,7 @@ LockCode es un MVP nativo para macOS que protege la apertura o activación de ap
 
 ## Funciones incluidas
 
-- Onboarding con código de 4 a 16 letras o números.
+- Onboarding con código de 4 a 64 caracteres; admite letras, números, espacios y símbolos imprimibles.
 - Credencial del código derivada con PBKDF2-HMAC-SHA256, sal aleatoria y 210.000 rondas, almacenada en Keychain. El código no se conserva.
 - Desbloqueo opcional con Touch ID, iniciado automáticamente cuando está habilitado y disponible.
 - Catálogo de aplicaciones instaladas.
@@ -21,7 +21,9 @@ LockCode es un MVP nativo para macOS que protege la apertura o activación de ap
 - Acceso a la configuración protegido por el código.
 - Salida normal de LockCode protegida por autenticación.
 - Esperas progresivas tras varios códigos incorrectos.
-- Secciones de Ayuda y soporte, donación voluntaria y consulta de actualizaciones en GitHub Releases.
+- Registro local de desbloqueos e intentos fallidos, sin nombres de aplicaciones ni datos de autenticación, con borrado manual y límite de 200 eventos.
+- Comprobación automática de GitHub Releases y notificación de macOS con «Sí, actualizar» y «No ahora».
+- Ayuda y soporte accesibles al final del sidebar, correo de contacto y donación voluntaria sin mostrar la cuenta asociada a PayPal.
 
 ## Requisitos
 
@@ -101,6 +103,7 @@ No se incluye el entitlement de Endpoint Security ni una System Extension en est
 4. Cuando detecta una aplicación protegida, la oculta; si acaba de iniciarse, solicita su terminación normal. Mientras la autenticación siga pendiente, cualquier nueva activación vuelve a ocultarla.
 5. Muestra un panel de autenticación por encima de los escritorios.
 6. Tras autenticarse, reactiva o vuelve a abrir la aplicación. El acceso puede durar hasta que se cierre esa aplicación o durante el número de minutos configurado.
+7. LockCode añade al registro la hora del desbloqueo o del intento fallido, sin identificar la aplicación.
 
 ## Estructura
 
@@ -122,6 +125,7 @@ No se incluye el entitlement de Endpoint Security ni una System Extension en est
 - Para evitar pérdida de datos, una aplicación que ya estaba abierta se oculta, pero no se fuerza su cierre al activarla.
 - Al reiniciarse, LockCode oculta las aplicaciones protegidas ya abiertas, pero `NSWorkspace` no puede impedir que el proceso llegue a iniciarse. Un bloqueo previo a la ejecución no es posible en este MVP.
 - Las penalizaciones del código viven en memoria y se reinician si se mata o reinicia LockCode; hacerlas persistentes requiere proteger también ese estado contra manipulación.
+- El registro de acceso se guarda localmente en las preferencias de la aplicación. Es informativo, no está firmado y un usuario con acceso a la cuenta puede modificarlo o eliminarlo.
 - Las aplicaciones eliminadas desaparecen del catálogo, pero su identificador puede permanecer en la configuración sin provocar bloqueos ni fallos. Si reaparecen con el mismo bundle identifier, recuperan la selección.
 
 Consulta `docs/SECURITY_MODEL.md` antes de prometer un nivel de protección comercial.
@@ -129,6 +133,7 @@ Consulta `docs/SECURITY_MODEL.md` antes de prometer un nivel de protección come
 ## Ayuda, actualizaciones y donaciones
 
 - La aplicación incluye una guía de uso y soporte redactada en español.
-- Las actualizaciones se consultan desde `https://github.com/D1abloo/LockAPP/releases`; LockCode no descarga ni instala código sin confirmación.
+- Las actualizaciones se consultan automáticamente desde `https://github.com/D1abloo/LockAPP/releases`. Solo se aceptan enlaces HTTPS del repositorio oficial; LockCode no descarga ni instala código sin confirmación.
+- El correo de soporte se muestra en Ayuda y soporte. La dirección asociada al botón de donación no se presenta en la interfaz.
 - LockCode es gratuito y no requiere donación. Quien quiera apoyar voluntariamente el proyecto puede usar el enlace de PayPal incluido en la sección Ayuda y soporte.
 - Software realizado por Isaac Silva Jiménez.
