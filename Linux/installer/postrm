@@ -1,0 +1,47 @@
+#!/bin/sh
+set -e
+
+case "${1:-}" in
+  remove|purge) ;;
+  *) exit 0 ;;
+esac
+
+user="${SUDO_USER:-}"
+if [ -z "$user" ] && [ -n "${PKEXEC_UID:-}" ] && [ "$PKEXEC_UID" != "0" ]; then
+  user="$(id -nu "$PKEXEC_UID" 2>/dev/null || true)"
+fi
+if [ -z "$user" ] && command -v loginctl >/dev/null 2>&1; then
+  user="$(loginctl list-sessions --no-legend 2>/dev/null | awk '$3 != "root" {print $3; exit}')"
+fi
+[ -n "$user" ] || exit 0
+
+uid="$(id -u "$user")"
+home="$(getent passwd "$user" | cut -d: -f6)"
+credential_id="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("credential_id", "legacy"))' \
+  "$home/.config/lockcode/settings.json" 2>/dev/null || echo legacy)"
+case "$credential_id" in
+  legacy) ;;
+  *[!0-9a-f]*|'') credential_id="legacy" ;;
+  *) [ "${#credential_id}" -eq 32 ] || credential_id="legacy" ;;
+esac
+
+if command -v secret-tool >/dev/null 2>&1 && [ -d "/run/user/$uid" ]; then
+  if [ "$credential_id" = "legacy" ]; then
+    attributes="application lockcode-linux type primary-code"
+  else
+    attributes="application lockcode-linux type primary-code credential-id $credential_id"
+  fi
+  # The timeout prevents a locked keyring from delaying package removal.
+  # shellcheck disable=SC2086
+  runuser -u "$user" -- env \
+    XDG_RUNTIME_DIR="/run/user/$uid" \
+    DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+    timeout 5s secret-tool clear $attributes >/dev/null 2>&1 || true
+fi
+
+if [ -n "$home" ] && [ "$home" != "/" ]; then
+  rm -rf -- "$home/.config/lockcode" "$home/.local/state/lockcode" "$home/.cache/lockcode"
+  rm -f -- "$home/.config/autostart/lockcode.desktop"
+fi
+
+exit 0

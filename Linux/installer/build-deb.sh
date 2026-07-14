@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VERSION="0.1.1"
+VERSION="0.1.2"
 STAGE="$ROOT/build/lockcode_${VERSION}_all"
 OUTPUT="$ROOT/build/lockcode-linux_${VERSION}_all.deb"
 
@@ -24,5 +24,6 @@ install -m 644 assets/lockcode.service "$STAGE/usr/lib/systemd/user/"
 sed "s/@VERSION@/$VERSION/g" installer/control.in > "$STAGE/DEBIAN/control"
 install -m 755 installer/postinst "$STAGE/DEBIAN/postinst"
 install -m 755 installer/prerm "$STAGE/DEBIAN/prerm"
+install -m 755 installer/postrm "$STAGE/DEBIAN/postrm"
 dpkg-deb --build --root-owner-group "$STAGE" "$OUTPUT"
 echo "Instalador creado: $OUTPUT"

@@ -26,6 +26,12 @@ class PolicyTests(unittest.TestCase):
         self.assertTrue(verify_credential("Clave !segura#", credential))
         self.assertFalse(verify_credential("Clave incorrecta", credential))
 
+    def test_fresh_install_uses_a_distinct_keyring_item(self):
+        first = SecretStore("a" * 32).attributes
+        second = SecretStore("b" * 32).attributes
+        self.assertNotEqual(first, second)
+        self.assertEqual(first[-2:], ["credential-id", "a" * 32])
+
     def test_locked_keyring_does_not_wait_forever(self):
         with patch("lockcode.secure_store.subprocess.run", side_effect=subprocess.TimeoutExpired("secret-tool", 1)):
             self.assertIsNone(SecretStore()._lookup())
@@ -97,6 +103,13 @@ class PersistenceTests(unittest.TestCase):
             self.assertEqual(restored.protected_executables, ["/usr/bin/example"])
             self.assertEqual(restored.grace_minutes, 42)
             self.assertTrue(restored.credential_configured)
+            self.assertEqual(restored.credential_id, store.value.credential_id)
+
+    def test_existing_install_keeps_legacy_keyring_item(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "settings.json"
+            path.write_text('{"credential_configured": true}', encoding="utf-8")
+            self.assertEqual(SettingsStore(path).value.credential_id, "legacy")
 
     def test_audit_is_generic_and_bounded(self):
         with tempfile.TemporaryDirectory() as directory:

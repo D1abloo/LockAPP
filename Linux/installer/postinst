@@ -1,19 +1,26 @@
 #!/bin/sh
 set -e
 gtk-update-icon-cache -q /usr/share/icons/hicolor 2>/dev/null || true
-if [ -n "${SUDO_USER:-}" ] && command -v runuser >/dev/null 2>&1; then
-  uid="$(id -u "$SUDO_USER")"
-  home="$(getent passwd "$SUDO_USER" | cut -d: -f6)"
+user="${SUDO_USER:-}"
+if [ -z "$user" ] && [ -n "${PKEXEC_UID:-}" ] && [ "$PKEXEC_UID" != "0" ]; then
+  user="$(id -nu "$PKEXEC_UID" 2>/dev/null || true)"
+fi
+if [ -z "$user" ] && command -v loginctl >/dev/null 2>&1; then
+  user="$(loginctl list-sessions --no-legend 2>/dev/null | awk '$3 != "root" {print $3; exit}')"
+fi
+if [ -n "$user" ] && command -v runuser >/dev/null 2>&1; then
+  uid="$(id -u "$user")"
+  home="$(getent passwd "$user" | cut -d: -f6)"
   rm -f "$home/.config/autostart/lockcode.desktop"
-  runuser -u "$SUDO_USER" -- env \
+  runuser -u "$user" -- env \
     XDG_RUNTIME_DIR="/run/user/$uid" \
     DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
     systemctl --user daemon-reload 2>/dev/null || true
-  runuser -u "$SUDO_USER" -- env \
+  runuser -u "$user" -- env \
     XDG_RUNTIME_DIR="/run/user/$uid" \
     DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
     systemctl --user reenable lockcode.service 2>/dev/null || true
-  runuser -u "$SUDO_USER" -- env \
+  runuser -u "$user" -- env \
     XDG_RUNTIME_DIR="/run/user/$uid" \
     DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
     systemctl --user start lockcode.service 2>/dev/null || true

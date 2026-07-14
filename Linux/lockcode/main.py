@@ -28,7 +28,7 @@ class LockCodeApplication(Gtk.Application):
         super().__init__(application_id="com.lockcode.Linux")
         self.background = background
         self.settings = SettingsStore()
-        self.secrets = SecretStore()
+        self.secrets = SecretStore(self.settings.value.credential_id)
         self.audit = AuditStore()
         self.limiter = AttemptLimiter()
         self.protection = ProtectionService(self.settings)
@@ -75,7 +75,7 @@ class LockCodeApplication(Gtk.Application):
             gi.require_version("AyatanaAppIndicator3", "0.1")
             from gi.repository import AyatanaAppIndicator3
             indicator = AyatanaAppIndicator3.Indicator.new(
-                "lockcode", "changes-prevent-symbolic",
+                "lockcode", "com.lockcode.Linux",
                 AyatanaAppIndicator3.IndicatorCategory.APPLICATION_STATUS,
             )
             menu = Gtk.Menu()
@@ -128,7 +128,7 @@ class LockCodeApplication(Gtk.Application):
         notebook.append_page(update_box, Gtk.Label(label="Actualizaciones"))
 
         help_label = Gtk.Label(xalign=0, yalign=0, margin=18); help_label.set_line_wrap(True)
-        help_label.set_markup("<b>Ayuda y soporte</b>\n\nCrea un código, selecciona aplicaciones y deja LockCode activo. La huella se solicita automáticamente si fprintd está disponible. El registro nunca contiene códigos ni nombres de aplicaciones.\n\nLockCode es gratuito y no requiere donación. Si quieres donar, puedes hacerlo ;)\n\nSoporte: kin_coriano14@hotmail.com\nSoftware realizado por Isaac Silva Jiménez.\n\nEs una protección de privacidad <i>best effort</i>, no un bloqueo infalible de procesos.")
+        help_label.set_markup("<b>Ayuda y soporte</b>\n\nCrea un código, selecciona aplicaciones y deja LockCode activo. Al cerrar la ventana, sigue funcionando desde su icono en la bandeja. La huella se solicita automáticamente si fprintd está disponible. El registro nunca contiene códigos ni nombres de aplicaciones.\n\nLockCode es gratuito y no requiere donación. Si quieres donar, puedes hacerlo ;)\n\nSoporte: kin_coriano14@hotmail.com\nSoftware realizado por Isaac Silva Jiménez.\n\nEs una protección de privacidad <i>best effort</i>, no un bloqueo infalible de procesos.")
         help_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL); help_box.pack_start(help_label, True, True, 0)
         donate = Gtk.Button(label="Donación voluntaria con PayPal"); donate.connect("clicked", lambda *_: webbrowser.open("https://www.paypal.com/paypalme/kin_coriano14")); help_box.pack_start(donate, False, False, 12)
         notebook.append_page(help_box, Gtk.Label(label="Ayuda y soporte"))

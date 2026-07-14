@@ -17,6 +17,11 @@ SECRET_TOOL_TIMEOUT = 20
 class SecretStore:
     """Stores only a salted derived credential in the desktop Secret Service."""
 
+    def __init__(self, credential_id: str = "legacy") -> None:
+        self.attributes = ATTRIBUTES if credential_id == "legacy" else [
+            *ATTRIBUTES, "credential-id", credential_id,
+        ]
+
     def available(self) -> bool:
         return subprocess.call(
             ["sh", "-c", "command -v secret-tool >/dev/null 2>&1"],
@@ -33,7 +38,7 @@ class SecretStore:
         payload = derive_credential(code)
         try:
             result = subprocess.run(
-                ["secret-tool", "store", "--label=LockCode", *ATTRIBUTES],
+                ["secret-tool", "store", "--label=LockCode", *self.attributes],
                 input=payload,
                 text=True,
                 stdout=subprocess.DEVNULL,
@@ -62,7 +67,7 @@ class SecretStore:
     def _lookup(self) -> str | None:
         try:
             result = subprocess.run(
-                ["secret-tool", "lookup", *ATTRIBUTES], capture_output=True, text=True,
+                ["secret-tool", "lookup", *self.attributes], capture_output=True, text=True,
                 check=False, timeout=5,
             )
         except subprocess.TimeoutExpired:

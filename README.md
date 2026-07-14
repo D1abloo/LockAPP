@@ -142,7 +142,7 @@ Consulta `docs/SECURITY_MODEL.md` antes de prometer un nivel de protección come
 ## Ediciones independientes
 
 - `Windows/`: aplicación WPF, pruebas, publicación autocontenida e instalador NSIS propios.
-- `Linux/`: aplicación GTK, pruebas e instalador Debian propios.
+- [`Linux/`](Linux/README.md): aplicación GTK, pruebas, actualización, desinstalación limpia e instalador Debian propios.
 
 Cada edición mantiene su configuración, almacén seguro, inicio automático y sistema biométrico. No se mezclan binarios ni instaladores con la edición macOS.
 
