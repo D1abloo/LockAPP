@@ -10,9 +10,25 @@ from lockcode.policy import AttemptLimiter, GrantState, PendingRequestState, val
 from lockcode.settings import SettingsStore
 from lockcode.secure_store import SecretStore, derive_credential, verify_credential
 from lockcode.startup import set_enabled
+from lockcode.updates import _apt_progress, _parse_release, is_newer
 
 
 class PolicyTests(unittest.TestCase):
+    def test_update_metadata_and_progress_are_validated(self):
+        release = _parse_release({"tag_name": "v0.1.4", "assets": [{
+            "name": "lockcode-linux_0.1.4_all.deb",
+            "browser_download_url": "https://github.com/D1abloo/LockAPP/releases/download/v0.1.4/lockcode.deb",
+            "digest": "sha256:" + "a" * 64,
+            "size": 100,
+        }]})
+        self.assertEqual(release.version, "0.1.4")
+        self.assertTrue(is_newer("0.1.4", "0.1.3"))
+        self.assertEqual(_apt_progress("pmstatus:lockcode:75:Instalando"), (0.75, "Instalando"))
+        self.assertIsNone(_parse_release({"tag_name": "v0.1.4", "assets": [{
+            "name": "lockcode-linux.deb", "browser_download_url": "https://example.com/fake.deb",
+            "digest": "sha256:" + "a" * 64,
+        }]}))
+
     def test_codes_accept_letters_and_symbols(self):
         self.assertTrue(valid_code("Clave segura !@#$%^&*()[]{}"))
         self.assertFalse(valid_code("abc"))

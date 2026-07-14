@@ -20,9 +20,18 @@ if [ -n "$user" ] && command -v runuser >/dev/null 2>&1; then
     XDG_RUNTIME_DIR="/run/user/$uid" \
     DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
     systemctl --user reenable lockcode.service 2>/dev/null || true
-  runuser -u "$user" -- env \
-    XDG_RUNTIME_DIR="/run/user/$uid" \
-    DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
-    systemctl --user start lockcode.service 2>/dev/null || true
+  if [ -n "${2:-}" ]; then
+    runuser -u "$user" -- env \
+      XDG_RUNTIME_DIR="/run/user/$uid" \
+      DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+      systemd-run --user --quiet --collect --on-active=1s --timer-property=AccuracySec=500ms \
+        --unit="lockcode-update-restart-$$" /usr/bin/systemctl --user restart lockcode.service \
+        2>/dev/null || true
+  else
+    runuser -u "$user" -- env \
+      XDG_RUNTIME_DIR="/run/user/$uid" \
+      DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+      systemctl --user start lockcode.service 2>/dev/null || true
+  fi
 fi
 exit 0

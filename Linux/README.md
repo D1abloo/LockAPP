@@ -18,7 +18,7 @@ sudo apt install python3 python3-gi gir1.2-gtk-3.0 libsecret-tools fprintd \
   gir1.2-ayatanaappindicator3-0.1 dpkg-dev
 chmod +x installer/build-deb.sh
 ./installer/build-deb.sh
-sudo apt install ./build/lockcode-linux_0.1.2_all.deb
+sudo apt install ./build/lockcode-linux_0.1.4_all.deb
 ```
 
 Pruebas sin instalar:
@@ -34,10 +34,12 @@ Si usas inicio de sesión automático, GNOME Keyring puede permanecer bloqueado.
 
 ## Actualizar desde LockCode
 
-Abre **Actualizaciones > Buscar actualización**. Si aparece una versión nueva, pulsa **Sí** para abrir la publicación oficial, descarga el `.deb` y actualiza con:
+Abre **Actualizaciones > Buscar actualización**. Si aparece una versión nueva, pulsa **Sí**. LockCode descarga el `.deb` oficial, comprueba su SHA-256, solicita permisos administrativos mediante `pkexec` y muestra el progreso de descarga e instalación. Al finalizar reinicia el servicio automáticamente.
+
+También puedes actualizar manualmente con:
 
 ```bash
-sudo apt install ./lockcode-linux_0.1.2_all.deb
+sudo apt install ./lockcode-linux_0.1.4_all.deb
 ```
 
 Una actualización conserva el código, las aplicaciones protegidas y el registro. El instalador reinicia el servicio y el icono vuelve a la bandeja automáticamente.

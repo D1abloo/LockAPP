@@ -36,6 +36,7 @@ class LockCodeApplication(Gtk.Application):
         self.auth_active = False
         self.management_unlocked = False
         self.management_pending = False
+        self.update_checking = False
         self.store = Gtk.ListStore(bool, str, str)
 
     def do_startup(self) -> None:
@@ -124,7 +125,8 @@ class LockCodeApplication(Gtk.Application):
         notebook.append_page(audit_box, Gtk.Label(label="Registro"))
 
         update_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, margin=18)
-        check = Gtk.Button(label="Buscar actualización"); check.connect("clicked", self._check_update); update_box.pack_start(check, False, False, 0)
+        self.update_check = Gtk.Button(label="Buscar actualización"); self.update_check.connect("clicked", self._check_update); update_box.pack_start(self.update_check, False, False, 0)
+        self.update_status = Gtk.Label(label="", xalign=0); update_box.pack_start(self.update_status, False, False, 0)
         notebook.append_page(update_box, Gtk.Label(label="Actualizaciones"))
 
         help_label = Gtk.Label(xalign=0, yalign=0, margin=18); help_label.set_line_wrap(True)
@@ -256,18 +258,29 @@ class LockCodeApplication(Gtk.Application):
 
     def _clear_audit(self, *_args) -> None: self.audit.clear(); self._refresh_audit()
     def _check_update(self, *_args) -> None:
-        remote = updates.latest_version()
-        if remote and remote != __version__:
-            dialog = Gtk.MessageDialog(
-                transient_for=self.window, modal=True, message_type=Gtk.MessageType.QUESTION,
-                buttons=Gtk.ButtonsType.YES_NO,
-                text=f"Hay una actualización {html.escape(remote)}. ¿Abrir la descarga?",
-            )
-            response = dialog.run(); dialog.destroy()
-            if response == Gtk.ResponseType.YES:
-                webbrowser.open("https://github.com/D1abloo/LockAPP/releases")
+        self._start_update_check(True)
+
+    def _start_update_check(self, manual: bool) -> None:
+        if self.update_checking: return
+        self.update_checking = True
+        if hasattr(self, "update_check"): self.update_check.set_sensitive(False)
+        if hasattr(self, "update_status"): self.update_status.set_text("Buscando actualización…")
+        threading.Thread(target=self._fetch_update, args=(manual,), daemon=True).start()
+
+    def _fetch_update(self, manual: bool) -> None:
+        GLib.idle_add(self._finish_update_check, updates.latest_release(), manual)
+
+    def _finish_update_check(self, release: updates.Release | None, manual: bool) -> bool:
+        self.update_checking = False
+        self.update_check.set_sensitive(True)
+        if release and updates.is_newer(release.version):
+            self.update_status.set_text(f"Versión {release.version} disponible")
+            self._offer_update(release)
         else:
-            self._message("No hay una actualización posterior publicada o no se pudo consultar.")
+            self.update_status.set_text("LockCode está actualizado" if release else "No se pudo consultar GitHub")
+            if manual and release is None: self._message("No se pudo consultar la actualización.")
+        return False
+
     def _request_exit(self, *_args) -> None:
         approved = self.settings.value.biometrics_enabled and biometrics.authenticate()
         if not approved:
@@ -277,17 +290,47 @@ class LockCodeApplication(Gtk.Application):
     def _hide_window(self, widget: Gtk.Widget, _event) -> bool:
         self.management_unlocked = False; widget.hide(); return True
     def _background_update_check(self) -> None:
-        remote = updates.latest_version()
-        if remote and remote != __version__: GLib.idle_add(self._offer_update, remote)
-    def _offer_update(self, remote: str) -> bool:
+        GLib.idle_add(self._start_update_check, False)
+    def _offer_update(self, release: updates.Release) -> bool:
         dialog = Gtk.MessageDialog(
             transient_for=self.window, modal=True, message_type=Gtk.MessageType.QUESTION,
             buttons=Gtk.ButtonsType.YES_NO,
-            text=f"Hay una actualización {html.escape(remote)}. ¿Quieres actualizar?",
+            text=f"Hay una actualización {html.escape(release.version)}. ¿Descargar e instalar ahora?",
         )
         response = dialog.run(); dialog.destroy()
-        if response == Gtk.ResponseType.YES: webbrowser.open("https://github.com/D1abloo/LockAPP/releases")
+        if response == Gtk.ResponseType.YES: self._install_update(release)
         return False
+
+    def _install_update(self, release: updates.Release) -> None:
+        dialog = Gtk.Dialog(title="Actualizando LockCode", transient_for=self.window, modal=True)
+        dialog.set_deletable(False)
+        progress = Gtk.ProgressBar(show_text=True, margin=20)
+        progress.set_text("Preparando actualización…")
+        dialog.get_content_area().add(progress); dialog.show_all()
+        error: list[str] = []
+
+        def report(value: float, text: str) -> None:
+            GLib.idle_add(self._set_update_progress, progress, value, text)
+
+        def install() -> None:
+            try:
+                updates.apply(release, report)
+            except (OSError, RuntimeError, subprocess.SubprocessError) as failure:
+                error.append(str(failure))
+            GLib.idle_add(dialog.response, Gtk.ResponseType.OK)
+
+        threading.Thread(target=install, daemon=True).start()
+        dialog.run(); dialog.destroy()
+        if error:
+            self.update_status.set_text("La actualización no se instaló")
+            self._message(error[0], Gtk.MessageType.ERROR)
+        else:
+            self.update_status.set_text("Actualización instalada. Reiniciando…")
+
+    @staticmethod
+    def _set_update_progress(progress: Gtk.ProgressBar, value: float, text: str) -> bool:
+        progress.set_fraction(max(0.0, min(value, 1.0))); progress.set_text(text); return False
+
     def _message(self, text: str, kind: Gtk.MessageType = Gtk.MessageType.INFO) -> None:
         dialog = Gtk.MessageDialog(transient_for=self.window, modal=True, message_type=kind, buttons=Gtk.ButtonsType.OK, text=text)
         dialog.run(); dialog.destroy()
