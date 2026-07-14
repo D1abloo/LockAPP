@@ -5,7 +5,12 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if !model.isConfigured {
+            if model.isConfigurationLoading {
+                VStack(spacing: 14) {
+                    BrandLogoView(size: 72)
+                    ProgressView("Iniciando protección…")
+                }
+            } else if !model.isConfigured {
                 OnboardingView()
             } else if !model.isManagementUnlocked {
                 ManagementUnlockView()

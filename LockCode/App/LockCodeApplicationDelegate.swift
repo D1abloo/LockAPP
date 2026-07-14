@@ -6,6 +6,7 @@ final class LockCodeApplicationDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard let model else { return .terminateNow }
+        guard !model.isConfigurationLoading else { return .terminateCancel }
         guard model.isConfigured else { return .terminateNow }
         if model.consumeQuitAuthorization() {
             return .terminateNow

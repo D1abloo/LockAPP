@@ -16,17 +16,25 @@ struct ApplicationAccessState {
         guard isProtected,
               !excludedBundleIdentifiers.contains(bundleIdentifier),
               !pendingBundleIdentifiers.contains(bundleIdentifier),
-              !unlockedUntilTermination.contains(bundleIdentifier) else {
+              !isAccessGranted(for: bundleIdentifier, at: date) else {
             return false
-        }
-
-        if let expiry = unlockedUntil[bundleIdentifier] {
-            guard expiry <= date else { return false }
-            unlockedUntil.removeValue(forKey: bundleIdentifier)
         }
 
         pendingBundleIdentifiers.insert(bundleIdentifier)
         return true
+    }
+
+    mutating func isAccessGranted(
+        for bundleIdentifier: String,
+        at date: Date = Date()
+    ) -> Bool {
+        if unlockedUntilTermination.contains(bundleIdentifier) {
+            return true
+        }
+        guard let expiry = unlockedUntil[bundleIdentifier] else { return false }
+        if expiry > date { return true }
+        unlockedUntil.removeValue(forKey: bundleIdentifier)
+        return false
     }
 
     func hasPendingRequest(for bundleIdentifier: String) -> Bool {

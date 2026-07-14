@@ -14,12 +14,17 @@
 - Enlace directo con `swiftc` del ejecutable completo: correcto en `x86_64` y `arm64`.
 - Verificador ejecutable de reglas de dominio: 28 comprobaciones correctas para código con símbolos, credencial PBKDF2 sin texto plano, penalizaciones, bloqueo al terminar, expiración por minutos, solicitud pendiente, deduplicación, inicio automático, registro persistente/borrable y validación de URL de actualización.
 - GitHub Releases devuelve el 404 esperado mientras no existan releases; la interfaz muestra ese estado y no genera una notificación falsa.
-- Bundle 0.3.0 (compilación 4) universal, con firma ad hoc y Hardened Runtime, desinstalado/reinstalado y ejecutándose desde `/Applications/LockCode.app`.
+- Bundle 0.3.1 (compilación 5) universal, firmado localmente, instalado y ejecutándose desde `/Applications/LockCode.app`; incorpora ocultado/cierre normal de aplicaciones restauradas y supervisión continua de todas las aplicaciones protegidas.
 - `SMAppService.mainApp` registró LockCode como ítem de inicio; System Events confirma `name: LockCode` y `path: /Applications/LockCode.app`.
 - Prueba gráfica del reinicio con WhatsApp protegida: antes de arrancar LockCode estaba en ejecución y visible; al iniciar LockCode permaneció en ejecución pero `NSRunningApplication.isHidden` pasó a `true`.
 - Prueba gráfica de solicitud pendiente: dos intentos consecutivos de activar WhatsApp mantuvieron `isHidden == true` y no dejaron visible la aplicación mientras esperaba autenticación.
-- Revisión estática de los escenarios de `ACCEPTANCE_TESTS.md`: todas las rutas están implementadas; solo se marcan arriba como manualmente verificadas las dos pruebas gráficas realizadas en esta sesión.
-- Revisión de seguridad 0.3.0: no hay logs del código ni nombres de aplicaciones en el registro; el código sigue derivado con PBKDF2 y almacenado en Keychain; el historial está limitado a 200 eventos y las URL de release se restringen a HTTPS del repositorio oficial.
+- Diagnóstico de reinicio 0.3.1: se detectó y eliminó una espera de inicialización que consultaba Keychain y servicios auxiliares antes de iniciar el monitor. La protección ahora arranca primero; Keychain, `SMAppService` y las notificaciones se inicializan después.
+- Durante la carga inicial se impide también la salida normal de LockCode, evitando eludir la autenticación mientras Keychain todavía no ha respondido.
+- Prueba con WhatsApp restaurada y Touch ID desactivado temporalmente: sin LockCode estaba en ejecución, visible y activa; un segundo después de iniciar la versión corregida ya no estaba en ejecución.
+- Prueba de apertura sin autorización: a los 0,5 segundos WhatsApp seguía inicializando, pero `isHidden == true`; a los 5 segundos había terminado normalmente.
+- Validación de pantalla opaca: durante la autenticación se observó una ventana LockCode de nivel 7 y 2048×1280 cubriendo el monitor, con el panel de autenticación en nivel 8 por encima.
+- Revisión estática de los escenarios de `ACCEPTANCE_TESTS.md`: todas las rutas están implementadas; las comprobaciones manuales realizadas se enumeran arriba.
+- Revisión de seguridad 0.3.1: no hay logs del código ni nombres de aplicaciones en el registro; el código sigue derivado con PBKDF2 y almacenado en Keychain; el historial está limitado a 200 eventos y las URL de release se restringen a HTTPS del repositorio oficial.
 
 ## Comprobaciones bloqueadas por el entorno
 

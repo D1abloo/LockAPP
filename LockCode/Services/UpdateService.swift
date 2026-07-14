@@ -29,7 +29,7 @@ final class UpdateService: ObservableObject {
     init(bundle: Bundle = .main) {
         self.installedVersion = bundle.object(
             forInfoDictionaryKey: "CFBundleShortVersionString"
-        ) as? String ?? "0.3.0"
+        ) as? String ?? "0.3.1"
     }
 
     nonisolated static func isTrustedReleaseURL(_ url: URL) -> Bool {

@@ -29,6 +29,6 @@ struct AboutView: View {
 
     private var version: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-            ?? "0.3.0"
+            ?? "0.3.1"
     }
 }

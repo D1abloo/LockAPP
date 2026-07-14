@@ -6,20 +6,21 @@ import Foundation
 final class AppModel: ObservableObject {
     @Published private(set) var installedApplications: [InstalledApplication] = []
     @Published private(set) var isConfigured: Bool
+    @Published private(set) var isConfigurationLoading = true
     @Published var isManagementUnlocked = false
     @Published var isLoadingApplications = false
     @Published var errorMessage: String?
 
     let settings: SettingsStore
-    let launchAtLoginService: LaunchAtLoginService
-    let auditLog: AuditLogStore
-    let updateService: UpdateService
+    lazy var launchAtLoginService = LaunchAtLoginService()
+    lazy var auditLog = AuditLogStore()
+    lazy var updateService = UpdateService()
 
     private let authenticationService: AuthenticationService
     private let catalogService = AppCatalogService()
     private let protectionService: AppProtectionService
     private let unlockPanelController = UnlockPanelController()
-    private let updateNotificationService: UpdateNotificationService
+    private lazy var updateNotificationService = UpdateNotificationService()
     private var queuedRequests: [AccessRequest] = []
     private var isStarted = false
     private var isQuitAuthorized = false
@@ -32,15 +33,13 @@ final class AppModel: ObservableObject {
 
         self.authenticationService = authenticationService
         self.settings = settings
-        self.launchAtLoginService = LaunchAtLoginService()
-        self.auditLog = AuditLogStore()
-        self.updateService = UpdateService()
-        self.updateNotificationService = UpdateNotificationService()
         self.protectionService = AppProtectionService(
             settings: settings,
             ownBundleIdentifier: ownBundleIdentifier
         )
-        self.isConfigured = authenticationService.hasPIN
+        // Keychain can take several seconds to answer immediately after login.
+        // Start with a closed UI state; protection is started before querying it.
+        self.isConfigured = false
 
         protectionService.onBlocked = { [weak self] request in
             self?.enqueue(request)
@@ -54,6 +53,14 @@ final class AppModel: ObservableObject {
         guard !isStarted else { return }
         isStarted = true
         protectionService.start()
+        let keychainService = Bundle.main.bundleIdentifier ?? "com.example.LockCode"
+        Task {
+            let hasPIN = await Task.detached(priority: .userInitiated) {
+                KeychainPINStore(service: keychainService).hasPIN
+            }.value
+            isConfigured = hasPIN
+            isConfigurationLoading = false
+        }
         Task { await refreshApplications() }
         if settings.launchAtLoginEnabled {
             Task { await configureLaunchAtLogin() }
@@ -164,6 +171,7 @@ final class AppModel: ObservableObject {
 
     func requestQuit() {
         guard !unlockPanelController.isPresented else { return }
+        guard !isConfigurationLoading else { return }
         guard isConfigured else {
             isQuitAuthorized = true
             NSApp.terminate(nil)
@@ -233,6 +241,7 @@ final class AppModel: ObservableObject {
         unlockPanelController.present(
             applicationName: request.applicationName,
             bundleURL: request.bundleURL,
+            protectedBundleIdentifier: request.bundleIdentifier,
             touchIDEnabled: settings.touchIDEnabled,
             touchIDAvailable: authenticationService.canUseBiometrics(),
             verifyPIN: { [weak self] pin in

@@ -26,6 +26,8 @@ Una persona con acceso físico temporal a una sesión de macOS ya iniciada, sin 
 - Las concesiones de acceso viven solo en memoria.
 - Las concesiones se borran al solicitarlo y ante eventos de suspensión/cambio de sesión observables.
 - Al arrancar el monitor se ocultan las aplicaciones protegidas que ya estén ejecutándose; una aplicación se vuelve a ocultar ante activaciones repetidas mientras su autenticación está pendiente.
+- Un supervisor comprueba cada 50 ms todas las aplicaciones protegidas en ejecución y vuelve a ocultar cualquiera que no tenga una concesión válida. En el arranque se solicita además el cierre normal de las aplicaciones protegidas restauradas.
+- Durante la autenticación se colocan ventanas opacas por encima de las aplicaciones en todos los monitores. Al cancelar, permanecen hasta confirmar que el proceso protegido está oculto o terminado.
 - Las respuestas tardías de una autenticación cancelada se descartan mediante un identificador único de presentación.
 - El registro local conserva únicamente tipo de evento, fecha y un UUID aleatorio; no contiene el código, el resultado detallado de Touch ID, bundle identifiers ni nombres de aplicaciones.
 - Las notificaciones de actualización solo abren enlaces HTTPS cuyo host y ruta corresponden al repositorio oficial.

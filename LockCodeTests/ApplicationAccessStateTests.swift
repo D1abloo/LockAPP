@@ -25,7 +25,15 @@ final class ApplicationAccessStateTests: XCTestCase {
 
         state.approve(bundleIdentifier: bundleIdentifier, graceInterval: 60, at: now)
 
+        XCTAssertTrue(state.isAccessGranted(
+            for: bundleIdentifier,
+            at: now.addingTimeInterval(59)
+        ))
         XCTAssertFalse(beginRequest(in: &state, at: now.addingTimeInterval(59)))
+        XCTAssertFalse(state.isAccessGranted(
+            for: bundleIdentifier,
+            at: now.addingTimeInterval(60)
+        ))
         XCTAssertTrue(beginRequest(in: &state, at: now.addingTimeInterval(60)))
     }
 

@@ -29,7 +29,9 @@ struct LockCodeApp: App {
 
         Settings {
             Group {
-                if !model.isConfigured {
+                if model.isConfigurationLoading {
+                    ProgressView("Iniciando protección…")
+                } else if !model.isConfigured {
                     OnboardingView()
                 } else if !model.isManagementUnlocked {
                     ManagementUnlockView()

@@ -13,7 +13,9 @@ LockCode es un MVP nativo para macOS que protege la apertura o activación de ap
 - Selección individual de aplicaciones protegidas.
 - Detección de lanzamiento y activación mediante `NSWorkspace`.
 - Restauración del bloqueo al reiniciar LockCode: las aplicaciones protegidas que ya estén abiertas se ocultan en cuanto vuelve a arrancar el monitor.
+- Cierre normal de aplicaciones protegidas restauradas al iniciar sesión y supervisor continuo de todas las aplicaciones protegidas en ejecución como respaldo ante eventos perdidos de `NSWorkspace`.
 - Ocultado repetido mientras exista una autenticación pendiente, para que una segunda activación no deje visible la aplicación.
+- Pantalla opaca de privacidad en todos los monitores mientras se solicita el código o Touch ID, evitando que una aplicación que rechace `hide()` exponga su contenido detrás del panel.
 - Bloqueo al cerrar la aplicación protegida, intervalos predefinidos o minutos personalizados.
 - Bloqueo inmediato de todas las sesiones concedidas.
 - Inicio automático con macOS mediante `SMAppService`, solicitado por defecto en la primera ejecución.
@@ -119,10 +121,12 @@ No se incluye el entitlement de Endpoint Security ni una System Extension en est
 ## Limitaciones conocidas
 
 - Existe una pequeña ventana entre el lanzamiento de una app y la recepción del evento de `NSWorkspace`.
+- En un reinicio, macOS decide el orden de restauración de aplicaciones e ítems de inicio. LockCode puede actuar en cuanto su proceso arranca, pero no antes; una garantía previa a cualquier ventana requiere Endpoint Security.
 - Algunas aplicaciones auxiliares o de fondo no generan la notificación de lanzamiento estándar.
 - El cierre normal de una app puede ser rechazado por ella misma.
 - No evita `kill`, Safe Mode, cambios administrativos ni la desactivación manual del login item.
 - Para evitar pérdida de datos, una aplicación que ya estaba abierta se oculta, pero no se fuerza su cierre al activarla.
+- Si una aplicación tarda en aceptar el ocultado o cierre normal, la pantalla de privacidad permanece por encima hasta autenticar o hasta que el proceso quede oculto/cerrado.
 - Al reiniciarse, LockCode oculta las aplicaciones protegidas ya abiertas, pero `NSWorkspace` no puede impedir que el proceso llegue a iniciarse. Un bloqueo previo a la ejecución no es posible en este MVP.
 - Las penalizaciones del código viven en memoria y se reinician si se mata o reinicia LockCode; hacerlas persistentes requiere proteger también ese estado contra manipulación.
 - El registro de acceso se guarda localmente en las preferencias de la aplicación. Es informativo, no está firmado y un usuario con acceso a la cuenta puede modificarlo o eliminarlo.

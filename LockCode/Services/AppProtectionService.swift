@@ -10,6 +10,8 @@ final class AppProtectionService {
     private let ownBundleIdentifier: String
     private var observers: [NSObjectProtocol] = []
     private var accessState = ApplicationAccessState()
+    private var lastTerminationRequest: [pid_t: Date] = [:]
+    private var enforcementTimer: DispatchSourceTimer?
     private var isStarted = false
 
     private let criticalBundleIdentifiers: Set<String> = [
@@ -91,15 +93,19 @@ final class AppProtectionService {
             }
         })
 
-        // A protected application may already be running when LockCode starts.
-        // Register every observer first so a concurrent activation cannot escape.
-        concealRunningProtectedApplications()
+        // macOS may restore applications before login items have finished
+        // starting. Hide and normally terminate protected restored apps before
+        // beginning the continuous frontmost-app safety check.
+        secureRestoredApplications()
+        startContinuousEnforcement()
     }
 
     func stop() {
         let center = NSWorkspace.shared.notificationCenter
         observers.forEach(center.removeObserver)
         observers.removeAll()
+        enforcementTimer?.cancel()
+        enforcementTimer = nil
         isStarted = false
     }
 
@@ -138,7 +144,7 @@ final class AppProtectionService {
         for application in NSRunningApplication.runningApplications(
             withBundleIdentifier: bundleIdentifier
         ) where !application.isTerminated {
-            _ = application.hide()
+            concealAndRequestNormalTermination(application)
         }
     }
 
@@ -147,8 +153,15 @@ final class AppProtectionService {
     }
 
     private func handle(_ notification: Notification, trigger: AccessRequest.Trigger) {
+        guard let application = notification.userInfo?[NSWorkspace.applicationUserInfoKey]
+                as? NSRunningApplication else {
+            return
+        }
+        handle(application, trigger: trigger)
+    }
+
+    private func handle(_ application: NSRunningApplication, trigger: AccessRequest.Trigger) {
         guard settings.protectionEnabled,
-              let application = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
               let bundleIdentifier = application.bundleIdentifier,
               !excludedBundleIdentifiers.contains(bundleIdentifier),
               settings.isProtected(bundleIdentifier) else {
@@ -159,7 +172,7 @@ final class AppProtectionService {
         // still on screen. It must remain hidden even though no second request
         // should be enqueued.
         if accessState.hasPendingRequest(for: bundleIdentifier) {
-            _ = application.hide()
+            concealAndRequestNormalTermination(application)
             return
         }
 
@@ -171,7 +184,7 @@ final class AppProtectionService {
             return
         }
 
-        _ = application.hide()
+        concealAndRequestNormalTermination(application)
 
         let bundleURL = application.bundleURL
         let resumeAction: AccessRequest.ResumeAction
@@ -180,7 +193,6 @@ final class AppProtectionService {
             // Request a normal termination. Never force-terminate by default because the app
             // may be restoring documents or performing another data-sensitive operation.
             if let bundleURL {
-                _ = application.terminate()
                 resumeAction = .reopen(bundleURL)
             } else {
                 resumeAction = .activate(
@@ -214,6 +226,7 @@ final class AppProtectionService {
             return
         }
         accessState.applicationDidTerminate(bundleIdentifier: bundleIdentifier)
+        lastTerminationRequest.removeValue(forKey: application.processIdentifier)
     }
 
     private func concealRunningProtectedApplications(force: Bool = false) {
@@ -225,8 +238,81 @@ final class AppProtectionService {
                   !application.isTerminated else {
                 continue
             }
+            concealAndRequestNormalTermination(application)
+        }
+    }
+
+    private func secureRestoredApplications() {
+        guard settings.protectionEnabled else { return }
+        for application in NSWorkspace.shared.runningApplications {
+            guard let bundleIdentifier = application.bundleIdentifier,
+                  settings.isProtected(bundleIdentifier),
+                  !excludedBundleIdentifiers.contains(bundleIdentifier),
+                  !application.isTerminated else {
+                continue
+            }
+            concealAndRequestNormalTermination(application)
+            // A normal termination lets the target save state or refuse. Never
+            // force-terminate because privacy protection must not lose data.
+        }
+    }
+
+    private func startContinuousEnforcement() {
+        enforcementTimer?.cancel()
+        let timer = DispatchSource.makeTimerSource(queue: .main)
+        timer.schedule(
+            deadline: .now() + .milliseconds(50),
+            repeating: .milliseconds(50),
+            leeway: .milliseconds(10)
+        )
+        timer.setEventHandler { [weak self] in
+            MainActor.assumeIsolated {
+                self?.enforceProtectedApplications()
+            }
+        }
+        timer.resume()
+        enforcementTimer = timer
+    }
+
+    private func enforceProtectedApplications() {
+        guard settings.protectionEnabled else { return }
+        let now = Date()
+        for bundleIdentifier in settings.protectedBundleIdentifiers {
+            guard !excludedBundleIdentifiers.contains(bundleIdentifier),
+                  !accessState.isAccessGranted(for: bundleIdentifier, at: now) else {
+                continue
+            }
+            for application in NSRunningApplication.runningApplications(
+                withBundleIdentifier: bundleIdentifier
+            ) where !application.isTerminated {
+                if application.isActive {
+                    handle(application, trigger: .activation)
+                } else {
+                    concealAndRequestNormalTermination(application)
+                }
+            }
+        }
+    }
+
+    private func concealAndRequestNormalTermination(
+        _ application: NSRunningApplication
+    ) {
+        guard !application.isTerminated else { return }
+        if !application.isHidden {
             _ = application.hide()
         }
+        requestNormalTermination(application)
+    }
+
+    private func requestNormalTermination(_ application: NSRunningApplication) {
+        let processIdentifier = application.processIdentifier
+        let now = Date()
+        if let previousRequest = lastTerminationRequest[processIdentifier],
+           now.timeIntervalSince(previousRequest) < 1 {
+            return
+        }
+        lastTerminationRequest[processIdentifier] = now
+        _ = application.terminate()
     }
 
     private func resume(_ request: AccessRequest) {

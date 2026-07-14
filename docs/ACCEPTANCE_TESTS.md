@@ -21,6 +21,10 @@
 10. Con el panel de autenticación abierto, intentar activar otra vez TextEdit; debe volver a ocultarse y no debe aparecer un segundo panel.
 11. Dejar una aplicación protegida abierta, reiniciar LockCode y verificar que se oculta inmediatamente. Al volver a activarla debe pedir código o Touch ID.
 12. Dejar una aplicación abierta, marcarla como protegida y comprobar que se oculta sin esperar a otro reinicio.
+13. Reiniciar la sesión con una aplicación protegida configurada para restaurarse; al arrancar LockCode debe ocultarla y solicitar su cierre normal.
+14. Con LockCode activo, activar repetidamente una aplicación protegida y comprobar que el supervisor la mantiene oculta incluso si no llega un nuevo evento de `NSWorkspace`. Repetir con otra aplicación visible pero no situada en primer plano.
+15. Usar una aplicación que rechace temporalmente `hide()` y verificar que una pantalla opaca cubre todos los monitores detrás del panel de autenticación, sin mostrar información de la aplicación.
+16. Cancelar la autenticación; la pantalla opaca debe permanecer hasta que la aplicación protegida quede oculta o termine normalmente.
 
 ## Touch ID
 
