@@ -12,9 +12,11 @@ LockCode es un MVP nativo para macOS que protege la apertura o activación de ap
 - Catálogo de aplicaciones instaladas.
 - Selección individual de aplicaciones protegidas.
 - Detección de lanzamiento y activación mediante `NSWorkspace`.
+- Restauración del bloqueo al reiniciar LockCode: las aplicaciones protegidas que ya estén abiertas se ocultan en cuanto vuelve a arrancar el monitor.
+- Ocultado repetido mientras exista una autenticación pendiente, para que una segunda activación no deje visible la aplicación.
 - Bloqueo al cerrar la aplicación protegida, intervalos predefinidos o minutos personalizados.
 - Bloqueo inmediato de todas las sesiones concedidas.
-- Inicio automático con macOS mediante `SMAppService`.
+- Inicio automático con macOS mediante `SMAppService`, solicitado por defecto en la primera ejecución.
 - Aplicación de barra de menús y ventana de gestión.
 - Acceso a la configuración protegido por el código.
 - Salida normal de LockCode protegida por autenticación.
@@ -70,8 +72,11 @@ xcodebuild \
 
 1. Copia `LockCode.app` a `/Applications` y ejecútala desde allí.
 2. Conserva el Hardened Runtime y firma la app; Keychain y `SMAppService.mainApp` deben validarse con una copia firmada.
-3. Activa **Iniciar LockCode con macOS** y, si aparece `requiresApproval`, usa el botón para abrir **Ajustes del Sistema > General > Ítems de inicio**.
-4. Ejecuta los escenarios de [pruebas de aceptación](docs/ACCEPTANCE_TESTS.md), especialmente con una aplicación ya abierta y otra recién lanzada.
+3. LockCode solicita registrar el inicio automático en la primera ejecución. Si macOS muestra que requiere aprobación, abre **Ajustes de LockCode > Inicio de sesión > Abrir Ítems de inicio** y permite LockCode en **Ajustes del Sistema > General > Ítems de inicio**.
+4. Reinicia la sesión o el Mac. LockCode debe aparecer en la barra de menús sin que tengas que abrirlo manualmente. El ajuste queda guardado y puede desactivarse desde LockCode.
+5. Ejecuta los escenarios de [pruebas de aceptación](docs/ACCEPTANCE_TESTS.md), especialmente con una aplicación ya abierta y otra recién lanzada.
+
+`SMAppService` necesita que la aplicación permanezca en `/Applications`. Una compilación de distribución debe estar firmada con Developer ID y notarizada; una firma ad hoc sirve para pruebas locales, pero macOS puede rechazar o pedir aprobación adicional para el inicio automático.
 
 ## Distribución fuera de Mac App Store
 
@@ -93,7 +98,7 @@ No se incluye el entitlement de Endpoint Security ni una System Extension en est
 1. El usuario configura un código alfanumérico.
 2. Selecciona aplicaciones en la pantalla **Aplicaciones**.
 3. LockCode observa lanzamientos y activaciones.
-4. Cuando detecta una aplicación protegida, la oculta; si acaba de iniciarse, solicita su terminación normal.
+4. Cuando detecta una aplicación protegida, la oculta; si acaba de iniciarse, solicita su terminación normal. Mientras la autenticación siga pendiente, cualquier nueva activación vuelve a ocultarla.
 5. Muestra un panel de autenticación por encima de los escritorios.
 6. Tras autenticarse, reactiva o vuelve a abrir la aplicación. El acceso puede durar hasta que se cierre esa aplicación o durante el número de minutos configurado.
 
@@ -115,6 +120,7 @@ No se incluye el entitlement de Endpoint Security ni una System Extension en est
 - El cierre normal de una app puede ser rechazado por ella misma.
 - No evita `kill`, Safe Mode, cambios administrativos ni la desactivación manual del login item.
 - Para evitar pérdida de datos, una aplicación que ya estaba abierta se oculta, pero no se fuerza su cierre al activarla.
+- Al reiniciarse, LockCode oculta las aplicaciones protegidas ya abiertas, pero `NSWorkspace` no puede impedir que el proceso llegue a iniciarse. Un bloqueo previo a la ejecución no es posible en este MVP.
 - Las penalizaciones del código viven en memoria y se reinician si se mata o reinicia LockCode; hacerlas persistentes requiere proteger también ese estado contra manipulación.
 - Las aplicaciones eliminadas desaparecen del catálogo, pero su identificador puede permanecer en la configuración sin provocar bloqueos ni fallos. Si reaparecen con el mismo bundle identifier, recuperan la selección.
 

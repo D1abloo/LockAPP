@@ -25,7 +25,10 @@ private struct SettingsContentView: View {
     var body: some View {
         Form {
             Section("Protección") {
-                Toggle("Protección activa", isOn: $settings.protectionEnabled)
+                Toggle("Protección activa", isOn: Binding(
+                    get: { settings.protectionEnabled },
+                    set: { model.setProtectionEnabled($0) }
+                ))
                 Toggle("Permitir Touch ID", isOn: $settings.touchIDEnabled)
                     .disabled(!model.canUseBiometrics())
 
@@ -63,12 +66,9 @@ private struct SettingsContentView: View {
 
             Section("Inicio de sesión") {
                 Toggle("Iniciar LockCode con macOS", isOn: Binding(
-                    get: {
-                        launchAtLoginService.state == .enabled
-                            || launchAtLoginService.state == .requiresApproval
-                    },
+                    get: { settings.launchAtLoginEnabled },
                     set: { newValue in
-                        Task { await launchAtLoginService.setEnabled(newValue) }
+                        Task { await model.setLaunchAtLoginEnabled(newValue) }
                     }
                 ))
 

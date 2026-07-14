@@ -38,3 +38,4 @@ Un usuario comparte o deja temporalmente su Mac desbloqueado y quiere impedir el
 - Menos de un segundo entre evento observado y presentación del panel en un Mac moderno.
 - Cero almacenamiento del código fuera de Keychain.
 - Todas las rutas de cancelación dejan la app privada oculta o cerrada.
+- Al restaurarse LockCode, las aplicaciones protegidas que ya estén en ejecución se ocultan antes de admitir nuevas activaciones.

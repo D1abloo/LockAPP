@@ -49,6 +49,9 @@ final class AppModel: ObservableObject {
         isStarted = true
         protectionService.start()
         Task { await refreshApplications() }
+        if settings.launchAtLoginEnabled {
+            Task { await configureLaunchAtLogin() }
+        }
     }
 
     func completeOnboarding(pin: String) {
@@ -117,7 +120,11 @@ final class AppModel: ObservableObject {
 
     func setProtected(_ protected: Bool, application: InstalledApplication) {
         settings.setProtected(protected, bundleIdentifier: application.bundleIdentifier)
-        if !protected {
+        if protected {
+            protectionService.concealRunningApplication(
+                bundleIdentifier: application.bundleIdentifier
+            )
+        } else {
             protectionService.invalidateAccess(for: application.bundleIdentifier)
         }
     }
@@ -125,6 +132,18 @@ final class AppModel: ObservableObject {
     func lockNow() {
         protectionService.invalidateAllAccess()
         isManagementUnlocked = false
+    }
+
+    func setProtectionEnabled(_ enabled: Bool) {
+        settings.protectionEnabled = enabled
+        if enabled {
+            protectionService.protectionDidBecomeEnabled()
+        }
+    }
+
+    func setLaunchAtLoginEnabled(_ enabled: Bool) async {
+        settings.launchAtLoginEnabled = enabled
+        await launchAtLoginService.setEnabled(enabled)
     }
 
     func requestQuit() {
@@ -170,6 +189,15 @@ final class AppModel: ObservableObject {
         guard isQuitAuthorized else { return false }
         isQuitAuthorized = false
         return true
+    }
+
+    private func configureLaunchAtLogin() async {
+        await launchAtLoginService.setEnabled(true)
+        if let lastError = launchAtLoginService.lastError, isConfigured {
+            errorMessage = "No se pudo activar el inicio automático: \(lastError)"
+        } else if launchAtLoginService.state == .requiresApproval, isConfigured {
+            errorMessage = "LockCode necesita aprobación en Ajustes del Sistema > General > Ítems de inicio para arrancar automáticamente."
+        }
     }
 
     private func enqueue(_ request: AccessRequest) {

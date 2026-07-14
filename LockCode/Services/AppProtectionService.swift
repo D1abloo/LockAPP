@@ -90,6 +90,10 @@ final class AppProtectionService {
                 self?.invalidateAllAccess()
             }
         })
+
+        // A protected application may already be running when LockCode starts.
+        // Register every observer first so a concurrent activation cannot escape.
+        concealRunningProtectedApplications()
     }
 
     func stop() {
@@ -121,6 +125,7 @@ final class AppProtectionService {
 
     func invalidateAllAccess() {
         accessState.invalidateAll()
+        concealRunningProtectedApplications(force: true)
         onSessionInvalidated?()
     }
 
@@ -128,13 +133,39 @@ final class AppProtectionService {
         accessState.invalidate(bundleIdentifier: bundleIdentifier)
     }
 
+    func concealRunningApplication(bundleIdentifier: String) {
+        guard settings.protectionEnabled else { return }
+        for application in NSRunningApplication.runningApplications(
+            withBundleIdentifier: bundleIdentifier
+        ) where !application.isTerminated {
+            _ = application.hide()
+        }
+    }
+
+    func protectionDidBecomeEnabled() {
+        concealRunningProtectedApplications()
+    }
+
     private func handle(_ notification: Notification, trigger: AccessRequest.Trigger) {
         guard settings.protectionEnabled,
               let application = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
               let bundleIdentifier = application.bundleIdentifier,
-              accessState.beginRequest(
+              !excludedBundleIdentifiers.contains(bundleIdentifier),
+              settings.isProtected(bundleIdentifier) else {
+            return
+        }
+
+        // A protected app may emit activation events while its first request is
+        // still on screen. It must remain hidden even though no second request
+        // should be enqueued.
+        if accessState.hasPendingRequest(for: bundleIdentifier) {
+            _ = application.hide()
+            return
+        }
+
+        guard accessState.beginRequest(
                   for: bundleIdentifier,
-                  isProtected: settings.isProtected(bundleIdentifier),
+                  isProtected: true,
                   excludedBundleIdentifiers: excludedBundleIdentifiers
               ) else {
             return
@@ -183,6 +214,19 @@ final class AppProtectionService {
             return
         }
         accessState.applicationDidTerminate(bundleIdentifier: bundleIdentifier)
+    }
+
+    private func concealRunningProtectedApplications(force: Bool = false) {
+        guard force || settings.protectionEnabled else { return }
+        for application in NSWorkspace.shared.runningApplications {
+            guard let bundleIdentifier = application.bundleIdentifier,
+                  settings.isProtected(bundleIdentifier),
+                  !excludedBundleIdentifiers.contains(bundleIdentifier),
+                  !application.isTerminated else {
+                continue
+            }
+            _ = application.hide()
+        }
     }
 
     private func resume(_ request: AccessRequest) {

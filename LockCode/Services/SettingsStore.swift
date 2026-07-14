@@ -8,6 +8,7 @@ final class SettingsStore: ObservableObject {
         static let touchIDEnabled = "touchIDEnabled"
         static let unlockDuration = "unlockDuration"
         static let customUnlockMinutes = "customUnlockMinutes"
+        static let launchAtLoginEnabled = "launchAtLoginEnabled"
         static let protectedBundleIdentifiers = "protectedBundleIdentifiers"
     }
 
@@ -36,6 +37,10 @@ final class SettingsStore: ObservableObject {
         }
     }
 
+    @Published var launchAtLoginEnabled: Bool {
+        didSet { defaults.set(launchAtLoginEnabled, forKey: Key.launchAtLoginEnabled) }
+    }
+
     @Published private(set) var protectedBundleIdentifiers: Set<String> {
         didSet {
             defaults.set(Array(protectedBundleIdentifiers).sorted(), forKey: Key.protectedBundleIdentifiers)
@@ -51,9 +56,14 @@ final class SettingsStore: ObservableObject {
         ) ?? .everyTime
         let storedCustomMinutes = defaults.integer(forKey: Key.customUnlockMinutes)
         self.customUnlockMinutes = storedCustomMinutes > 0 ? storedCustomMinutes : 10
+        let storedLaunchAtLogin = defaults.object(forKey: Key.launchAtLoginEnabled) as? Bool
+        self.launchAtLoginEnabled = storedLaunchAtLogin ?? true
         self.protectedBundleIdentifiers = Set(
             defaults.stringArray(forKey: Key.protectedBundleIdentifiers) ?? []
         )
+        if storedLaunchAtLogin == nil {
+            defaults.set(true, forKey: Key.launchAtLoginEnabled)
+        }
     }
 
     func isProtected(_ bundleIdentifier: String) -> Bool {

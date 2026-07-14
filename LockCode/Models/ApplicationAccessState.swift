@@ -29,6 +29,10 @@ struct ApplicationAccessState {
         return true
     }
 
+    func hasPendingRequest(for bundleIdentifier: String) -> Bool {
+        pendingBundleIdentifiers.contains(bundleIdentifier)
+    }
+
     mutating func approve(
         bundleIdentifier: String,
         graceInterval: TimeInterval,

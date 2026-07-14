@@ -25,6 +25,7 @@ Una persona con acceso físico temporal a una sesión de macOS ya iniciada, sin 
 - Los intentos fallidos activan esperas progresivas en memoria.
 - Las concesiones de acceso viven solo en memoria.
 - Las concesiones se borran al solicitarlo y ante eventos de suspensión/cambio de sesión observables.
+- Al arrancar el monitor se ocultan las aplicaciones protegidas que ya estén ejecutándose; una aplicación se vuelve a ocultar ante activaciones repetidas mientras su autenticación está pendiente.
 - Las respuestas tardías de una autenticación cancelada se descartan mediante un identificador único de presentación.
 - El MVP no fuerza la terminación de apps ya abiertas para evitar pérdida de datos.
 

@@ -12,10 +12,13 @@
 - `xcodegen generate`: correcto; genera `LockCode.xcodeproj` y el esquema compartido `LockCode` con `LockCodeTests`.
 - Type-check de todas las fuentes con Swift 6, concurrencia estricta y warnings como errores: correcto para `x86_64` y `arm64`, con deployment target macOS 13.
 - Enlace directo con `swiftc` del ejecutable completo: correcto en `x86_64` y `arm64`.
-- Verificador ejecutable de reglas de dominio: 17 comprobaciones correctas para código alfanumérico, credencial PBKDF2 sin texto plano, penalizaciones, bloqueo al terminar, expiración por minutos, deduplicación, versiones y persistencia.
+- Verificador ejecutable de reglas de dominio: 22 comprobaciones correctas para código alfanumérico, credencial PBKDF2 sin texto plano, penalizaciones, bloqueo al terminar, expiración por minutos, solicitud pendiente, deduplicación, inicio automático por defecto y persistencia.
 - PayPal Donation devuelve HTTP 200 para la cuenta configurada y GitHub Releases devuelve el 404 esperado mientras no existan releases.
-- Bundle 0.2.0 universal, con firma ad hoc y Hardened Runtime, instalado y ejecutándose desde `/Applications/LockCode.app`.
-- Revisión estática de los escenarios de `ACCEPTANCE_TESTS.md`: todas las rutas están implementadas; no se han marcado como pruebas manuales superadas.
+- Bundle 0.2.1 (compilación 3) universal, con firma ad hoc y Hardened Runtime, instalado y ejecutándose desde `/Applications/LockCode.app`.
+- `SMAppService.mainApp` registró LockCode como ítem de inicio; System Events confirma `name: LockCode` y `path: /Applications/LockCode.app`.
+- Prueba gráfica del reinicio con WhatsApp protegida: antes de arrancar LockCode estaba en ejecución y visible; al iniciar LockCode permaneció en ejecución pero `NSRunningApplication.isHidden` pasó a `true`.
+- Prueba gráfica de solicitud pendiente: dos intentos consecutivos de activar WhatsApp mantuvieron `isHidden == true` y no dejaron visible la aplicación mientras esperaba autenticación.
+- Revisión estática de los escenarios de `ACCEPTANCE_TESTS.md`: todas las rutas están implementadas; solo se marcan arriba como manualmente verificadas las dos pruebas gráficas realizadas en esta sesión.
 
 ## Comprobaciones bloqueadas por el entorno
 
@@ -28,7 +31,7 @@ Quedan pendientes en un Mac con Xcode completo y sesión gráfica:
 - verificar Keychain con la app firmada y sin sandbox;
 - verificar Touch ID en hardware compatible, incluido fallback al código;
 - validar los estados de `SMAppService.mainApp` con una firma Apple válida;
-- probar aplicaciones ya abiertas y recién lanzadas;
+- completar el recorrido de una aplicación recién lanzada con código correcto y Touch ID real;
 - capturar onboarding, listado, ajustes y panel de desbloqueo;
 - ejecutar binarios en hardware Apple Silicon e Intel (ambas arquitecturas se type-comprobaron y enlazaron aquí, pero no se ejecutaron en ambos tipos de hardware).
 

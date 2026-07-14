@@ -11,9 +11,11 @@ final class ApplicationAccessStateTests: XCTestCase {
         var state = ApplicationAccessState()
 
         XCTAssertTrue(beginRequest(in: &state, at: now))
+        XCTAssertTrue(state.hasPendingRequest(for: bundleIdentifier))
         XCTAssertFalse(beginRequest(in: &state, at: now))
 
         state.deny(bundleIdentifier: bundleIdentifier)
+        XCTAssertFalse(state.hasPendingRequest(for: bundleIdentifier))
         XCTAssertTrue(beginRequest(in: &state, at: now))
     }
 

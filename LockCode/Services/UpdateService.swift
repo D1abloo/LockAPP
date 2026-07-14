@@ -29,7 +29,7 @@ final class UpdateService: ObservableObject {
     init(bundle: Bundle = .main) {
         self.installedVersion = bundle.object(
             forInfoDictionaryKey: "CFBundleShortVersionString"
-        ) as? String ?? "0.2.0"
+        ) as? String ?? "0.2.1"
     }
 
     func checkForUpdates() async {

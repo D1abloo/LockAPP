@@ -5,6 +5,16 @@ import XCTest
 
 @MainActor
 final class SettingsStoreTests: XCTestCase {
+    func testLaunchAtLoginIsEnabledByDefault() {
+        let suiteName = "LockCodeTests.SettingsStore.Defaults.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("No se pudo crear UserDefaults aislado")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        XCTAssertTrue(SettingsStore(defaults: defaults).launchAtLoginEnabled)
+    }
+
     func testProtectedApplicationsPersistAcrossStoreInstances() {
         let suiteName = "LockCodeTests.SettingsStore.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {
@@ -18,6 +28,7 @@ final class SettingsStoreTests: XCTestCase {
         firstStore.setProtected(false, bundleIdentifier: "com.example.First")
         firstStore.unlockDuration = .custom
         firstStore.customUnlockMinutes = 42
+        firstStore.launchAtLoginEnabled = false
 
         let restoredStore = SettingsStore(defaults: defaults)
 
@@ -26,5 +37,6 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(restoredStore.protectedBundleIdentifiers, Set(["com.example.Second"]))
         XCTAssertEqual(restoredStore.unlockDuration, .custom)
         XCTAssertEqual(restoredStore.customUnlockMinutes, 42)
+        XCTAssertFalse(restoredStore.launchAtLoginEnabled)
     }
 }

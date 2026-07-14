@@ -18,6 +18,9 @@
 7. Cancelar; TextEdit debe permanecer oculto o cerrado.
 8. Seleccionar «Al cerrar la aplicación», cerrar TextEdit y volver a abrirlo; debe pedir autenticación.
 9. Seleccionar minutos personalizados y comprobar que la autorización expira en el tiempo indicado.
+10. Con el panel de autenticación abierto, intentar activar otra vez TextEdit; debe volver a ocultarse y no debe aparecer un segundo panel.
+11. Dejar una aplicación protegida abierta, reiniciar LockCode y verificar que se oculta inmediatamente. Al volver a activarla debe pedir código o Touch ID.
+12. Dejar una aplicación abierta, marcarla como protegida y comprobar que se oculta sin esperar a otro reinicio.
 
 ## Touch ID
 
@@ -42,7 +45,8 @@
 
 ## Inicio de sesión
 
-1. Activar “Iniciar con macOS”.
-2. Revisar Ajustes del Sistema > General > Ítems de inicio.
+1. Instalar LockCode en `/Applications` y abrirlo por primera vez; “Iniciar LockCode con macOS” debe aparecer activado por defecto.
+2. Revisar Ajustes del Sistema > General > Ítems de inicio. Si macOS indica `requiresApproval`, aprobar LockCode.
 3. Cerrar sesión y volver a entrar.
-4. Verificar que el monitor queda activo incluso antes de abrir la ventana principal.
+4. Verificar que el icono aparece en la barra de menús sin abrir LockCode manualmente.
+5. Dejar una aplicación protegida abierta antes de reiniciar LockCode y comprobar que el monitor restaura el bloqueo.

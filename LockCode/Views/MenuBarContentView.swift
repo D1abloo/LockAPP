@@ -33,7 +33,10 @@ private struct MenuBarContent: View {
 
         Divider()
 
-        Toggle("Protección activa", isOn: $settings.protectionEnabled)
+        Toggle("Protección activa", isOn: Binding(
+            get: { settings.protectionEnabled },
+            set: { model.setProtectionEnabled($0) }
+        ))
 
         Divider()
 
