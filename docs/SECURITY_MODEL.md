@@ -20,6 +20,7 @@ Una persona con acceso físico temporal a una sesión de macOS ya iniciada, sin 
 ## Controles
 
 - El código se transforma mediante PBKDF2-HMAC-SHA256 con una sal aleatoria y 210.000 rondas. Solo la sal, los parámetros y la clave derivada se guardan como contraseña genérica de Keychain; la comparación es en tiempo constante.
+- El acceso al elemento de Keychain depende del requisito designado de la firma. Las actualizaciones deben usar siempre la misma identidad estable; una firma ad hoc distinta puede provocar otra solicitud de acceso de macOS.
 - Touch ID usa LocalAuthentication; LockCode no recibe datos biométricos.
 - La configuración se oculta hasta autenticar al propietario.
 - Los intentos fallidos activan esperas progresivas en memoria.

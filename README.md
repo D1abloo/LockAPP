@@ -82,6 +82,8 @@ xcodebuild \
 
 `SMAppService` necesita que la aplicación permanezca en `/Applications`. Una compilación de distribución debe estar firmada con Developer ID y notarizada; una firma ad hoc sirve para pruebas locales, pero macOS puede rechazar o pedir aprobación adicional para el inicio automático.
 
+La identidad de firma debe permanecer estable entre versiones. Si cada actualización se firma de forma ad hoc, Keychain la identifica mediante un hash diferente y puede volver a mostrar el cuadro de acceso aunque anteriormente se eligiera «Permitir siempre». En este Mac se ha creado la identidad local `LockCode Local Signing`; para distribuir la aplicación debe sustituirse por un certificado Developer ID Application de Apple.
+
 ## Distribución fuera de Mac App Store
 
 1. Sustituye `com.example.LockCode` en `project.yml` por un identificador propio y configura `DEVELOPMENT_TEAM` en Xcode o en tu configuración local.
@@ -96,6 +98,8 @@ xcodebuild \
 4. Exporta y prueba la app notarizada desde `/Applications` en una cuenta limpia antes de distribuirla.
 
 No se incluye el entitlement de Endpoint Security ni una System Extension en este target.
+
+No cambies la identidad de firma entre actualizaciones: la autorización del elemento de Keychain está ligada al requisito designado de la aplicación firmada.
 
 ## Flujo del MVP
 
