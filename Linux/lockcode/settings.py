@@ -12,6 +12,7 @@ class Settings:
     biometrics_enabled: bool = True
     start_with_linux: bool = True
     grace_minutes: int = 0
+    credential_configured: bool = False
     protected_executables: list[str] = field(default_factory=list)
 
 

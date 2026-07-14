@@ -9,7 +9,7 @@ Proyecto independiente para Debian 12, Ubuntu 22.04 o distribuciones compatibles
 - Catálogo basado en entradas `.desktop`.
 - Monitor `/proc`: pausa inmediatamente el proceso con `SIGSTOP`; al autorizar usa `SIGCONT`, y al cancelar solicita cierre normal con `SIGTERM`. Nunca usa `SIGKILL`.
 - Periodo de gracia, bloqueo inmediato, penalización progresiva, registro anónimo y actualizaciones confirmadas.
-- Inicio de sesión mediante systemd de usuario y autostart XDG; indicador de bandeja cuando Ayatana AppIndicator está disponible.
+- Inicio automático mediante un único servicio systemd de usuario ligado a la sesión gráfica; indicador de bandeja cuando Ayatana AppIndicator está disponible.
 
 ## Crear e instalar el paquete Debian
 
@@ -18,7 +18,7 @@ sudo apt install python3 python3-gi gir1.2-gtk-3.0 libsecret-tools fprintd \
   gir1.2-ayatanaappindicator3-0.1 dpkg-dev
 chmod +x installer/build-deb.sh
 ./installer/build-deb.sh
-sudo apt install ./build/lockcode-linux_0.1.0_all.deb
+sudo apt install ./build/lockcode-linux_0.1.1_all.deb
 ```
 
 Pruebas sin instalar:
@@ -28,9 +28,9 @@ python3 -m unittest discover -s tests -v
 python3 -m compileall -q lockcode
 ```
 
-Tras instalar, ejecuta `lockcode`. Para la huella, registra primero el dedo con `fprintd-enroll`. La aplicación se mantiene en segundo plano; el apagado no requiere autenticación.
+El instalador activa e inicia LockCode automáticamente para el usuario que ejecuta `sudo`. Para la huella, registra primero el dedo con `fprintd-enroll`. La aplicación se mantiene en segundo plano; el apagado no requiere autenticación.
 
-Si usas inicio de sesión automático, GNOME Keyring puede permanecer bloqueado. Desbloquéalo cuando Ubuntu lo solicite. LockCode guarda el código en segundo plano y muestra un error tras una espera limitada, por lo que la interfaz no queda congelada.
+Si usas inicio de sesión automático, GNOME Keyring puede permanecer bloqueado. LockCode no consulta el llavero durante el arranque si la credencial ya está configurada; solo será necesario desbloquearlo cuando GNOME lo requiera para validar el código. La interfaz mantiene una espera limitada y no queda congelada.
 
 ## Limitaciones
 

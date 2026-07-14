@@ -1,22 +1,12 @@
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
 
-
-AUTOSTART = """[Desktop Entry]
-Type=Application
-Name=LockCode
-Exec=/usr/bin/lockcode --background
-Terminal=false
-X-GNOME-Autostart-enabled=true
-Comment=Protección de privacidad de aplicaciones
-"""
-
-
 def set_enabled(enabled: bool) -> None:
-    path = Path.home() / ".config" / "autostart" / "lockcode.desktop"
-    if enabled:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(AUTOSTART, encoding="utf-8")
-    else:
-        path.unlink(missing_ok=True)
+    # Migrate the old XDG entry: running both it and systemd caused duplicate activation prompts.
+    (Path.home() / ".config" / "autostart" / "lockcode.desktop").unlink(missing_ok=True)
+    subprocess.run(
+        ["systemctl", "--user", "enable" if enabled else "disable", "lockcode.service"],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False, timeout=5,
+    )

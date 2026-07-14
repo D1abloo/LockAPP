@@ -1,6 +1,15 @@
 #!/bin/sh
 set -e
 if [ -n "${SUDO_USER:-}" ] && command -v runuser >/dev/null 2>&1; then
-  runuser -u "$SUDO_USER" -- systemctl --user disable --now lockcode.service 2>/dev/null || true
+  uid="$(id -u "$SUDO_USER")"
+  action="stop"
+  if [ "${1:-}" != "upgrade" ]; then
+    action="disable --now"
+  fi
+  # shellcheck disable=SC2086
+  runuser -u "$SUDO_USER" -- env \
+    XDG_RUNTIME_DIR="/run/user/$uid" \
+    DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+    systemctl --user $action lockcode.service 2>/dev/null || true
 fi
 exit 0

@@ -14,8 +14,8 @@ class InstalledApp:
     executable: str
 
 
-def load_apps() -> list[InstalledApp]:
-    roots = [
+def load_apps(roots: list[Path] | None = None) -> list[InstalledApp]:
+    roots = roots or [
         Path.home() / ".local/share/applications",
         Path("/usr/local/share/applications"),
         Path("/usr/share/applications"),

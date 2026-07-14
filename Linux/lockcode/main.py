@@ -52,7 +52,7 @@ class LockCodeApplication(Gtk.Application):
         if not self.secrets.available():
             self._message("Instala libsecret-tools para guardar el código de forma segura.", Gtk.MessageType.ERROR)
             return
-        if not self.secrets.has_code() and not self._setup_code():
+        if not self._has_configured_code() and not self._setup_code():
             return
         self._refresh_apps()
         self._refresh_audit()
@@ -141,6 +141,15 @@ class LockCodeApplication(Gtk.Application):
         if first != second: self._message("Los códigos no coinciden.", Gtk.MessageType.ERROR); return False
         return self._store_code(first)
 
+    def _has_configured_code(self) -> bool:
+        if self.settings.value.credential_configured:
+            return True
+        if not self.secrets.has_code():
+            return False
+        self.settings.value.credential_configured = True
+        self.settings.save()
+        return True
+
     def _store_code(self, code: str) -> bool:
         result: list[str | None] = [None]
         dialog = Gtk.MessageDialog(
@@ -164,6 +173,8 @@ class LockCodeApplication(Gtk.Application):
         if result[0] is not None:
             self._message(result[0], Gtk.MessageType.ERROR)
             return False
+        self.settings.value.credential_configured = True
+        self.settings.save()
         return True
 
     def _code_dialog(self, title: str, prompt: str) -> str | None:

@@ -1,6 +1,7 @@
 [Unit]
 Description=LockCode privacy protection
 After=graphical-session.target gnome-keyring-daemon.service
+PartOf=graphical-session.target
 
 [Service]
 Type=simple
@@ -9,4 +10,4 @@ Restart=on-failure
 RestartSec=2
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
