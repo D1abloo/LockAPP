@@ -4,10 +4,10 @@ LockCode es un MVP nativo para macOS que protege la apertura o activación de ap
 
 | Edición | Versión publicada |
 | --- | --- |
-| macOS | **0.4.6** |
-| Windows | **0.4.6** |
-| Debian/Ubuntu | **0.4.6** |
-| Fedora/CentOS RPM | **0.4.6** |
+| macOS | **0.4.7** |
+| Windows | **0.4.7** |
+| Debian/Ubuntu | **0.4.7** |
+| Fedora/CentOS RPM | **0.4.7** |
 
 LockCode es gratuito, no requiere donación y se distribuye conforme a la [Política de uso](USAGE_POLICY.md).
 
@@ -84,7 +84,7 @@ xcodebuild \
 
 ## Instalación y prueba funcional
 
-1. Genera `macOS/Installer/output/LockCode-macOS-0.4.6.zip` con `./macOS/Installer/build.sh`, descomprímelo, copia `LockCode.app` a `/Applications` y ejecútala desde allí.
+1. Genera `macOS/Installer/output/LockCode-macOS-0.4.7.zip` con `./macOS/Installer/build.sh`, descomprímelo, copia `LockCode.app` a `/Applications` y ejecútala desde allí.
 2. Conserva el Hardened Runtime y firma la app; Keychain y `SMAppService.mainApp` deben validarse con una copia firmada.
 3. LockCode solicita registrar el inicio automático en la primera ejecución. Si macOS muestra que requiere aprobación, abre **Ajustes de LockCode > Inicio de sesión > Abrir Ítems de inicio** y permite LockCode en **Ajustes del Sistema > General > Ítems de inicio**.
 4. Reinicia la sesión o el Mac. LockCode debe aparecer en la barra de menús sin que tengas que abrirlo manualmente. El ajuste queda guardado y puede desactivarse desde LockCode.

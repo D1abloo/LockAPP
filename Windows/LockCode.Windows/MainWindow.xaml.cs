@@ -25,7 +25,7 @@ public partial class MainWindow : Window
     private bool _allowClose;
     private bool _managementAuthorized;
     private static readonly Version CurrentVersion = typeof(MainWindow).Assembly.GetName().Version
-        ?? new Version(0, 4, 6);
+        ?? new Version(0, 4, 7);
 
     public MainWindow()
     {

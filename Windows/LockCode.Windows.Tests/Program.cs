@@ -60,10 +60,10 @@ var packagePassed = packageEntries.Count == 1 && packageEntries[0].Name == "Calc
 Directory.Delete(packageDirectory, true);
 Console.WriteLine($"{(packagePassed ? "PASS" : "FAIL")} aplicaciones integradas de Windows");
 var updateJson = """
-{"tag_name":"v0.4.6","assets":[{"name":"LockCode-Windows-0.4.6-Setup.exe","browser_download_url":"https://github.com/D1abloo/LockAPP/releases/download/v0.4.6/LockCode-Windows-0.4.6-Setup.exe","digest":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","size":123}]}
+{"tag_name":"v0.4.7","assets":[{"name":"LockCode-Windows-0.4.7-Setup.exe","browser_download_url":"https://github.com/D1abloo/LockAPP/releases/download/v0.4.7/LockCode-Windows-0.4.7-Setup.exe","digest":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","size":123}]}
 """;
 var release = UpdateService.Parse(updateJson, new Version(0, 4, 0));
-var updatePassed = release?.Version == new Version(0, 4, 6)
+var updatePassed = release?.Version == new Version(0, 4, 7)
     && UpdateService.Parse(updateJson.Replace("github.com", "example.com"), new Version(0, 4, 0)) is null;
 Console.WriteLine($"{(updatePassed ? "PASS" : "FAIL")} actualización oficial validada");
 return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed && resetPassed

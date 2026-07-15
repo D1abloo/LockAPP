@@ -2,14 +2,14 @@
 
 Instalador independiente para Fedora 42 o posterior y CentOS Stream 9/10. CentOS requiere EPEL porque el indicador Ayatana se distribuye allí.
 
-Versión publicada: **0.4.6**. Uso gratuito sujeto a la [Política de uso](../../USAGE_POLICY.md).
+Versión publicada: **0.4.7**. Uso gratuito sujeto a la [Política de uso](../../USAGE_POLICY.md).
 
 ## Fedora
 
 ```bash
 sudo dnf install rpm-build
 ./RPM/build-rpm.sh
-sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.6_noarch.rpm
+sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.7_noarch.rpm
 gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
 ```
 
@@ -19,7 +19,7 @@ gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
 sudo dnf config-manager --set-enabled crb
 sudo dnf install epel-release rpm-build
 ./RPM/build-rpm.sh
-sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.6_noarch.rpm
+sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.7_noarch.rpm
 gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
 ```
 
