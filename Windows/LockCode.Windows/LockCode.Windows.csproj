@@ -9,7 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>LockCode</AssemblyName>
     <RootNamespace>LockCode.Windows</RootNamespace>
-    <Version>0.4.4</Version>
+    <Version>0.4.5</Version>
     <ApplicationIcon>Assets\LockCode.ico</ApplicationIcon>
     <Company>Isaac Silva Jiménez</Company>
     <Product>LockCode para Windows</Product>

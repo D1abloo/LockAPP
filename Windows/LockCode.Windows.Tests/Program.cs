@@ -30,8 +30,12 @@ grants.Approve("close.exe", 20, 0, now);
 var closePassed = grants.IsGranted("close.exe", 20, now, _ => true)
     && !grants.IsGranted("close.exe", 21, now, _ => true)
     && !grants.IsGranted("close.exe", 20, now, _ => false);
+grants.Approve("reset.exe", 30, 5, now);
+grants.InvalidateAll();
+var resetPassed = !grants.IsGranted("reset.exe", 30, now, _ => true);
 Console.WriteLine($"{(gracePassed ? "PASS" : "FAIL")} periodo de gracia");
 Console.WriteLine($"{(closePassed ? "PASS" : "FAIL")} bloqueo al cerrar");
+Console.WriteLine($"{(resetPassed ? "PASS" : "FAIL")} cambio de política invalida permisos");
 var pending = new PendingRequestState();
 var cyclePassed = pending.Begin(30) && !pending.Begin(30);
 pending.Complete(30); cyclePassed = cyclePassed && pending.Begin(30);
@@ -55,11 +59,11 @@ var packagePassed = packageEntries.Count == 1 && packageEntries[0].Name == "Calc
 Directory.Delete(packageDirectory, true);
 Console.WriteLine($"{(packagePassed ? "PASS" : "FAIL")} aplicaciones integradas de Windows");
 var updateJson = """
-{"tag_name":"v0.4.4","assets":[{"name":"LockCode-Windows-0.4.4-Setup.exe","browser_download_url":"https://github.com/D1abloo/LockAPP/releases/download/v0.4.4/LockCode-Windows-0.4.4-Setup.exe","digest":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","size":123}]}
+{"tag_name":"v0.4.5","assets":[{"name":"LockCode-Windows-0.4.5-Setup.exe","browser_download_url":"https://github.com/D1abloo/LockAPP/releases/download/v0.4.5/LockCode-Windows-0.4.5-Setup.exe","digest":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","size":123}]}
 """;
 var release = UpdateService.Parse(updateJson, new Version(0, 4, 0));
-var updatePassed = release?.Version == new Version(0, 4, 4)
+var updatePassed = release?.Version == new Version(0, 4, 5)
     && UpdateService.Parse(updateJson.Replace("github.com", "example.com"), new Version(0, 4, 0)) is null;
 Console.WriteLine($"{(updatePassed ? "PASS" : "FAIL")} actualización oficial validada");
-return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed
+return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed && resetPassed
     && cyclePassed && manualPassed && packagePassed && updatePassed ? 0 : 1;

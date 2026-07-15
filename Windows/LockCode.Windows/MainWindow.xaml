@@ -14,6 +14,10 @@
           <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
             <Button Content="Actualizar lista" Padding="12,5" Click="Refresh_Click"/>
             <Button Content="＋  Añadir aplicación manualmente…" Style="{StaticResource AccentButton}" Margin="8,0,0,0" Click="AddApp_Click"/>
+            <TextBlock Text="Buscar:" Margin="16,0,6,0" VerticalAlignment="Center"/>
+            <TextBox x:Name="SearchApps" Width="240" Padding="10,6"
+                     VerticalContentAlignment="Center" ToolTip="Buscar por nombre o ruta"
+                     TextChanged="SearchApps_TextChanged"/>
           </StackPanel>
           <ListView x:Name="AppsList"><ListView.ItemTemplate><DataTemplate>
             <CheckBox IsChecked="{Binding IsProtected}" Content="{Binding Name}" ToolTip="{Binding ExecutablePath}" Checked="ProtectionChanged" Unchecked="ProtectionChanged" Padding="4"/>

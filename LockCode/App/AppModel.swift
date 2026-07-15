@@ -191,6 +191,10 @@ final class AppModel: ObservableObject {
         isManagementUnlocked = false
     }
 
+    func unlockPolicyDidChange() {
+        protectionService.unlockPolicyDidChange()
+    }
+
     func setProtectionEnabled(_ enabled: Bool) {
         settings.protectionEnabled = enabled
         if enabled {

@@ -61,7 +61,12 @@ private struct SettingsContentView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
-                Button("Bloquear ahora") { model.lockNow() }
+                Button {
+                    model.lockNow()
+                } label: {
+                    Label("Bloquear ahora", systemImage: "lock.fill")
+                }
+                .buttonStyle(.borderedProminent)
             }
 
             Section("Inicio de sesión") {
@@ -134,6 +139,13 @@ private struct SettingsContentView: View {
         .navigationTitle("Ajustes")
         .padding()
         .onAppear { launchAtLoginService.refresh() }
+        .onChange(of: settings.unlockDuration) { _ in
+            model.unlockPolicyDidChange()
+        }
+        .onChange(of: settings.customUnlockMinutes) { _ in
+            guard settings.unlockDuration == .custom else { return }
+            model.unlockPolicyDidChange()
+        }
     }
 
     private var unlockDurationExplanation: String {

@@ -28,13 +28,22 @@ struct ApplicationsView: View {
                 } label: {
                     Label("Añadir aplicación…", systemImage: "plus")
                 }
+                .buttonStyle(.borderedProminent)
                 Button {
                     Task { await model.refreshApplications() }
                 } label: {
                     Label("Actualizar", systemImage: "arrow.clockwise")
                 }
+                .buttonStyle(.bordered)
             }
             .padding()
+            .background(
+                LinearGradient(
+                    colors: [Color.accentColor.opacity(0.12), .clear],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
 
             if model.isLoadingApplications {
                 ProgressView("Buscando aplicaciones…")
@@ -47,9 +56,15 @@ struct ApplicationsView: View {
                         onSetProtected: { model.setProtected($0, application: application) }
                     )
                 }
-                .searchable(text: $searchText, prompt: "Buscar aplicación")
+                .overlay {
+                    if filteredApplications.isEmpty {
+                        Text("No se encontraron aplicaciones")
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
         }
+        .searchable(text: $searchText, placement: .toolbar, prompt: "Buscar aplicación")
     }
 }
 

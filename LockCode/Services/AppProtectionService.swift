@@ -127,6 +127,11 @@ final class AppProtectionService {
 
     func deny(_ request: AccessRequest) {
         accessState.deny(bundleIdentifier: request.bundleIdentifier)
+        terminateRequestTarget(request)
+    }
+
+    func unlockPolicyDidChange() {
+        accessState.invalidateAll()
     }
 
     func invalidateAllAccess() {
@@ -172,7 +177,7 @@ final class AppProtectionService {
         // still on screen. It must remain hidden even though no second request
         // should be enqueued.
         if accessState.hasPendingRequest(for: bundleIdentifier) {
-            concealAndRequestNormalTermination(application)
+            conceal(application)
             return
         }
 
@@ -184,28 +189,14 @@ final class AppProtectionService {
             return
         }
 
-        concealAndRequestNormalTermination(application)
+        conceal(application)
 
         let bundleURL = application.bundleURL
         let resumeAction: AccessRequest.ResumeAction
-        switch trigger {
-        case .launch:
-            // Request a normal termination. Never force-terminate by default because the app
-            // may be restoring documents or performing another data-sensitive operation.
-            if let bundleURL {
-                resumeAction = .reopen(bundleURL)
-            } else {
-                resumeAction = .activate(
-                    processIdentifier: application.processIdentifier,
-                    fallbackURL: nil
-                )
-            }
-        case .activation:
-            resumeAction = .activate(
-                processIdentifier: application.processIdentifier,
-                fallbackURL: bundleURL
-            )
-        }
+        resumeAction = .activate(
+            processIdentifier: application.processIdentifier,
+            fallbackURL: bundleURL
+        )
 
         let request = AccessRequest(
             bundleIdentifier: bundleIdentifier,
@@ -285,7 +276,9 @@ final class AppProtectionService {
             for application in NSRunningApplication.runningApplications(
                 withBundleIdentifier: bundleIdentifier
             ) where !application.isTerminated {
-                if application.isActive {
+                if accessState.hasPendingRequest(for: bundleIdentifier) {
+                    conceal(application)
+                } else if application.isActive {
                     handle(application, trigger: .activation)
                 } else {
                     concealAndRequestNormalTermination(application)
@@ -298,10 +291,28 @@ final class AppProtectionService {
         _ application: NSRunningApplication
     ) {
         guard !application.isTerminated else { return }
-        if !application.isHidden {
-            _ = application.hide()
-        }
+        conceal(application)
         requestNormalTermination(application)
+    }
+
+    private func conceal(_ application: NSRunningApplication) {
+        guard !application.isTerminated, !application.isHidden else { return }
+        _ = application.hide()
+    }
+
+    private func terminateRequestTarget(_ request: AccessRequest) {
+        switch request.resumeAction {
+        case .activate(let processIdentifier, _):
+            if let application = NSRunningApplication(processIdentifier: processIdentifier) {
+                requestNormalTermination(application)
+            }
+        case .reopen:
+            for application in NSRunningApplication.runningApplications(
+                withBundleIdentifier: request.bundleIdentifier
+            ) where !application.isTerminated {
+                requestNormalTermination(application)
+            }
+        }
     }
 
     private func requestNormalTermination(_ application: NSRunningApplication) {

@@ -80,6 +80,9 @@ class PolicyTests(unittest.TestCase):
         self.assertTrue(grants.granted("/close", 20, 500, lambda _pid: True))
         self.assertFalse(grants.granted("/close", 21, 500, lambda _pid: True))
         self.assertFalse(grants.granted("/close", 20, 500, lambda _pid: False))
+        grants.approve("/reset", 30, 5, 100)
+        grants.invalidate_all()
+        self.assertFalse(grants.granted("/reset", 30, 101, lambda _pid: True))
 
     def test_pending_request_prevents_cycles(self):
         pending = PendingRequestState()

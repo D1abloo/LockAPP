@@ -26,6 +26,7 @@ struct RootView: View {
         } message: {
             Text(model.errorMessage ?? "")
         }
+        .tint(Color(red: 0.78, green: 0.08, blue: 0.12))
     }
 }
 
@@ -72,10 +73,18 @@ private struct ManagementView: View {
                 .padding(.top, 8)
 
                 VStack(spacing: 8) {
-                    Button("Bloquear ahora") { model.lockNow() }
+                    Button {
+                        model.lockNow()
+                    } label: {
+                        Label("Bloquear ahora", systemImage: "lock.fill")
+                    }
                         .buttonStyle(.borderedProminent)
-                    Button("Bloquear configuración") { model.lockManagement() }
-                        .buttonStyle(.plain)
+                    Button {
+                        model.lockManagement()
+                    } label: {
+                        Label("Bloquear configuración", systemImage: "gearshape.fill")
+                    }
+                    .buttonStyle(.bordered)
                 }
                 .padding()
             }

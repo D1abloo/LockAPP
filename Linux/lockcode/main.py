@@ -39,6 +39,7 @@ class LockCodeApplication(Gtk.Application):
         self.management_pending = False
         self.update_checking = False
         self.store = Gtk.ListStore(bool, str, str)
+        self.available_apps: list[InstalledApp] = []
 
     def do_startup(self) -> None:
         Gtk.Application.do_startup(self)
@@ -114,6 +115,9 @@ class LockCodeApplication(Gtk.Application):
         app_actions = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
         refresh = action_button("Actualizar lista", "view-refresh-symbolic"); refresh.connect("clicked", lambda *_: self._refresh_apps()); app_actions.pack_start(refresh, False, False, 0)
         add = action_button("Añadir aplicación manualmente…", "list-add-symbolic", "suggested-action"); add.connect("clicked", self._add_app); app_actions.pack_start(add, False, False, 0)
+        self.app_search = Gtk.SearchEntry(); self.app_search.set_placeholder_text("Buscar aplicación")
+        self.app_search.set_tooltip_text("Buscar por nombre o ruta")
+        self.app_search.connect("search-changed", self._filter_apps); app_actions.pack_end(self.app_search, False, False, 0)
         apps_box.pack_start(app_actions, False, False, 0)
         tree = Gtk.TreeView(model=self.store); toggle = Gtk.CellRendererToggle(); toggle.connect("toggled", self._toggle_app)
         tree.append_column(Gtk.TreeViewColumn("Proteger", toggle, active=0)); tree.append_column(Gtk.TreeViewColumn("Aplicación", Gtk.CellRendererText(), text=1))
@@ -247,11 +251,15 @@ class LockCodeApplication(Gtk.Application):
         return True
 
     def _code_dialog(self, title: str, prompt: str) -> str | None:
-        dialog = Gtk.Dialog(title=title, transient_for=self.window, modal=True)
+        parent = self.window if self.window is not None and self.window.get_visible() else None
+        dialog = Gtk.Dialog(title=title, transient_for=parent, modal=True)
+        dialog.set_keep_above(True)
+        dialog.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
         dialog.add_buttons("Cancelar", Gtk.ResponseType.CANCEL, "Continuar", Gtk.ResponseType.OK)
         entry = Gtk.Entry(); entry.set_visibility(False); entry.set_activates_default(True)
         box = dialog.get_content_area(); box.set_spacing(8); box.set_margin_top(14); box.set_margin_bottom(14); box.set_margin_start(14); box.set_margin_end(14)
         box.add(Gtk.Label(label=prompt, xalign=0)); box.add(entry); dialog.set_default_response(Gtk.ResponseType.OK); dialog.show_all(); entry.grab_focus()
+        dialog.present()
         response = dialog.run(); value = entry.get_text(); entry.set_text(""); dialog.destroy()
         return value if response == Gtk.ResponseType.OK and valid_code(value) else None
 
@@ -299,11 +307,18 @@ class LockCodeApplication(Gtk.Application):
         self.settings.save()
 
     def _refresh_apps(self) -> None:
-        self.store.clear(); protected = set(self.settings.value.protected_executables)
         apps = {app.executable: app for app in load_apps()}
         for executable, name in self.settings.value.manual_executables.items():
             if app := manual_app(executable): apps[app.executable] = InstalledApp(name, app.executable)
-        for app in sorted(apps.values(), key=lambda item: item.name.casefold()):
+        self.available_apps = sorted(apps.values(), key=lambda item: item.name.casefold())
+        self._filter_apps()
+
+    def _filter_apps(self, *_args) -> None:
+        self.store.clear(); protected = set(self.settings.value.protected_executables)
+        query = self.app_search.get_text().strip().casefold() if hasattr(self, "app_search") else ""
+        for app in self.available_apps:
+            if query and query not in app.name.casefold() and query not in app.executable.casefold():
+                continue
             self.store.append([app.executable in protected, app.name, app.executable])
 
     def _add_app(self, *_args) -> None:
@@ -325,10 +340,13 @@ class LockCodeApplication(Gtk.Application):
         self.settings.save(); self._refresh_apps()
 
     def _save_settings(self, *_args) -> None:
+        previous_grace_minutes = self.settings.value.grace_minutes
         self.settings.value.protection_enabled = self.protection_check.get_active()
         self.settings.value.biometrics_enabled = self.bio_check.get_active()
         self.settings.value.start_with_linux = self.start_check.get_active()
         self.settings.value.grace_minutes = self.minutes.get_value_as_int()
+        if self.settings.value.grace_minutes != previous_grace_minutes:
+            self.protection.lock_now()
         self.settings.save(); set_enabled(self.settings.value.start_with_linux)
 
     def _change_code(self, *_args) -> None:

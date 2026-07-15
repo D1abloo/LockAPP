@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Windows;
+using System.Windows.Data;
 using Microsoft.Win32;
 using LockCode.Windows.Models;
 using LockCode.Windows.Services;
@@ -24,7 +25,7 @@ public partial class MainWindow : Window
     private bool _allowClose;
     private bool _managementAuthorized;
     private static readonly Version CurrentVersion = typeof(MainWindow).Assembly.GetName().Version
-        ?? new Version(0, 4, 4);
+        ?? new Version(0, 4, 5);
 
     public MainWindow()
     {
@@ -132,6 +133,19 @@ public partial class MainWindow : Window
     {
         _apps.Clear();
         foreach (var app in AppCatalog.Load(_settings.Value)) _apps.Add(app);
+        ApplyAppFilter();
+    }
+
+    private void SearchApps_TextChanged(object sender, RoutedEventArgs e) => ApplyAppFilter();
+
+    private void ApplyAppFilter()
+    {
+        var query = SearchApps.Text.Trim();
+        var view = CollectionViewSource.GetDefaultView(_apps);
+        view.Filter = item => item is InstalledApp app && (query.Length == 0
+            || app.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase)
+            || app.ExecutablePath.Contains(query, StringComparison.OrdinalIgnoreCase));
+        view.Refresh();
     }
 
     private void ProtectionChanged(object sender, RoutedEventArgs e)
@@ -155,10 +169,12 @@ public partial class MainWindow : Window
     private void SettingsChanged(object sender, RoutedEventArgs e)
     {
         if (_loading) return;
+        var previousGraceMinutes = _settings.Value.GraceMinutes;
         _settings.Value.ProtectionEnabled = ProtectionEnabled.IsChecked == true;
         _settings.Value.BiometricsEnabled = BiometricsEnabled.IsChecked == true;
         _settings.Value.StartWithWindows = StartupEnabled.IsChecked == true;
         _settings.Value.GraceMinutes = int.TryParse(GraceMinutes.Text, out var minutes) ? Math.Clamp(minutes, 0, 1440) : 0;
+        if (_settings.Value.GraceMinutes != previousGraceMinutes) _protection.LockNow();
         _settings.Save();
         StartupService.SetEnabled(_settings.Value.StartWithWindows);
     }

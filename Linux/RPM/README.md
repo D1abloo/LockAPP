@@ -7,7 +7,7 @@ Instalador independiente para Fedora 42 o posterior y CentOS Stream 9/10. CentOS
 ```bash
 sudo dnf install rpm-build
 ./RPM/build-rpm.sh
-sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.4_noarch.rpm
+sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.5_noarch.rpm
 gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
 ```
 
@@ -17,7 +17,7 @@ gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
 sudo dnf config-manager --set-enabled crb
 sudo dnf install epel-release rpm-build
 ./RPM/build-rpm.sh
-sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.4_noarch.rpm
+sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.5_noarch.rpm
 gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
 ```
 
