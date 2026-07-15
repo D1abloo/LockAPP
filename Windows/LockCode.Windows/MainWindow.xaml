@@ -34,7 +34,33 @@
         <DockPanel Margin="10"><Button DockPanel.Dock="Bottom" Content="Borrar registro" Padding="10,5" HorizontalAlignment="Left" Click="ClearAudit_Click"/><ListBox x:Name="AuditList"/></DockPanel>
       </TabItem>
       <TabItem Header="Actualizaciones"><StackPanel Margin="18"><TextBlock Text="LockCode para Windows" FontSize="18" FontWeight="SemiBold"/><TextBlock x:Name="CurrentVersionText" Margin="0,4,0,0"/><TextBlock x:Name="UpdateStatusText" Text="Busca versiones publicadas en el repositorio oficial." Margin="0,8,0,0" TextWrapping="Wrap"/><ProgressBar x:Name="UpdateProgress" Visibility="Collapsed" Height="8" Margin="0,12,0,0" Minimum="0" Maximum="100"/><Button x:Name="UpdateButton" Content="Buscar actualización" Padding="12,5" HorizontalAlignment="Left" Margin="0,12" Click="Updates_Click"/></StackPanel></TabItem>
-      <TabItem Header="Ayuda y soporte"><StackPanel Margin="18"><TextBlock TextWrapping="Wrap" FontSize="14"><Run Text="Uso: crea un código, marca las aplicaciones y deja LockCode activo en el área de notificación. Al detectar una aplicación protegida, la oculta y solicita código o Windows Hello. El registro solo muestra horas e intentos; nunca códigos ni nombres de aplicaciones.&#10;&#10;LockCode es gratuito y no requiere donación. Si quieres donar, puedes hacerlo ;)&#10;&#10;Soporte: kin_coriano14@hotmail.com&#10;Software realizado por Isaac Silva Jiménez.&#10;Copyright © 2026 Isaac SJ.&#10;&#10;Limitación: es una protección de privacidad best effort; no impide por completo la ejecución de procesos."/></TextBlock><Button Content="Donación voluntaria con PayPal" HorizontalAlignment="Left" Padding="12,5" Margin="0,14,0,0" Click="Donate_Click"/></StackPanel></TabItem>
+      <TabItem Header="Ayuda y soporte">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="18" MaxWidth="700" HorizontalAlignment="Left">
+            <TextBlock Text="Ayuda y soporte" FontSize="24" FontWeight="SemiBold"/>
+            <TextBlock Text="Guía práctica para configurar la protección, resolver dudas y contactar con soporte." TextWrapping="Wrap" Margin="0,4,0,14" Foreground="DimGray"/>
+            <GroupBox Header="Uso esencial" Margin="0,0,0,10">
+              <TextBlock Margin="10" TextWrapping="Wrap" Text="Crea un código, marca las aplicaciones que quieras proteger y deja LockCode activo en el área de notificación. Al detectar una aplicación protegida, la oculta y solicita el código o Windows Hello. Usa «Bloquear ahora» para invalidar inmediatamente los periodos de gracia."/>
+            </GroupBox>
+            <GroupBox Header="Privacidad y seguridad" Margin="0,0,0,10">
+              <TextBlock Margin="10" TextWrapping="Wrap" Text="El registro solo conserva la hora y el resultado de cada intento; nunca guarda códigos, datos biométricos ni nombres de aplicaciones. LockCode es una protección de privacidad best effort y no impide por completo la ejecución de procesos."/>
+            </GroupBox>
+            <GroupBox Header="Soporte técnico" Margin="0,0,0,10">
+              <StackPanel Margin="10">
+                <TextBlock TextWrapping="Wrap" Text="Indica las versiones de Windows y LockCode, qué estabas intentando hacer y los pasos para reproducir el problema. No envíes tu código ni información privada."/>
+                <Button Content="Escribir a isaaccoria46@gmail.com" HorizontalAlignment="Left" Padding="12,5" Margin="0,10,0,0" Click="SupportEmail_Click"/>
+              </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Proyecto y donación">
+              <StackPanel Margin="10">
+                <TextBlock TextWrapping="Wrap" Text="LockCode es gratuito y todas sus funciones pueden utilizarse sin donar. Si deseas apoyar voluntariamente su mantenimiento y futuras mejoras, puedes hacerlo mediante PayPal ;)"/>
+                <Button Content="Donación voluntaria con PayPal" HorizontalAlignment="Left" Padding="12,5" Margin="0,10,0,0" Click="Donate_Click"/>
+                <TextBlock Text="Copyright © 2026 Isaac Silva Jiménez." FontWeight="SemiBold" Margin="0,12,0,0"/>
+              </StackPanel>
+            </GroupBox>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
     </TabControl>
   </DockPanel>
 </Window>

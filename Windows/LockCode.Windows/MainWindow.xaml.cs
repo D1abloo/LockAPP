@@ -173,6 +173,8 @@ public partial class MainWindow : Window
     private async void Updates_Click(object sender, RoutedEventArgs e) => await CheckUpdateAsync(true);
     private void Donate_Click(object sender, RoutedEventArgs e) => Process.Start(
         new ProcessStartInfo("https://www.paypal.com/paypalme/kin_coriano14") { UseShellExecute = true });
+    private void SupportEmail_Click(object sender, RoutedEventArgs e) => Process.Start(
+        new ProcessStartInfo("mailto:isaaccoria46@gmail.com") { UseShellExecute = true });
 
     private async Task CheckUpdateAsync(bool interactive)
     {

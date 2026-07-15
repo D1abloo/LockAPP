@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VERSION="0.4.2"
+VERSION="0.4.3"
 TOPDIR="$ROOT/build/rpm"
 SOURCE="$TOPDIR/SOURCES/lockcode-linux-$VERSION"
 OUTPUT="$ROOT/RPM/output/lockcode-linux_${VERSION}_noarch.rpm"

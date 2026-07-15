@@ -8,9 +8,7 @@ struct AboutView: View {
                 .font(.largeTitle.bold())
             Text("Versión \(version) — MVP")
                 .foregroundStyle(.secondary)
-            Text("Software realizado por Isaac Silva Jiménez")
-                .font(.headline)
-            Text("Copyright © 2026 Isaac SJ. Todos los derechos reservados.")
+            Text("Copyright © 2026 Isaac Silva Jiménez.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
 
@@ -32,6 +30,6 @@ struct AboutView: View {
 
     private var version: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-            ?? "0.4.2"
+            ?? "0.4.3"
     }
 }

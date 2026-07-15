@@ -48,7 +48,7 @@ final class UpdateService: ObservableObject {
     init(bundle: Bundle = .main) {
         self.installedVersion = bundle.object(
             forInfoDictionaryKey: "CFBundleShortVersionString"
-        ) as? String ?? "0.4.2"
+        ) as? String ?? "0.4.3"
         if let previous = UserDefaults.standard.string(forKey: "updateCompletedFrom") {
             statusMessage = "LockCode se actualizó correctamente de \(previous) a \(installedVersion)."
             UserDefaults.standard.removeObject(forKey: "updateCompletedFrom")

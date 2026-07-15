@@ -103,5 +103,5 @@ update-desktop-database -q /usr/share/applications >/dev/null 2>&1 || :
 /usr/share/icons/hicolor/scalable/apps/com.lockcode.Linux.svg
 
 %changelog
-* Wed Jul 15 2026 Isaac Silva Jiménez <kin_coriano14@hotmail.com> - @VERSION@-1
+* Wed Jul 15 2026 Isaac Silva Jiménez <isaaccoria46@gmail.com> - @VERSION@-1
 - Primer paquete RPM independiente para Fedora y CentOS Stream.

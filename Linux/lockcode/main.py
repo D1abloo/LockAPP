@@ -137,10 +137,37 @@ class LockCodeApplication(Gtk.Application):
         self.update_status = Gtk.Label(label="", xalign=0); update_box.pack_start(self.update_status, False, False, 0)
         notebook.append_page(update_box, Gtk.Label(label="Actualizaciones"))
 
-        help_label = Gtk.Label(xalign=0, yalign=0, margin=18); help_label.set_line_wrap(True)
-        help_label.set_markup("<b>Ayuda y soporte</b>\n\nCrea un código, selecciona aplicaciones y deja LockCode activo. Al cerrar la ventana, sigue funcionando desde su icono en la bandeja. La huella se solicita automáticamente si fprintd está disponible. El registro nunca contiene códigos ni nombres de aplicaciones.\n\nLockCode es gratuito y no requiere donación. Si quieres donar, puedes hacerlo ;)\n\nSoporte: kin_coriano14@hotmail.com\nSoftware realizado por Isaac Silva Jiménez.\nCopyright © 2026 Isaac SJ.\n\nEs una protección de privacidad <i>best effort</i>, no un bloqueo infalible de procesos.")
-        help_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL); help_box.pack_start(help_label, True, True, 0)
-        donate = Gtk.Button(label="Donación voluntaria con PayPal"); donate.connect("clicked", lambda *_: webbrowser.open("https://www.paypal.com/paypalme/kin_coriano14")); help_box.pack_start(donate, False, False, 12)
+        help_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, margin=18)
+        help_title = Gtk.Label(xalign=0); help_title.set_markup("<span size='x-large'><b>Ayuda y soporte</b></span>\nGuía práctica para configurar la protección, resolver dudas y contactar con soporte.")
+        help_box.pack_start(help_title, False, False, 0)
+
+        def add_help_section(title: str, text: str) -> Gtk.Box:
+            frame = Gtk.Frame(label=title)
+            content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin=12)
+            label = Gtk.Label(label=text, xalign=0); label.set_line_wrap(True)
+            content.pack_start(label, False, False, 0); frame.add(content)
+            help_box.pack_start(frame, False, False, 0)
+            return content
+
+        add_help_section(
+            "Uso esencial",
+            "Crea un código, selecciona las aplicaciones y deja LockCode activo en la bandeja. La huella se solicita automáticamente cuando fprintd está disponible. Usa «Bloquear ahora» para invalidar inmediatamente los periodos de gracia.",
+        )
+        add_help_section(
+            "Privacidad y seguridad",
+            "El registro solo conserva la hora y el resultado de cada intento; nunca guarda códigos, datos biométricos ni nombres de aplicaciones. LockCode es una protección de privacidad best effort, no un bloqueo infalible de procesos.",
+        )
+        support = add_help_section(
+            "Soporte técnico",
+            "Indica las versiones de Linux y LockCode, qué estabas intentando hacer y los pasos para reproducir el problema. No envíes tu código ni información privada.",
+        )
+        support.pack_start(Gtk.LinkButton.new_with_label("mailto:isaaccoria46@gmail.com", "isaaccoria46@gmail.com"), False, False, 0)
+        project = add_help_section(
+            "Proyecto y donación",
+            "LockCode es gratuito y todas sus funciones pueden utilizarse sin donar. Si deseas apoyar voluntariamente su mantenimiento y futuras mejoras, puedes hacerlo mediante PayPal ;)",
+        )
+        donate = Gtk.Button(label="Donación voluntaria con PayPal"); donate.connect("clicked", lambda *_: webbrowser.open("https://www.paypal.com/paypalme/kin_coriano14")); project.pack_start(donate, False, False, 0)
+        project.pack_start(Gtk.Label(label="Copyright © 2026 Isaac Silva Jiménez.", xalign=0), False, False, 0)
         notebook.append_page(help_box, Gtk.Label(label="Ayuda y soporte"))
         window.add(outer); outer.show_all(); return window
 

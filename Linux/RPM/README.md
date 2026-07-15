@@ -7,7 +7,7 @@ Instalador independiente para Fedora 42 o posterior y CentOS Stream 9/10. CentOS
 ```bash
 sudo dnf install rpm-build
 ./RPM/build-rpm.sh
-sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.2_noarch.rpm
+sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.3_noarch.rpm
 gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
 ```
 
@@ -17,7 +17,7 @@ gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
 sudo dnf config-manager --set-enabled crb
 sudo dnf install epel-release rpm-build
 ./RPM/build-rpm.sh
-sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.2_noarch.rpm
+sudo dnf install --nogpgcheck ./RPM/output/lockcode-linux_0.4.3_noarch.rpm
 gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
 ```
 
@@ -30,3 +30,7 @@ sudo dnf remove lockcode-linux
 ```
 
 El RPM de prueba publicado no está firmado con GPG; por eso la instalación manual usa `--nogpgcheck`. LockCode sí exige que la descarga automática coincida con el SHA-256 publicado por GitHub. Para distribución estable debe firmarse el RPM con una clave de publicación.
+
+Soporte: `isaaccoria46@gmail.com`. No envíes códigos, contraseñas ni información privada.
+
+Copyright © 2026 Isaac Silva Jiménez.

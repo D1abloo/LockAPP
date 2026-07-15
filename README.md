@@ -153,7 +153,6 @@ Las versiones se publican de forma coordinada: una actualización funcional se a
 
 - La aplicación incluye una guía de uso y soporte redactada en español.
 - Las actualizaciones se consultan automáticamente desde `https://github.com/D1abloo/LockAPP/releases`. Solo se aceptan descargas HTTPS del repositorio oficial con SHA-256 publicado; nunca se instalan sin confirmación.
-- El correo de soporte se muestra en Ayuda y soporte. La dirección asociada al botón de donación no se presenta en la interfaz.
+- El soporte está disponible en `isaaccoria46@gmail.com`. El botón de donación no utiliza ni muestra ese correo.
 - LockCode es gratuito y no requiere donación. Quien quiera apoyar voluntariamente el proyecto puede usar el enlace de PayPal incluido en la sección Ayuda y soporte.
-- Software realizado por Isaac Silva Jiménez.
-- Copyright © 2026 Isaac SJ. Todos los derechos reservados.
+- Copyright © 2026 Isaac Silva Jiménez.

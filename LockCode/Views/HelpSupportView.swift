@@ -1,11 +1,9 @@
 import SwiftUI
 
 struct HelpSupportView: View {
-    private let donationURL = URL(
-        string: "https://www.paypal.com/donate/?business=kin_coriano14%40hotmail.com&no_recurring=0&currency_code=EUR"
-    )!
+    private let donationURL = URL(string: "https://www.paypal.com/paypalme/kin_coriano14")!
     private let supportURL = URL(string: "https://github.com/D1abloo/LockAPP/issues")!
-    private let emailURL = URL(string: "mailto:kin_coriano14@hotmail.com")!
+    private let emailURL = URL(string: "mailto:isaaccoria46@gmail.com")!
 
     var body: some View {
         ScrollView {
@@ -41,23 +39,24 @@ struct HelpSupportView: View {
                     Text("Al aceptar, LockCode descarga el ZIP oficial, verifica su SHA-256, sustituye la copia instalada y se reinicia. Nunca instala una descarga sin tu intervención.")
                 }
 
-                HelpCard(title: "Ayuda y soporte", systemImage: "questionmark.bubble") {
-                    Text("Si encuentras un problema, indica la versión de macOS, la versión de LockCode y los pasos necesarios para reproducirlo. Nunca envíes tu código de acceso.")
+                HelpCard(title: "Soporte técnico", systemImage: "questionmark.bubble") {
+                    Text("Si necesitas ayuda, explica qué estabas intentando hacer, los pasos para reproducir el problema y las versiones de macOS y LockCode.")
+                    Text("No envíes tu código, datos biométricos, registros privados ni información de las aplicaciones protegidas.")
                     Link("Abrir una incidencia en GitHub", destination: supportURL)
                     HStack(spacing: 6) {
-                        Text("Correo de contacto:")
-                        Link("kin_coriano14@hotmail.com", destination: emailURL)
+                        Text("Correo de soporte:")
+                        Link("isaaccoria46@gmail.com", destination: emailURL)
                     }
                 }
 
                 HelpCard(title: "Proyecto y donaciones", systemImage: "heart.fill") {
-                    Text("LockCode es de uso gratuito y no necesitas realizar ninguna donación. Si quieres apoyar voluntariamente el desarrollo, puedes hacerlo ;)")
+                    Text("LockCode es gratuito y todas sus funciones pueden utilizarse sin donar. Si deseas apoyar voluntariamente su mantenimiento y futuras mejoras, puedes hacerlo mediante PayPal ;)")
                     Link(destination: donationURL) {
                         Label("Donar con PayPal", systemImage: "heart.circle.fill")
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.red)
-                    Text("Software realizado por Isaac Silva Jiménez. Copyright © 2026 Isaac SJ.")
+                    Text("Copyright © 2026 Isaac Silva Jiménez.")
                         .fontWeight(.semibold)
                 }
             }
@@ -73,7 +72,7 @@ struct HelpSupportView: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text("Ayuda y soporte")
                     .font(.largeTitle.bold())
-                Text("Guía de instalación, configuración, registro y actualizaciones.")
+                Text("Guía práctica para configurar la protección, resolver dudas y contactar con soporte.")
                     .foregroundStyle(.secondary)
             }
         }
