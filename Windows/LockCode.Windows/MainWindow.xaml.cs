@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
 using System.Windows;
+using Microsoft.Win32;
 using LockCode.Windows.Models;
 using LockCode.Windows.Services;
 
@@ -19,6 +21,8 @@ public partial class MainWindow : Window
     private bool _loading;
     private bool _allowClose;
     private bool _managementAuthorized;
+    private static readonly Version CurrentVersion = typeof(MainWindow).Assembly.GetName().Version
+        ?? new Version(0, 4, 0);
 
     public MainWindow()
     {
@@ -39,8 +43,10 @@ public partial class MainWindow : Window
             _credentials.SetCode(setup.Code);
         }
         LoadSettings();
+        CurrentVersionText.Text = $"Versión instalada: {CurrentVersion.ToString(3)}";
         RefreshApps();
         RefreshAudit();
+        ShowCompletedUpdate();
         StartupService.SetEnabled(_settings.Value.StartWithWindows);
         await CheckUpdateAsync(false);
     }
@@ -91,6 +97,28 @@ public partial class MainWindow : Window
     }
     private void LockNow_Click(object sender, RoutedEventArgs e) => LockNow();
     private void Refresh_Click(object sender, RoutedEventArgs e) => RefreshApps();
+
+    private void AddApp_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Añadir aplicación a LockCode",
+            Filter = "Aplicaciones de Windows (*.exe)|*.exe",
+            CheckFileExists = true,
+            CheckPathExists = true,
+            Multiselect = false
+        };
+        if (dialog.ShowDialog(this) != true) return;
+        var path = Path.GetFullPath(dialog.FileName);
+        if (string.Equals(path, Environment.ProcessPath, StringComparison.OrdinalIgnoreCase))
+        {
+            System.Windows.MessageBox.Show("LockCode no puede bloquearse a sí mismo.", "LockCode");
+            return;
+        }
+        _settings.Value.ManualExecutables.Add(path);
+        _settings.Value.ProtectedExecutables.Add(path);
+        _settings.Save(); RefreshApps();
+    }
 
     private void RefreshApps()
     {
@@ -144,23 +172,38 @@ public partial class MainWindow : Window
     private void Donate_Click(object sender, RoutedEventArgs e) => Process.Start(
         new ProcessStartInfo("https://www.paypal.com/paypalme/kin_coriano14") { UseShellExecute = true });
 
-    private static async Task CheckUpdateAsync(bool interactive)
+    private async Task CheckUpdateAsync(bool interactive)
     {
+        UpdateStatusText.Text = $"LockCode {CurrentVersion.ToString(3)} · buscando actualización…";
         try
         {
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("LockCode-Windows/0.1.0");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd($"LockCode-Windows/{CurrentVersion.ToString(3)}");
             var json = await client.GetStringAsync("https://api.github.com/repos/D1abloo/LockAPP/releases/latest");
             using var document = System.Text.Json.JsonDocument.Parse(json);
             var hasWindowsInstaller = document.RootElement.GetProperty("assets").EnumerateArray()
-                .Any(asset => asset.GetProperty("name").GetString()?.Contains("Windows", StringComparison.OrdinalIgnoreCase) == true);
-            if (!hasWindowsInstaller) { if (interactive) System.Windows.MessageBox.Show("No hay un instalador de Windows publicado.", "LockCode"); return; }
+                .Any(asset => asset.GetProperty("name").GetString() is string name
+                    && name.Contains("Windows", StringComparison.OrdinalIgnoreCase)
+                    && name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+            if (!hasWindowsInstaller) { UpdateStatusText.Text = "La versión publicada no incluye LockCode para Windows."; if (interactive) System.Windows.MessageBox.Show(UpdateStatusText.Text, "LockCode"); return; }
             var tag = document.RootElement.GetProperty("tag_name").GetString()?.TrimStart('v');
-            if (Version.TryParse(tag, out var remote) && remote > new Version("0.1.0")
-                && System.Windows.MessageBox.Show($"Hay una actualización {remote}. ¿Abrir la descarga?", "LockCode", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                Process.Start(new ProcessStartInfo("https://github.com/D1abloo/LockAPP/releases") { UseShellExecute = true });
-            else if (interactive) System.Windows.MessageBox.Show("No hay una actualización posterior publicada.", "LockCode");
+            if (Version.TryParse(tag, out var remote) && remote > CurrentVersion)
+            {
+                UpdateStatusText.Text = $"LockCode {CurrentVersion.ToString(3)} · versión {remote.ToString(3)} disponible";
+                if (System.Windows.MessageBox.Show($"LockCode {CurrentVersion.ToString(3)} puede actualizarse a {remote.ToString(3)}. ¿Abrir la descarga?", "LockCode", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    Process.Start(new ProcessStartInfo("https://github.com/D1abloo/LockAPP/releases") { UseShellExecute = true });
+            }
+            else { UpdateStatusText.Text = "LockCode está actualizado."; if (interactive) System.Windows.MessageBox.Show(UpdateStatusText.Text, "LockCode"); }
         }
-        catch { if (interactive) System.Windows.MessageBox.Show("No se pudo comprobar la actualización.", "LockCode"); }
+        catch { UpdateStatusText.Text = "No se pudo comprobar la actualización."; if (interactive) System.Windows.MessageBox.Show(UpdateStatusText.Text, "LockCode"); }
+    }
+
+    private void ShowCompletedUpdate()
+    {
+        using var key = Registry.CurrentUser.OpenSubKey(@"Software\LockCode", writable: true);
+        if (key?.GetValue("UpdatedFrom") is not string previous) return;
+        key.DeleteValue("UpdatedFrom", false);
+        UpdateStatusText.Text = $"LockCode se actualizó correctamente de {previous} a {CurrentVersion.ToString(3)}.";
+        System.Windows.MessageBox.Show(UpdateStatusText.Text, "LockCode");
     }
 }

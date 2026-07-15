@@ -13,6 +13,13 @@ public partial class App : System.Windows.Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        if (e.Args.Contains("--smoke-test", StringComparer.OrdinalIgnoreCase))
+        {
+            _window = new MainWindow();
+            _window.DisposeServices();
+            Shutdown();
+            return;
+        }
         _singleInstance = new Mutex(true, "Local\\LockCode.Windows", out var first);
         if (!first) { Shutdown(); return; }
 

@@ -24,6 +24,11 @@ struct ApplicationsView: View {
                 }
                 Spacer()
                 Button {
+                    model.addApplicationManually()
+                } label: {
+                    Label("Añadir aplicación…", systemImage: "plus")
+                }
+                Button {
                     Task { await model.refreshApplications() }
                 } label: {
                     Label("Actualizar", systemImage: "arrow.clockwise")

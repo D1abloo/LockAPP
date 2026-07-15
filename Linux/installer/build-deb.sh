@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VERSION="0.1.5"
+VERSION="0.4.0"
 STAGE="$ROOT/build/lockcode_${VERSION}_all"
 OUTPUT="$ROOT/build/lockcode-linux_${VERSION}_all.deb"
 

@@ -39,4 +39,24 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(restoredStore.customUnlockMinutes, 42)
         XCTAssertFalse(restoredStore.launchAtLoginEnabled)
     }
+
+    func testManuallyAddedApplicationPersists() {
+        let suiteName = "LockCodeTests.SettingsStore.Manual.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("No se pudo crear UserDefaults aislado")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let application = InstalledApplication(
+            bundleIdentifier: "com.example.Manual",
+            displayName: "Manual",
+            bundleURL: URL(fileURLWithPath: "/tmp/Manual.app")
+        )
+        let firstStore = SettingsStore(defaults: defaults)
+        firstStore.addManually(application)
+        firstStore.setProtected(true, bundleIdentifier: application.bundleIdentifier)
+
+        let restored = SettingsStore(defaults: defaults)
+        XCTAssertEqual(restored.manuallyAddedApplications, [application])
+        XCTAssertTrue(restored.isProtected(application.bundleIdentifier))
+    }
 }

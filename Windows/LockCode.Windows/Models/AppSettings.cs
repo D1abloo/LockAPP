@@ -7,6 +7,7 @@ public sealed class AppSettings
     public bool StartWithWindows { get; set; } = true;
     public int GraceMinutes { get; set; }
     public HashSet<string> ProtectedExecutables { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public HashSet<string> ManualExecutables { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 }
 
 public sealed record InstalledApp(string Name, string ExecutablePath)

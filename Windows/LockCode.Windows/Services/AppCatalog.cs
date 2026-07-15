@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using System.Diagnostics;
 using System.IO;
 using LockCode.Windows.Models;
 
@@ -30,6 +31,15 @@ public static class AppCatalog
                 }
             }
             catch { /* An inaccessible uninstall entry is ignored. */ }
+        }
+        foreach (var path in settings.ManualExecutables.Where(File.Exists))
+        {
+            var executable = Path.GetFullPath(path);
+            if (string.Equals(executable, Environment.ProcessPath, StringComparison.OrdinalIgnoreCase)) continue;
+            var name = FileVersionInfo.GetVersionInfo(executable).FileDescription;
+            found[executable] = new InstalledApp(
+                string.IsNullOrWhiteSpace(name) ? Path.GetFileNameWithoutExtension(executable) : name,
+                executable) { IsProtected = settings.ProtectedExecutables.Contains(executable) };
         }
         return found.Values.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
     }

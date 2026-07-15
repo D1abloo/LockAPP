@@ -25,6 +25,8 @@
 14. Con LockCode activo, activar repetidamente una aplicación protegida y comprobar que el supervisor la mantiene oculta incluso si no llega un nuevo evento de `NSWorkspace`. Repetir con otra aplicación visible pero no situada en primer plano.
 15. Usar una aplicación que rechace temporalmente `hide()` y verificar que una pantalla opaca cubre todos los monitores detrás del panel de autenticación, sin mostrar información de la aplicación.
 16. Cancelar la autenticación; la pantalla opaca debe permanecer hasta que la aplicación protegida quede oculta o termine normalmente.
+17. Pulsar «Añadir aplicación…», elegir un paquete `.app` fuera de las carpetas catalogadas y comprobar que aparece protegido.
+18. Reiniciar LockCode y comprobar que la aplicación añadida manualmente conserva su estado; moverla o eliminarla no debe provocar fallos.
 
 ## Touch ID
 

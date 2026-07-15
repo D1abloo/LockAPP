@@ -3,15 +3,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="LockCode para Windows" Icon="Assets/LockCode.png" Width="900" Height="620" MinWidth="720" MinHeight="480">
   <DockPanel Margin="18">
-    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,14">
-      <Image Source="Assets/LockCode.png" Width="48" Height="48" Margin="0,0,10,0"/>
+    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,14">
+      <Image DockPanel.Dock="Left" Source="Assets/LockCode.png" Width="48" Height="48" Margin="0,0,10,0"/>
+      <Button DockPanel.Dock="Right" Content="Bloquear ahora" Margin="10,4,0,4" Padding="14,6" Click="LockNow_Click"/>
       <StackPanel><TextBlock Text="LockCode" FontSize="26" FontWeight="SemiBold"/><TextBlock Text="Protección de privacidad para Windows"/></StackPanel>
-      <Button Content="Bloquear ahora" Margin="Auto,4,0,4" Padding="14,6" Click="LockNow_Click"/>
-    </StackPanel>
+    </DockPanel>
     <TabControl>
       <TabItem Header="Aplicaciones">
         <DockPanel Margin="10">
-          <Button DockPanel.Dock="Top" Content="Actualizar lista" HorizontalAlignment="Left" Padding="12,5" Margin="0,0,0,8" Click="Refresh_Click"/>
+          <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="Actualizar lista" Padding="12,5" Click="Refresh_Click"/>
+            <Button Content="Añadir aplicación manualmente…" Padding="12,5" Margin="8,0,0,0" Click="AddApp_Click"/>
+          </StackPanel>
           <ListView x:Name="AppsList"><ListView.ItemTemplate><DataTemplate>
             <CheckBox IsChecked="{Binding IsProtected}" Content="{Binding Name}" ToolTip="{Binding ExecutablePath}" Checked="ProtectionChanged" Unchecked="ProtectionChanged" Padding="4"/>
           </DataTemplate></ListView.ItemTemplate></ListView>
@@ -30,7 +33,7 @@
       <TabItem Header="Registro">
         <DockPanel Margin="10"><Button DockPanel.Dock="Bottom" Content="Borrar registro" Padding="10,5" HorizontalAlignment="Left" Click="ClearAudit_Click"/><ListBox x:Name="AuditList"/></DockPanel>
       </TabItem>
-      <TabItem Header="Actualizaciones"><StackPanel Margin="18"><TextBlock Text="Busca versiones publicadas en el repositorio oficial."/><Button Content="Buscar actualización" Padding="12,5" HorizontalAlignment="Left" Margin="0,12" Click="Updates_Click"/></StackPanel></TabItem>
+      <TabItem Header="Actualizaciones"><StackPanel Margin="18"><TextBlock Text="LockCode para Windows" FontSize="18" FontWeight="SemiBold"/><TextBlock x:Name="CurrentVersionText" Margin="0,4,0,0"/><TextBlock x:Name="UpdateStatusText" Text="Busca versiones publicadas en el repositorio oficial." Margin="0,8,0,0"/><Button Content="Buscar actualización" Padding="12,5" HorizontalAlignment="Left" Margin="0,12" Click="Updates_Click"/></StackPanel></TabItem>
       <TabItem Header="Ayuda y soporte"><StackPanel Margin="18"><TextBlock TextWrapping="Wrap" FontSize="14"><Run Text="Uso: crea un código, marca las aplicaciones y deja LockCode activo en el área de notificación. Al detectar una aplicación protegida, la oculta y solicita código o Windows Hello. El registro solo muestra horas e intentos; nunca códigos ni nombres de aplicaciones.&#10;&#10;LockCode es gratuito y no requiere donación. Si quieres donar, puedes hacerlo ;)&#10;&#10;Soporte: kin_coriano14@hotmail.com&#10;Software realizado por Isaac Silva Jiménez.&#10;&#10;Limitación: es una protección de privacidad best effort; no impide por completo la ejecución de procesos."/></TextBlock><Button Content="Donación voluntaria con PayPal" HorizontalAlignment="Left" Padding="12,5" Margin="0,14,0,0" Click="Donate_Click"/></StackPanel></TabItem>
     </TabControl>
   </DockPanel>

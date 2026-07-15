@@ -6,7 +6,7 @@ Proyecto independiente para Debian 12, Ubuntu 22.04 o distribuciones compatibles
 
 - Código de 4–64 caracteres con símbolos, derivado mediante PBKDF2-HMAC-SHA256; solo la credencial derivada se guarda en Secret Service/libsecret.
 - Huella automática mediante fprintd cuando existe un lector configurado.
-- Catálogo basado en entradas `.desktop`.
+- Catálogo basado en entradas `.desktop` y selector manual de cualquier ejecutable válido.
 - Monitor `/proc`: pausa inmediatamente el proceso con `SIGSTOP`; al autorizar usa `SIGCONT`, y al cancelar solicita cierre normal con `SIGTERM`. Nunca usa `SIGKILL`.
 - Periodo de gracia, bloqueo inmediato, penalización progresiva, registro anónimo y actualizaciones confirmadas.
 - Inicio automático mediante un único servicio systemd de usuario ligado a la sesión gráfica; indicador de bandeja con el icono de LockCode.
@@ -18,7 +18,7 @@ sudo apt install python3 python3-gi gir1.2-gtk-3.0 libsecret-tools fprintd \
   gir1.2-ayatanaappindicator3-0.1 dpkg-dev
 chmod +x installer/build-deb.sh
 ./installer/build-deb.sh
-sudo apt install ./build/lockcode-linux_0.1.5_all.deb
+sudo apt install ./build/lockcode-linux_0.4.0_all.deb
 ```
 
 Para Fedora y CentOS Stream usa el instalador RPM independiente y sus instrucciones en [`RPM/README.md`](RPM/README.md). Los paquetes `.deb` y `.rpm` no se mezclan.
@@ -41,7 +41,7 @@ Abre **Actualizaciones > Buscar actualización**. Si aparece una versión nueva,
 También puedes actualizar manualmente con:
 
 ```bash
-sudo apt install ./lockcode-linux_0.1.5_all.deb
+sudo apt install ./lockcode-linux_0.4.0_all.deb
 ```
 
 Una actualización conserva el código, las aplicaciones protegidas y el registro. El instalador reinicia el servicio y el icono vuelve a la bandeja automáticamente.

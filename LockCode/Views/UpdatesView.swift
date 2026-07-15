@@ -21,6 +21,8 @@ private struct UpdatesContent: View {
                     VStack(alignment: .leading, spacing: 5) {
                         Text("Actualizaciones")
                             .font(.largeTitle.bold())
+                        Text("LockCode para macOS")
+                            .font(.headline)
                         Text("Versión instalada: \(updateService.installedVersion)")
                             .foregroundStyle(.secondary)
                     }

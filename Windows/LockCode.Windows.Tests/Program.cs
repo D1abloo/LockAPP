@@ -1,5 +1,6 @@
 using LockCode.Windows.Services;
 using LockCode.Windows.Models;
+using System.Text.Json;
 
 var checks = new (string Name, bool Passed)[]
 {
@@ -35,4 +36,8 @@ var pending = new PendingRequestState();
 var cyclePassed = pending.Begin(30) && !pending.Begin(30);
 pending.Complete(30); cyclePassed = cyclePassed && pending.Begin(30);
 Console.WriteLine($"{(cyclePassed ? "PASS" : "FAIL")} prevención de ciclos");
-return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed && cyclePassed ? 0 : 1;
+var manual = new AppSettings { ManualExecutables = new(StringComparer.OrdinalIgnoreCase) { @"C:\Apps\Private.exe" } };
+var restored = JsonSerializer.Deserialize<AppSettings>(JsonSerializer.Serialize(manual));
+var manualPassed = restored?.ManualExecutables.Contains(@"C:\Apps\Private.exe") == true;
+Console.WriteLine($"{(manualPassed ? "PASS" : "FAIL")} aplicación manual persistente");
+return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed && cyclePassed && manualPassed ? 0 : 1;

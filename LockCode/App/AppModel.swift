@@ -1,6 +1,7 @@
 import AppKit
 import Combine
 import Foundation
+import UniformTypeIdentifiers
 
 @MainActor
 final class AppModel: ObservableObject {
@@ -135,10 +136,42 @@ final class AppModel: ObservableObject {
 
     func refreshApplications() async {
         isLoadingApplications = true
-        installedApplications = await catalogService.loadInstalledApplications(
+        let scanned = await catalogService.loadInstalledApplications(
             excluding: protectionService.excludedBundleIdentifiers
         )
+        var applications = Dictionary(uniqueKeysWithValues: scanned.map { ($0.bundleIdentifier, $0) })
+        for application in settings.manuallyAddedApplications
+        where !protectionService.excludedBundleIdentifiers.contains(application.bundleIdentifier)
+            && FileManager.default.fileExists(atPath: application.bundleURL.path) {
+            applications[application.bundleIdentifier] = application
+        }
+        installedApplications = applications.values.sorted {
+            $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending
+        }
         isLoadingApplications = false
+    }
+
+    func addApplicationManually() {
+        let panel = NSOpenPanel()
+        panel.title = "Añadir aplicación a LockCode"
+        panel.prompt = "Añadir y proteger"
+        panel.directoryURL = URL(fileURLWithPath: "/Applications", isDirectory: true)
+        panel.allowedContentTypes = [.applicationBundle]
+        panel.allowsMultipleSelection = false
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.treatsFilePackagesAsDirectories = false
+        guard panel.runModal() == .OK, let url = panel.url,
+              let application = catalogService.application(
+                at: url,
+                excluding: protectionService.excludedBundleIdentifiers
+              ) else {
+            if panel.url != nil { errorMessage = "Selecciona una aplicación .app válida distinta de LockCode." }
+            return
+        }
+        settings.addManually(application)
+        setProtected(true, application: application)
+        Task { await refreshApplications() }
     }
 
     func setProtected(_ protected: Bool, application: InstalledApplication) {

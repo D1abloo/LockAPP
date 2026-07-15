@@ -9,7 +9,7 @@ LockCode es un MVP nativo para macOS que protege la apertura o activación de ap
 - Onboarding con código de 4 a 64 caracteres; admite letras, números, espacios y símbolos imprimibles.
 - Credencial del código derivada con PBKDF2-HMAC-SHA256, sal aleatoria y 210.000 rondas, almacenada en Keychain. El código no se conserva.
 - Desbloqueo opcional con Touch ID, iniciado automáticamente cuando está habilitado y disponible.
-- Catálogo de aplicaciones instaladas.
+- Catálogo de aplicaciones instaladas y selector manual de paquetes `.app` situados fuera de las carpetas habituales.
 - Selección individual de aplicaciones protegidas.
 - Detección de lanzamiento y activación mediante `NSWorkspace`.
 - Restauración del bloqueo al reiniciar LockCode: las aplicaciones protegidas que ya estén abiertas se ocultan en cuanto vuelve a arrancar el monitor.
@@ -145,6 +145,8 @@ Consulta `docs/SECURITY_MODEL.md` antes de prometer un nivel de protección come
 - [`Linux/`](Linux/README.md): aplicación GTK, pruebas, actualización, desinstalación limpia e instalador Debian propios.
 
 Cada edición mantiene su configuración, almacén seguro, inicio automático y sistema biométrico. No se mezclan binarios ni instaladores con la edición macOS.
+
+Las versiones se publican de forma coordinada: una actualización funcional se anuncia únicamente cuando GitHub Releases contiene los instaladores de macOS, Windows, Debian/Ubuntu y Fedora/CentOS con el mismo número de versión.
 
 ## Ayuda, actualizaciones y donaciones
 

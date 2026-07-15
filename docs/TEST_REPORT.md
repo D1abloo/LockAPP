@@ -1,4 +1,4 @@
-# Informe de validación — 14 de julio de 2026
+# Informe de validación — 15 de julio de 2026
 
 ## Entorno disponible
 
@@ -10,10 +10,13 @@
 ## Comprobaciones completadas
 
 - `xcodegen generate`: correcto; genera `LockCode.xcodeproj` y el esquema compartido `LockCode` con `LockCodeTests`.
+- Fuentes 0.4.0 comprobadas con Swift 6.3.3: type-check correcto; la suite XCTest no puede ejecutarse sin Xcode completo.
+- Selector manual `.app`: valida paquete, bundle identifier y exclusión de LockCode; persiste la ruta y activa la protección. Sus pruebas XCTest se compilan dentro del proyecto generado.
+- Bundle universal 0.4.0 para Intel y Apple Silicon enlazado, firmado con `LockCode Local Signing`, verificado con `codesign` y empaquetado como `LockCode-macOS-0.4.0.zip`.
 - Type-check de todas las fuentes con Swift 6, concurrencia estricta y warnings como errores: correcto para `x86_64` y `arm64`, con deployment target macOS 13.
 - Enlace directo con `swiftc` del ejecutable completo: correcto en `x86_64` y `arm64`.
 - Verificador ejecutable de reglas de dominio: 28 comprobaciones correctas para código con símbolos, credencial PBKDF2 sin texto plano, penalizaciones, bloqueo al terminar, expiración por minutos, solicitud pendiente, deduplicación, inicio automático, registro persistente/borrable y validación de URL de actualización.
-- GitHub Releases devuelve el 404 esperado mientras no existan releases; la interfaz muestra ese estado y no genera una notificación falsa.
+- El actualizador solo anuncia una publicación que contenga un paquete macOS y muestra versión instalada y disponible.
 - Bundle 0.3.2 (compilación 6) universal, firmado localmente, instalado y ejecutándose desde `/Applications/LockCode.app`; incorpora ocultado/cierre normal de aplicaciones restauradas y supervisión continua de todas las aplicaciones protegidas.
 - La versión 0.3.2 se enlazó con Swift 6.3.3, concurrencia estricta y advertencias tratadas como errores para `x86_64-apple-macosx13.0` y `arm64-apple-macosx13.0`.
 - Se sustituyó la firma ad hoc por la identidad estable `LockCode Local Signing`. El requisito designado resultante es el identificador `com.example.LockCode` unido al certificado raíz local `B6B43B1032FFE0624A6192E2F9B976709BAB2F00`, por lo que futuras compilaciones firmadas con esa identidad conservan la autorización «Permitir siempre» de Keychain.

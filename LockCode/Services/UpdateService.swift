@@ -1,12 +1,17 @@
 import Combine
 import Foundation
 
+struct GitHubAsset: Decodable, Sendable {
+    let name: String
+}
+
 struct GitHubRelease: Decodable, Sendable {
     let tagName: String
     let name: String?
     let body: String?
     let htmlURL: URL
     let publishedAt: Date?
+    let assets: [GitHubAsset]?
 
     enum CodingKeys: String, CodingKey {
         case tagName = "tag_name"
@@ -14,6 +19,7 @@ struct GitHubRelease: Decodable, Sendable {
         case body
         case htmlURL = "html_url"
         case publishedAt = "published_at"
+        case assets
     }
 }
 
@@ -83,10 +89,20 @@ final class UpdateService: ObservableObject {
                 statusMessage = "GitHub devolvió un enlace de actualización no válido."
                 return
             }
+            guard release.assets?.contains(where: {
+                let name = $0.name.lowercased()
+                return (name.contains("macos") || name.contains("mac-"))
+                    && (name.hasSuffix(".zip") || name.hasSuffix(".dmg"))
+            }) == true else {
+                latestRelease = nil
+                updateAvailable = false
+                statusMessage = "La versión publicada todavía no incluye LockCode para macOS."
+                return
+            }
             latestRelease = release
             updateAvailable = AppVersion(installedVersion) < AppVersion(release.tagName)
             statusMessage = updateAvailable
-                ? "Hay una nueva versión disponible: \(release.tagName)."
+                ? "LockCode \(installedVersion) puede actualizarse a \(release.tagName)."
                 : "LockCode está actualizado."
         } catch {
             statusMessage = "No se pudo comprobar la actualización. Revisa tu conexión."

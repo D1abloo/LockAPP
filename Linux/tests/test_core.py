@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from lockcode.audit import AuditStore
-from lockcode.catalog import load_apps
+from lockcode.catalog import load_apps, manual_app
 from lockcode.policy import AttemptLimiter, GrantState, PendingRequestState, valid_code
 from lockcode.settings import SettingsStore
 from lockcode.secure_store import SecretStore, derive_credential, verify_credential
@@ -115,6 +115,20 @@ class PersistenceTests(unittest.TestCase):
             apps = load_apps([root])
             self.assertEqual([(app.name, app.executable) for app in apps],
                 [("Terminal", str(executable.resolve()))])
+
+    def test_manual_executable_is_validated_and_persisted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            executable = Path(directory) / "private-app"
+            executable.write_text("#!/bin/sh\n", encoding="utf-8")
+            executable.chmod(0o755)
+            app = manual_app(str(executable))
+            self.assertEqual(app.name, "private-app")
+            path = Path(directory) / "settings.json"
+            store = SettingsStore(path)
+            store.value.manual_executables[app.executable] = app.name
+            store.save()
+            self.assertEqual(SettingsStore(path).value.manual_executables,
+                             {app.executable: "private-app"})
 
     def test_protected_apps_persist(self):
         with tempfile.TemporaryDirectory() as directory:

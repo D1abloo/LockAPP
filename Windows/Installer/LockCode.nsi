@@ -1,8 +1,9 @@
 Unicode True
 !include "MUI2.nsh"
+!include "LogicLib.nsh"
 
 !define APP_NAME "LockCode"
-!define APP_VERSION "0.1.0"
+!define APP_VERSION "0.4.0"
 !define APP_PUBLISHER "Isaac Silva Jiménez"
 !define APP_URL "https://github.com/D1abloo/LockAPP"
 !define MUI_ICON "..\LockCode.Windows\Assets\LockCode.ico"
@@ -29,7 +30,7 @@ SetCompressor /SOLID lzma
 BrandingText "LockCode — protección de privacidad"
 Icon "..\LockCode.Windows\Assets\LockCode.ico"
 WindowIcon On
-VIProductVersion 0.1.0.0
+VIProductVersion 0.4.0.0
 VIAddVersionKey /LANG=1034 "ProductName" "LockCode para Windows"
 VIAddVersionKey /LANG=1034 "CompanyName" "${APP_PUBLISHER}"
 VIAddVersionKey /LANG=1034 "FileDescription" "Instalador de LockCode"
@@ -49,6 +50,11 @@ VIAddVersionKey /LANG=1034 "LegalCopyright" "Copyright © 2026 ${APP_PUBLISHER}"
 
 Section "LockCode (obligatorio)" SecMain
   SectionIn RO
+  ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LockCode" "DisplayVersion"
+  ${If} $0 != ""
+  ${AndIf} $0 != "${APP_VERSION}"
+    WriteRegStr HKCU "Software\LockCode" "UpdatedFrom" "$0"
+  ${EndIf}
   SetOutPath "$INSTDIR"
   File /r "..\publish\*"
   CreateDirectory "$SMPROGRAMS\LockCode"

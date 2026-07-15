@@ -23,7 +23,8 @@ final class GitHubReleaseTests: XCTestCase {
             "name": "LockCode 0.2.0",
             "body": "Mejoras de seguridad",
             "html_url": "https://github.com/D1abloo/LockAPP/releases/tag/v0.2.0",
-            "published_at": "2026-07-14T12:00:00Z"
+            "published_at": "2026-07-14T12:00:00Z",
+            "assets": [{"name": "LockCode-macOS-0.2.0.zip"}]
         }
         """#.utf8)
         let decoder = JSONDecoder()
@@ -38,5 +39,6 @@ final class GitHubReleaseTests: XCTestCase {
             "https://github.com/D1abloo/LockAPP/releases/tag/v0.2.0"
         )
         XCTAssertNotNil(release.publishedAt)
+        XCTAssertEqual(release.assets?.first?.name, "LockCode-macOS-0.2.0.zip")
     }
 }

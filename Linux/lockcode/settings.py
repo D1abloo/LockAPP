@@ -16,6 +16,7 @@ class Settings:
     credential_configured: bool = False
     credential_id: str = field(default_factory=lambda: uuid.uuid4().hex)
     protected_executables: list[str] = field(default_factory=list)
+    manual_executables: dict[str, str] = field(default_factory=dict)
 
 
 class SettingsStore:
@@ -40,6 +41,7 @@ class SettingsStore:
     def save(self) -> None:
         self.value.grace_minutes = max(0, min(1440, int(self.value.grace_minutes)))
         self.value.protected_executables = sorted(set(self.value.protected_executables))
+        self.value.manual_executables = dict(sorted(self.value.manual_executables.items()))
         self.path.parent.mkdir(parents=True, exist_ok=True)
         temporary = self.path.with_suffix(".tmp")
         temporary.write_text(json.dumps(asdict(self.value), indent=2), encoding="utf-8")

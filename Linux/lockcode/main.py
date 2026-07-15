@@ -16,7 +16,7 @@ from gi.repository import GLib, Gtk  # noqa: E402
 
 from . import __version__, biometrics, updates
 from .audit import AuditStore
-from .catalog import load_apps
+from .catalog import InstalledApp, load_apps, manual_app
 from .policy import AttemptLimiter, valid_code
 from .protection import AccessRequest, ProtectionService
 from .secure_store import SecretStore
@@ -103,7 +103,10 @@ class LockCodeApplication(Gtk.Application):
         notebook = Gtk.Notebook(); outer.pack_start(notebook, True, True, 0)
 
         apps_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin=10)
-        refresh = Gtk.Button(label="Actualizar lista"); refresh.connect("clicked", lambda *_: self._refresh_apps()); apps_box.pack_start(refresh, False, False, 0)
+        app_actions = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        refresh = Gtk.Button(label="Actualizar lista"); refresh.connect("clicked", lambda *_: self._refresh_apps()); app_actions.pack_start(refresh, False, False, 0)
+        add = Gtk.Button(label="Añadir aplicación manualmente…"); add.connect("clicked", self._add_app); app_actions.pack_start(add, False, False, 0)
+        apps_box.pack_start(app_actions, False, False, 0)
         tree = Gtk.TreeView(model=self.store); toggle = Gtk.CellRendererToggle(); toggle.connect("toggled", self._toggle_app)
         tree.append_column(Gtk.TreeViewColumn("Proteger", toggle, active=0)); tree.append_column(Gtk.TreeViewColumn("Aplicación", Gtk.CellRendererText(), text=1))
         scroll = Gtk.ScrolledWindow(); scroll.add(tree); apps_box.pack_start(scroll, True, True, 0)
@@ -238,7 +241,29 @@ class LockCodeApplication(Gtk.Application):
 
     def _refresh_apps(self) -> None:
         self.store.clear(); protected = set(self.settings.value.protected_executables)
-        for app in load_apps(): self.store.append([app.executable in protected, app.name, app.executable])
+        apps = {app.executable: app for app in load_apps()}
+        for executable, name in self.settings.value.manual_executables.items():
+            if app := manual_app(executable): apps[app.executable] = InstalledApp(name, app.executable)
+        for app in sorted(apps.values(), key=lambda item: item.name.casefold()):
+            self.store.append([app.executable in protected, app.name, app.executable])
+
+    def _add_app(self, *_args) -> None:
+        dialog = Gtk.FileChooserDialog(
+            title="Añadir aplicación", transient_for=self.window,
+            action=Gtk.FileChooserAction.OPEN,
+        )
+        dialog.add_buttons("Cancelar", Gtk.ResponseType.CANCEL, "Añadir", Gtk.ResponseType.ACCEPT)
+        dialog.set_local_only(True)
+        response = dialog.run(); selected = dialog.get_filename(); dialog.destroy()
+        app = manual_app(selected) if response == Gtk.ResponseType.ACCEPT and selected else None
+        if app is None:
+            if response == Gtk.ResponseType.ACCEPT:
+                self._message("Selecciona un ejecutable válido distinto de LockCode.", Gtk.MessageType.ERROR)
+            return
+        self.settings.value.manual_executables[app.executable] = app.name
+        if app.executable not in self.settings.value.protected_executables:
+            self.settings.value.protected_executables.append(app.executable)
+        self.settings.save(); self._refresh_apps()
 
     def _save_settings(self, *_args) -> None:
         self.settings.value.protection_enabled = self.protection_check.get_active()

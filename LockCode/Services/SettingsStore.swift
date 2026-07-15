@@ -10,6 +10,7 @@ final class SettingsStore: ObservableObject {
         static let customUnlockMinutes = "customUnlockMinutes"
         static let launchAtLoginEnabled = "launchAtLoginEnabled"
         static let protectedBundleIdentifiers = "protectedBundleIdentifiers"
+        static let manuallyAddedApplications = "manuallyAddedApplications"
     }
 
     private let defaults: UserDefaults
@@ -47,6 +48,13 @@ final class SettingsStore: ObservableObject {
         }
     }
 
+    @Published private(set) var manuallyAddedApplications: [InstalledApplication] {
+        didSet {
+            defaults.set(try? JSONEncoder().encode(manuallyAddedApplications),
+                         forKey: Key.manuallyAddedApplications)
+        }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         self.protectionEnabled = defaults.object(forKey: Key.protectionEnabled) as? Bool ?? true
@@ -61,6 +69,8 @@ final class SettingsStore: ObservableObject {
         self.protectedBundleIdentifiers = Set(
             defaults.stringArray(forKey: Key.protectedBundleIdentifiers) ?? []
         )
+        self.manuallyAddedApplications = (defaults.data(forKey: Key.manuallyAddedApplications)
+            .flatMap { try? JSONDecoder().decode([InstalledApplication].self, from: $0) }) ?? []
         if storedLaunchAtLogin == nil {
             defaults.set(true, forKey: Key.launchAtLoginEnabled)
         }
@@ -75,6 +85,16 @@ final class SettingsStore: ObservableObject {
             protectedBundleIdentifiers.insert(bundleIdentifier)
         } else {
             protectedBundleIdentifiers.remove(bundleIdentifier)
+        }
+    }
+
+    func addManually(_ application: InstalledApplication) {
+        manuallyAddedApplications.removeAll {
+            $0.bundleIdentifier == application.bundleIdentifier
+        }
+        manuallyAddedApplications.append(application)
+        manuallyAddedApplications.sort {
+            $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending
         }
     }
 }

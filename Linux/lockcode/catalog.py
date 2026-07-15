@@ -14,6 +14,14 @@ class InstalledApp:
     executable: str
 
 
+def manual_app(path: str) -> InstalledApp | None:
+    executable = os.path.realpath(path)
+    if (not os.path.isfile(executable) or not os.access(executable, os.X_OK)
+            or executable in {"/usr/bin/lockcode", "/usr/lib/lockcode/lockcode.py"}):
+        return None
+    return InstalledApp(Path(executable).name, executable)
+
+
 def load_apps(roots: list[Path] | None = None) -> list[InstalledApp]:
     roots = roots or [
         Path.home() / ".local/share/applications",
