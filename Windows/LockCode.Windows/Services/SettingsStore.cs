@@ -16,6 +16,15 @@ public sealed class SettingsStore
         Directory.CreateDirectory(DirectoryPath);
         try { Value = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath)) ?? new(); }
         catch { Value = new(); }
+        var protectedExecutables = Value.ProtectedExecutables
+            .Select(ExecutablePathPolicy.Normalize).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var manualExecutables = Value.ManualExecutables
+            .Select(ExecutablePathPolicy.Normalize).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var changed = !protectedExecutables.SetEquals(Value.ProtectedExecutables)
+            || !manualExecutables.SetEquals(Value.ManualExecutables);
+        Value.ProtectedExecutables = protectedExecutables;
+        Value.ManualExecutables = manualExecutables;
+        if (changed) Save();
     }
 
     public void Save()

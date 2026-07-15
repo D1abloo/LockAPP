@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace LockCode.Windows.Models;
 
 public sealed class AppSettings
@@ -16,6 +18,26 @@ public sealed record InstalledApp(string Name, string ExecutablePath)
 }
 
 public sealed record AccessEvent(DateTimeOffset At, string Kind);
+
+public static class ExecutablePathPolicy
+{
+    public static string Normalize(string path)
+    {
+        try
+        {
+            var executable = Path.GetFullPath(path);
+            var versionDirectory = Directory.GetParent(executable);
+            if (versionDirectory?.Parent is not null
+                && Version.TryParse(versionDirectory.Name, out _))
+            {
+                var launcher = Path.Combine(versionDirectory.Parent.FullName, Path.GetFileName(executable));
+                if (File.Exists(launcher)) return launcher;
+            }
+            return executable;
+        }
+        catch { return path; }
+    }
+}
 
 public sealed class AttemptLimiter
 {

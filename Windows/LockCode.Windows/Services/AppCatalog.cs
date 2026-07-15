@@ -27,8 +27,9 @@ public static class AppCatalog
                     var icon = (item?.GetValue("DisplayIcon") as string)?.Split(',')[0].Trim('"');
                     if (string.IsNullOrWhiteSpace(displayName) || string.IsNullOrWhiteSpace(icon)
                         || !icon.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) || !File.Exists(icon)) continue;
-                    found[icon] = new InstalledApp(displayName, icon)
-                        { IsProtected = settings.ProtectedExecutables.Contains(icon) };
+                    var executable = ExecutablePathPolicy.Normalize(icon);
+                    found[executable] = new InstalledApp(displayName, executable)
+                        { IsProtected = settings.ProtectedExecutables.Contains(executable) };
                 }
             }
             catch { /* An inaccessible uninstall entry is ignored. */ }
@@ -38,7 +39,7 @@ public static class AppCatalog
         LoadBuiltInApps(settings, found);
         foreach (var path in settings.ManualExecutables.Where(File.Exists))
         {
-            var executable = Path.GetFullPath(path);
+            var executable = ExecutablePathPolicy.Normalize(path);
             if (string.Equals(executable, Environment.ProcessPath, StringComparison.OrdinalIgnoreCase)) continue;
             var name = FileVersionInfo.GetVersionInfo(executable).FileDescription;
             found[executable] = new InstalledApp(
@@ -105,7 +106,7 @@ public static class AppCatalog
     {
         if (!File.Exists(path) || !path.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
             || string.Equals(Path.GetFullPath(path), Environment.ProcessPath, StringComparison.OrdinalIgnoreCase)) return;
-        var executable = Path.GetFullPath(path);
+        var executable = ExecutablePathPolicy.Normalize(path);
         var fileName = FileVersionInfo.GetVersionInfo(executable).FileDescription;
         var name = string.IsNullOrWhiteSpace(displayName)
             ? string.IsNullOrWhiteSpace(fileName) ? Path.GetFileNameWithoutExtension(executable) : fileName

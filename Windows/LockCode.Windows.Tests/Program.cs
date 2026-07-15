@@ -59,6 +59,15 @@ var packagePassed = packageEntries.Count == 1 && packageEntries[0].Name == "Calc
     && packageEntries[0].ExecutablePath == packageExecutable;
 Directory.Delete(packageDirectory, true);
 Console.WriteLine($"{(packagePassed ? "PASS" : "FAIL")} aplicaciones integradas de Windows");
+var browserDirectory = Path.Combine(Path.GetTempPath(), $"lockcode-browser-{Guid.NewGuid():N}", "Application");
+var browserVersionDirectory = Path.Combine(browserDirectory, "150.0.4078.65");
+Directory.CreateDirectory(browserVersionDirectory);
+var browserLauncher = Path.Combine(browserDirectory, "msedge.exe");
+var browserInternal = Path.Combine(browserVersionDirectory, "msedge.exe");
+File.WriteAllBytes(browserLauncher, []); File.WriteAllBytes(browserInternal, []);
+var browserPassed = ExecutablePathPolicy.Normalize(browserInternal) == browserLauncher;
+Directory.Delete(Directory.GetParent(browserDirectory)!.FullName, true);
+Console.WriteLine($"{(browserPassed ? "PASS" : "FAIL")} navegador normalizado a un único lanzador");
 var updateJson = """
 {"tag_name":"v0.4.7","assets":[{"name":"LockCode-Windows-0.4.7-Setup.exe","browser_download_url":"https://github.com/D1abloo/LockAPP/releases/download/v0.4.7/LockCode-Windows-0.4.7-Setup.exe","digest":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","size":123}]}
 """;
@@ -70,4 +79,4 @@ var installerInfo = UpdateService.InstallerStartInfo(Path.Combine(Path.GetTempPa
 var installerPassed = !installerInfo.UseShellExecute && installerInfo.ArgumentList.SequenceEqual(["/S"]);
 Console.WriteLine($"{(installerPassed ? "PASS" : "FAIL")} instalador ejecutado directamente sin navegador");
 return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed && resetPassed
-    && cyclePassed && manualPassed && packagePassed && updatePassed && installerPassed ? 0 : 1;
+    && cyclePassed && manualPassed && packagePassed && browserPassed && updatePassed && installerPassed ? 0 : 1;

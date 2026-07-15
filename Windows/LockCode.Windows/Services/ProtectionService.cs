@@ -67,8 +67,10 @@ public sealed class ProtectionService : IDisposable
             lock (_pending) _pending.Retain(processes.Select(process => process.Id).ToHashSet());
             foreach (var process in processes)
             {
-                var path = ExecutablePath(process);
-                if (path is null || path.Equals(Environment.ProcessPath, StringComparison.OrdinalIgnoreCase)
+                var rawPath = ExecutablePath(process);
+                if (rawPath is null) { process.Dispose(); continue; }
+                var path = ExecutablePathPolicy.Normalize(rawPath);
+                if (path.Equals(Environment.ProcessPath, StringComparison.OrdinalIgnoreCase)
                     || !_settings.Value.ProtectedExecutables.Contains(path) || IsGranted(path, process)) { process.Dispose(); continue; }
                 lock (_pending) if (!_pending.Begin(path, process.Id)) { Hide(process); process.Dispose(); continue; }
                 Hide(process);
