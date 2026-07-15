@@ -1,8 +1,8 @@
-# LockCode para Windows 0.4.5
+# LockCode para Windows 0.4.6
 
 Proyecto independiente para Windows 10 2004 o posterior. No usa archivos ni configuración de la edición macOS.
 
-Versión publicada: **0.4.5**. Uso gratuito sujeto a la [Política de uso general](../USAGE_POLICY.md) y a las condiciones mostradas por el instalador.
+Versión publicada: **0.4.6**. Uso gratuito sujeto a la [Política de uso general](../USAGE_POLICY.md) y a las condiciones mostradas por el instalador.
 
 ## Funciones
 
@@ -29,7 +29,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\build.ps1
 ```
 
-El instalador moderno se crea en `Installer\output\LockCode-Windows-0.4.5-Setup.exe`. Incluye:
+El instalador moderno se crea en `Installer\output\LockCode-Windows-0.4.6-Setup.exe`. Incluye:
 
 - icono rojo de LockCode en el instalador, ejecutable, ventanas, bandeja, menú Inicio, escritorio y desinstalación;
 - presentación y descripción del producto;
@@ -46,7 +46,7 @@ dotnet run --project .\LockCode.Windows.Tests\LockCode.Windows.Tests.csproj
 
 ## Instalación y primer inicio
 
-1. Ejecuta `LockCode-Windows-0.4.5-Setup.exe`.
+1. Ejecuta `LockCode-Windows-0.4.6-Setup.exe`.
 2. Lee las condiciones. Si no las aceptas, cancela: no se instalará la aplicación.
 3. Conserva la carpeta propuesta o elige otra y termina el asistente.
 4. Crea un código de 4–64 caracteres. Admite letras, números, espacios y símbolos.

@@ -1,14 +1,14 @@
-# Validación Linux 0.4.5
+# Validación Linux 0.4.6
 
-Estado publicado vigente para Debian/Ubuntu y RPM. La posterior versión macOS 0.4.6 no modifica Linux. Condiciones generales: [`USAGE_POLICY.md`](../USAGE_POLICY.md).
+Estado publicado vigente para Debian/Ubuntu y RPM. Condiciones generales: [`USAGE_POLICY.md`](../USAGE_POLICY.md).
 
 - 15 de julio de 2026: 14 pruebas unitarias correctas (incluyen selector manual persistente, metadatos seguros de actualización, progreso de APT/DNF, identidad de credencial por instalación, catálogo de Terminal y migración de inicio).
 - `compileall`: correcto.
 - Paquete Debian inspeccionado: metadatos, permisos, dependencia obligatoria del indicador, icono, entrada de escritorio, unidad systemd y scripts `postinst`, `prerm` y `postrm` correctos.
-- Instalador Debian: `installer/output/lockcode-linux_0.4.5_all.deb`.
-- Instalador RPM: `RPM/output/lockcode-linux_0.4.5_noarch.rpm`.
-- SHA-256 DEB: `b4fa13e4c13a1d45ed06bd5c986b9c4aece2e8a452e696e0a1380f75fdbbffc9`.
-- SHA-256 RPM: `cf99aebc8455ea9232023a379751c9a6d8f881217b9446a99f235da38f83a5a9`.
+- Instalador Debian: `installer/output/lockcode-linux_0.4.6_all.deb`.
+- Instalador RPM: `RPM/output/lockcode-linux_0.4.6_noarch.rpm`.
+- SHA-256 DEB: `90afc90d567d2589830cf725af8f3efd1b44ba27fa54cf84d56d1e2c472ab02e`.
+- SHA-256 RPM: `4ee5faa14f63f841df1ba5a9cfc986762b4ec76aeae45b2a49e00def40bd2886`.
 - Actualización 0.1.1 → 0.1.2 comprobada en Ubuntu: configuración conservada, servicio activo y una sola instancia.
 - `apt purge` comprobado: servicio, configuración, registro, caché y archivos del paquete eliminados.
 - Instalación nueva comprobada sin variables de `sudo`: servicio activo, una sola instancia, onboarding nuevo pendiente e indicador Ayatana `Active` con el icono `com.lockcode.Linux`.

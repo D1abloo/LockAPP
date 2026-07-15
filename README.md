@@ -5,9 +5,9 @@ LockCode es un MVP nativo para macOS que protege la apertura o activación de ap
 | Edición | Versión publicada |
 | --- | --- |
 | macOS | **0.4.6** |
-| Windows | **0.4.5** |
-| Debian/Ubuntu | **0.4.5** |
-| Fedora/CentOS RPM | **0.4.5** |
+| Windows | **0.4.6** |
+| Debian/Ubuntu | **0.4.6** |
+| Fedora/CentOS RPM | **0.4.6** |
 
 LockCode es gratuito, no requiere donación y se distribuye conforme a la [Política de uso](USAGE_POLICY.md).
 
@@ -131,7 +131,6 @@ No cambies la identidad de firma entre actualizaciones: la autorización del ele
 - `macOS/Installer`: proceso y salida del instalador ZIP de macOS.
 - `docs`: especificación funcional, aceptación, seguridad e informes de prueba.
 - `USAGE_POLICY.md`: condiciones de uso, privacidad, distribución y soporte.
-- `CODEX_TASK.md`: estado de mantenimiento y reglas de futuras entregas.
 
 ## Limitaciones conocidas
 
