@@ -4,6 +4,10 @@ import XCTest
 @testable import LockCode
 
 final class PINCredentialTests: XCTestCase {
+    func testKeychainUsesBrandedServiceName() {
+        XCTAssertEqual(KeychainPINStore.defaultService, "LockCode")
+    }
+
     func testCredentialVerifiesOnlyOriginalPIN() throws {
         let hasher = PINCredentialHasher(rounds: 1_000)
         let credential = try hasher.makeCredential(for: "1234")

@@ -56,10 +56,9 @@ final class AppModel: ObservableObject {
         guard !isStarted else { return }
         isStarted = true
         protectionService.start()
-        let keychainService = Bundle.main.bundleIdentifier ?? "com.example.LockCode"
         Task {
             let hasPIN = await Task.detached(priority: .userInitiated) {
-                KeychainPINStore(service: keychainService).hasPIN
+                KeychainPINStore().hasPIN
             }.value
             isConfigured = hasPIN
             isConfigurationLoading = false

@@ -57,7 +57,7 @@ struct HelpSupportView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.red)
-                    Text("Software realizado por Isaac Silva Jiménez.")
+                    Text("Software realizado por Isaac Silva Jiménez. Copyright © 2026 Isaac SJ.")
                         .fontWeight(.semibold)
                 }
             }

@@ -6,6 +6,7 @@
 2. Verificar que acepta entre 4 y 64 caracteres, incluidos espacios y símbolos, y rechaza saltos de línea o caracteres de control.
 3. Verificar que la confirmación debe coincidir.
 4. Cerrar y abrir; comprobar que vuelve a pedir autenticación de gestión.
+5. Actualizar desde una versión anterior y comprobar que Keychain muestra `LockCode` y nunca presenta el nombre técnico provisional; si la migración silenciosa no está autorizada, crear un código nuevo dentro de LockCode.
 
 ## Protección
 

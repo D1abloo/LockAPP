@@ -10,9 +10,10 @@
 ## Comprobaciones completadas
 
 - `xcodegen generate`: correcto; genera `LockCode.xcodeproj` y el esquema compartido `LockCode` con `LockCodeTests`.
-- Fuentes 0.4.1 comprobadas con Swift 6.3.3, concurrencia completa y warnings como errores: type-check correcto; la suite XCTest no puede ejecutarse sin Xcode completo.
+- Fuentes 0.4.2 comprobadas con Swift 6.3.3, concurrencia completa y warnings como errores: type-check correcto; la suite XCTest no puede ejecutarse sin Xcode completo.
 - Selector manual `.app`: valida paquete, bundle identifier y exclusión de LockCode; persiste la ruta y activa la protección. Sus pruebas XCTest se compilan dentro del proyecto generado.
-- Bundle universal 0.4.1 para Intel y Apple Silicon enlazado, firmado con `LockCode Local Signing`, verificado con `codesign` y empaquetado en `macOS/Installer/output/LockCode-macOS-0.4.1.zip` (SHA-256 `c2c70716677015f77275e374ba86faa9eef5a3bb667d3340099573a296f46816`).
+- Bundle universal 0.4.2 para Intel y Apple Silicon enlazado, firmado con `LockCode Local Signing`, verificado con `codesign` y empaquetado en `macOS/Installer/output/LockCode-macOS-0.4.2.zip` (SHA-256 `c5c3fda96e05d9a7b3a9adf5d8729f177cd44ca172015fb226c9a7f9891a6b9e`).
+- El elemento de Keychain usa el nombre visible `LockCode`. La credencial derivada histórica solo se migra si Keychain permite leerla sin interfaz; si no, se solicita crear otro código dentro de LockCode y nunca se muestra el diálogo técnico anterior.
 - Actualizador macOS: asset HTTPS oficial, digest SHA-256, firma de código, sustitución segura, relanzamiento y confirmación posterior implementados; queda pendiente recorrer el reemplazo real con una versión futura instalada en `/Applications`.
 - Type-check de todas las fuentes con Swift 6, concurrencia estricta y warnings como errores: correcto para `x86_64` y `arm64`, con deployment target macOS 13.
 - Enlace directo con `swiftc` del ejecutable completo: correcto en `x86_64` y `arm64`.
@@ -20,7 +21,7 @@
 - El actualizador solo anuncia una publicación que contenga un paquete macOS y muestra versión instalada y disponible.
 - Bundle 0.3.2 (compilación 6) universal, firmado localmente, instalado y ejecutándose desde `/Applications/LockCode.app`; incorpora ocultado/cierre normal de aplicaciones restauradas y supervisión continua de todas las aplicaciones protegidas.
 - La versión 0.3.2 se enlazó con Swift 6.3.3, concurrencia estricta y advertencias tratadas como errores para `x86_64-apple-macosx13.0` y `arm64-apple-macosx13.0`.
-- Se sustituyó la firma ad hoc por la identidad estable `LockCode Local Signing`. El requisito designado resultante es el identificador `com.example.LockCode` unido al certificado raíz local `B6B43B1032FFE0624A6192E2F9B976709BAB2F00`, por lo que futuras compilaciones firmadas con esa identidad conservan la autorización «Permitir siempre» de Keychain.
+- Se sustituyó la firma ad hoc por la identidad estable `LockCode Local Signing`; mantener esa identidad evita repetir la autorización «Permitir siempre» de Keychain.
 - `SMAppService.mainApp` registró LockCode como ítem de inicio; System Events confirma `name: LockCode` y `path: /Applications/LockCode.app`.
 - El registro se renovó tras actualizar la compilación (`Generation: 8`, estado habilitado). Una apertura real de la aplicación protegida configurada confirmó que el supervisor la ocultó y solicitó su terminación normal.
 - El delegado permite terminar inmediatamente durante apagado, reinicio o cierre de sesión, pero conserva la autenticación para una salida manual.

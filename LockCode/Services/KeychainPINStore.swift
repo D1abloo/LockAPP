@@ -1,4 +1,5 @@
 import Foundation
+import LocalAuthentication
 import Security
 
 enum KeychainPINStoreError: LocalizedError {
@@ -16,17 +17,22 @@ enum KeychainPINStoreError: LocalizedError {
 }
 
 final class KeychainPINStore {
+    static let defaultService = "LockCode"
+
     private let service: String
+    private let legacyServices: [String]
     private let account = "primary-pin"
     private let encoder = PropertyListEncoder()
     private let decoder = PropertyListDecoder()
     private let hasher: PINCredentialHasher
 
     init(
-        service: String = Bundle.main.bundleIdentifier ?? "com.example.LockCode",
+        service: String = KeychainPINStore.defaultService,
+        legacyServices: [String] = ["com.example.LockCode"],
         hasher: PINCredentialHasher = PINCredentialHasher()
     ) {
         self.service = service
+        self.legacyServices = legacyServices
         self.hasher = hasher
     }
 
@@ -37,7 +43,10 @@ final class KeychainPINStore {
     func save(pin: String) throws {
         let credential = try hasher.makeCredential(for: pin)
         let data = try encoder.encode(credential)
+        try save(data: data, service: service)
+    }
 
+    private func save(data: Data, service: String) throws {
         let baseQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -46,6 +55,8 @@ final class KeychainPINStore {
 
         let attributes: [String: Any] = [
             kSecValueData as String: data,
+            kSecAttrLabel as String: "LockCode",
+            kSecAttrDescription as String: "Código de acceso de LockCode",
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         ]
 
@@ -102,13 +113,44 @@ final class KeychainPINStore {
     }
 
     private func readPINData() throws -> Data {
-        let query: [String: Any] = [
+        do {
+            return try readPINData(service: service)
+        } catch KeychainPINStoreError.unexpectedStatus(let status)
+            where status == errSecItemNotFound {
+            for legacyService in legacyServices where legacyService != service {
+                guard let data = try? readPINData(
+                    service: legacyService,
+                    allowAuthenticationUI: false
+                ) else { continue }
+                try save(data: data, service: service)
+                let legacyQuery: [String: Any] = [
+                    kSecClass as String: kSecClassGenericPassword,
+                    kSecAttrService as String: legacyService,
+                    kSecAttrAccount as String: account
+                ]
+                _ = SecItemDelete(legacyQuery as CFDictionary)
+                return data
+            }
+            throw KeychainPINStoreError.unexpectedStatus(status)
+        }
+    }
+
+    private func readPINData(
+        service: String,
+        allowAuthenticationUI: Bool = true
+    ) throws -> Data {
+        var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
             kSecReturnData as String: true,
             kSecMatchLimit as String: kSecMatchLimitOne
         ]
+        if !allowAuthenticationUI {
+            let context = LAContext()
+            context.interactionNotAllowed = true
+            query[kSecUseAuthenticationContext as String] = context
+        }
 
         var result: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &result)

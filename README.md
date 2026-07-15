@@ -87,7 +87,7 @@ La identidad de firma debe permanecer estable entre versiones. Si cada actualiza
 
 ## Distribución fuera de Mac App Store
 
-1. Sustituye `com.example.LockCode` en `project.yml` por un identificador propio y configura `DEVELOPMENT_TEAM` en Xcode o en tu configuración local.
+1. Configura `DEVELOPMENT_TEAM` y una identidad Developer ID estable en Xcode o en tu configuración local.
 2. Genera el proyecto y el archivo Release:
 
    ```bash
@@ -156,3 +156,4 @@ Las versiones se publican de forma coordinada: una actualización funcional se a
 - El correo de soporte se muestra en Ayuda y soporte. La dirección asociada al botón de donación no se presenta en la interfaz.
 - LockCode es gratuito y no requiere donación. Quien quiera apoyar voluntariamente el proyecto puede usar el enlace de PayPal incluido en la sección Ayuda y soporte.
 - Software realizado por Isaac Silva Jiménez.
+- Copyright © 2026 Isaac SJ. Todos los derechos reservados.

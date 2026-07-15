@@ -10,6 +10,9 @@ struct AboutView: View {
                 .foregroundStyle(.secondary)
             Text("Software realizado por Isaac Silva Jiménez")
                 .font(.headline)
+            Text("Copyright © 2026 Isaac SJ. Todos los derechos reservados.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
 
             GroupBox("Aviso de seguridad") {
                 Text("LockCode observa lanzamientos y activaciones después de que ocurren. Está pensado para privacidad casual y no puede resistir a un administrador o a alguien que cierre el proceso.")
@@ -29,6 +32,6 @@ struct AboutView: View {
 
     private var version: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-            ?? "0.3.1"
+            ?? "0.4.2"
     }
 }
