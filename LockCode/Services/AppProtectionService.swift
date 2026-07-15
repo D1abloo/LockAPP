@@ -1,4 +1,5 @@
 import AppKit
+import CoreGraphics
 import Foundation
 
 @MainActor
@@ -268,23 +269,55 @@ final class AppProtectionService {
     private func enforceProtectedApplications() {
         guard settings.protectionEnabled else { return }
         let now = Date()
+        let visibleProcessIdentifiers = visibleApplicationProcessIdentifiers()
         for bundleIdentifier in settings.protectedBundleIdentifiers {
-            guard !excludedBundleIdentifiers.contains(bundleIdentifier),
-                  !accessState.isAccessGranted(for: bundleIdentifier, at: now) else {
+            guard !excludedBundleIdentifiers.contains(bundleIdentifier) else {
                 continue
             }
-            for application in NSRunningApplication.runningApplications(
+            let applications = NSRunningApplication.runningApplications(
                 withBundleIdentifier: bundleIdentifier
-            ) where !application.isTerminated {
+            ).filter { !$0.isTerminated }
+            let hasVisibleWindow = applications.contains {
+                visibleProcessIdentifiers.contains($0.processIdentifier)
+            }
+            if settings.unlockDuration.keepsAccessUntilApplicationCloses,
+               accessState.updateImmediateWindowVisibility(
+                   bundleIdentifier: bundleIdentifier,
+                   isVisible: hasVisibleWindow
+               ) {
+                continue
+            }
+            guard !accessState.isAccessGranted(for: bundleIdentifier, at: now),
+                  hasVisibleWindow else {
+                continue
+            }
+            for application in applications
+            where visibleProcessIdentifiers.contains(application.processIdentifier) {
                 if accessState.hasPendingRequest(for: bundleIdentifier) {
                     conceal(application)
-                } else if application.isActive {
-                    handle(application, trigger: .activation)
                 } else {
-                    concealAndRequestNormalTermination(application)
+                    handle(application, trigger: .activation)
                 }
             }
         }
+    }
+
+    private func visibleApplicationProcessIdentifiers() -> Set<pid_t> {
+        guard let windows = CGWindowListCopyWindowInfo(
+            [.optionOnScreenOnly, .excludeDesktopElements],
+            kCGNullWindowID
+        ) as? [[String: Any]] else {
+            return []
+        }
+        return Set(windows.compactMap { window in
+            guard let processIdentifier = window[kCGWindowOwnerPID as String] as? NSNumber,
+                  let layer = window[kCGWindowLayer as String] as? NSNumber,
+                  layer.intValue == 0,
+                  (window[kCGWindowAlpha as String] as? NSNumber)?.doubleValue ?? 1 > 0 else {
+                return nil
+            }
+            return pid_t(processIdentifier.int32Value)
+        })
     }
 
     private func concealAndRequestNormalTermination(

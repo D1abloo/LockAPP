@@ -48,6 +48,39 @@ final class ApplicationAccessStateTests: XCTestCase {
         XCTAssertTrue(beginRequest(in: &state, at: now.addingTimeInterval(3_601)))
     }
 
+    func testImmediateModeRelocksAfterLastWindowCloses() {
+        var state = ApplicationAccessState()
+        XCTAssertTrue(beginRequest(in: &state, at: now))
+        state.approveUntilApplicationTerminates(bundleIdentifier: bundleIdentifier)
+
+        XCTAssertFalse(state.updateImmediateWindowVisibility(
+            bundleIdentifier: bundleIdentifier,
+            isVisible: false
+        ))
+        XCTAssertFalse(state.updateImmediateWindowVisibility(
+            bundleIdentifier: bundleIdentifier,
+            isVisible: true
+        ))
+        XCTAssertTrue(state.updateImmediateWindowVisibility(
+            bundleIdentifier: bundleIdentifier,
+            isVisible: false
+        ))
+        XCTAssertTrue(beginRequest(in: &state, at: now.addingTimeInterval(1)))
+    }
+
+    func testWindowClosureDoesNotCancelTimedGracePeriod() {
+        var state = ApplicationAccessState()
+        XCTAssertTrue(beginRequest(in: &state, at: now))
+        state.approve(bundleIdentifier: bundleIdentifier, graceInterval: 60, at: now)
+
+        XCTAssertFalse(state.updateImmediateWindowVisibility(
+            bundleIdentifier: bundleIdentifier,
+            isVisible: false
+        ))
+        XCTAssertFalse(beginRequest(in: &state, at: now.addingTimeInterval(59)))
+        XCTAssertTrue(beginRequest(in: &state, at: now.addingTimeInterval(60)))
+    }
+
     func testInvalidatingAccessEndsGracePeriodImmediately() {
         var state = ApplicationAccessState()
         XCTAssertTrue(beginRequest(in: &state, at: now))

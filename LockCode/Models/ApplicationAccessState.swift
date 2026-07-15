@@ -5,6 +5,7 @@ import Foundation
 struct ApplicationAccessState {
     private var unlockedUntil: [String: Date] = [:]
     private var unlockedUntilTermination: Set<String> = []
+    private var immediateWindowWasVisible: Set<String> = []
     private var pendingBundleIdentifiers: Set<String> = []
 
     mutating func beginRequest(
@@ -53,11 +54,28 @@ struct ApplicationAccessState {
     mutating func approveUntilApplicationTerminates(bundleIdentifier: String) {
         pendingBundleIdentifiers.remove(bundleIdentifier)
         unlockedUntil.removeValue(forKey: bundleIdentifier)
+        immediateWindowWasVisible.remove(bundleIdentifier)
         unlockedUntilTermination.insert(bundleIdentifier)
+    }
+
+    /// Returns true once the last visible window closes and immediate access is revoked.
+    mutating func updateImmediateWindowVisibility(
+        bundleIdentifier: String,
+        isVisible: Bool
+    ) -> Bool {
+        guard unlockedUntilTermination.contains(bundleIdentifier) else { return false }
+        if isVisible {
+            immediateWindowWasVisible.insert(bundleIdentifier)
+            return false
+        }
+        guard immediateWindowWasVisible.remove(bundleIdentifier) != nil else { return false }
+        unlockedUntilTermination.remove(bundleIdentifier)
+        return true
     }
 
     mutating func applicationDidTerminate(bundleIdentifier: String) {
         unlockedUntilTermination.remove(bundleIdentifier)
+        immediateWindowWasVisible.remove(bundleIdentifier)
     }
 
     mutating func deny(bundleIdentifier: String) {
@@ -67,10 +85,12 @@ struct ApplicationAccessState {
     mutating func invalidateAll() {
         unlockedUntil.removeAll()
         unlockedUntilTermination.removeAll()
+        immediateWindowWasVisible.removeAll()
     }
 
     mutating func invalidate(bundleIdentifier: String) {
         unlockedUntil.removeValue(forKey: bundleIdentifier)
         unlockedUntilTermination.remove(bundleIdentifier)
+        immediateWindowWasVisible.remove(bundleIdentifier)
     }
 }
