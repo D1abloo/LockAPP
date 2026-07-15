@@ -28,8 +28,8 @@ var gracePassed = grants.IsGranted("app.exe", 11, now.AddMinutes(4), _ => false)
     && !grants.IsGranted("app.exe", 11, now.AddMinutes(6), _ => false);
 grants.Approve("close.exe", 20, 0, now);
 var closePassed = grants.IsGranted("close.exe", 20, now, _ => true)
-    && !grants.IsGranted("close.exe", 21, now, _ => true)
-    && !grants.IsGranted("close.exe", 20, now, _ => false);
+    && grants.IsGranted("close.exe", 21, now, pid => pid == 20)
+    && !grants.IsGranted("close.exe", 22, now, _ => false);
 grants.Approve("reset.exe", 30, 5, now);
 grants.InvalidateAll();
 var resetPassed = !grants.IsGranted("reset.exe", 30, now, _ => true);
@@ -37,9 +37,10 @@ Console.WriteLine($"{(gracePassed ? "PASS" : "FAIL")} periodo de gracia");
 Console.WriteLine($"{(closePassed ? "PASS" : "FAIL")} bloqueo al cerrar");
 Console.WriteLine($"{(resetPassed ? "PASS" : "FAIL")} cambio de política invalida permisos");
 var pending = new PendingRequestState();
-var cyclePassed = pending.Begin(30) && !pending.Begin(30);
-pending.Complete(30); cyclePassed = cyclePassed && pending.Begin(30);
-Console.WriteLine($"{(cyclePassed ? "PASS" : "FAIL")} prevención de ciclos");
+var cyclePassed = pending.Begin("multi.exe", 30) && !pending.Begin("multi.exe", 31)
+    && pending.Members("multi.exe").Order().SequenceEqual([30, 31]);
+pending.Complete("multi.exe"); cyclePassed = cyclePassed && pending.Begin("multi.exe", 32);
+Console.WriteLine($"{(cyclePassed ? "PASS" : "FAIL")} una solicitud por aplicación multiproceso");
 var manual = new AppSettings { ManualExecutables = new(StringComparer.OrdinalIgnoreCase) { @"C:\Apps\Private.exe" } };
 var restored = JsonSerializer.Deserialize<AppSettings>(JsonSerializer.Serialize(manual));
 var manualPassed = restored?.ManualExecutables.Contains(@"C:\Apps\Private.exe") == true;

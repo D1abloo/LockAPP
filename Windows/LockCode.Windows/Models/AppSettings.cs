@@ -36,10 +36,12 @@ public sealed class AccessGrantState
     private sealed record Grant(DateTimeOffset? Until, HashSet<int> ProcessIds);
     private readonly Dictionary<string, Grant> _grants = new(StringComparer.OrdinalIgnoreCase);
     public void Approve(string path, int processId, int minutes, DateTimeOffset now)
+        => Approve(path, [processId], minutes, now);
+    public void Approve(string path, IEnumerable<int> processIds, int minutes, DateTimeOffset now)
     {
         _grants[path] = minutes > 0
             ? new Grant(now.AddMinutes(minutes), [])
-            : new Grant(null, [processId]);
+            : new Grant(null, processIds.ToHashSet());
     }
     public bool IsGranted(string path, int processId, DateTimeOffset now, Func<int, bool> isLiving)
     {
@@ -51,16 +53,43 @@ public sealed class AccessGrantState
         }
         grant.ProcessIds.RemoveWhere(pid => !isLiving(pid));
         if (grant.ProcessIds.Count == 0) { _grants.Remove(path); return false; }
-        return grant.ProcessIds.Contains(processId);
+        grant.ProcessIds.Add(processId);
+        return true;
     }
     public void InvalidateAll() => _grants.Clear();
 }
 
 public sealed class PendingRequestState
 {
-    private readonly HashSet<int> _processIds = [];
-    public bool Begin(int processId) => _processIds.Add(processId);
-    public void Complete(int processId) => _processIds.Remove(processId);
-    public void Retain(ISet<int> living) => _processIds.RemoveWhere(pid => !living.Contains(pid));
-    public int[] Drain() { var result = _processIds.ToArray(); _processIds.Clear(); return result; }
+    private readonly Dictionary<string, HashSet<int>> _requests = new(StringComparer.OrdinalIgnoreCase);
+    public bool Begin(string path, int processId)
+    {
+        if (_requests.TryGetValue(path, out var processIds))
+        {
+            processIds.Add(processId);
+            return false;
+        }
+        _requests[path] = [processId];
+        return true;
+    }
+    public int[] Complete(string path)
+    {
+        if (!_requests.Remove(path, out var processIds)) return [];
+        return processIds.ToArray();
+    }
+    public int[] Members(string path) => _requests.TryGetValue(path, out var processIds) ? processIds.ToArray() : [];
+    public void Retain(ISet<int> living)
+    {
+        foreach (var (path, processIds) in _requests.ToArray())
+        {
+            processIds.RemoveWhere(pid => !living.Contains(pid));
+            if (processIds.Count == 0) _requests.Remove(path);
+        }
+    }
+    public int[] Drain()
+    {
+        var result = _requests.Values.SelectMany(processIds => processIds).Distinct().ToArray();
+        _requests.Clear();
+        return result;
+    }
 }

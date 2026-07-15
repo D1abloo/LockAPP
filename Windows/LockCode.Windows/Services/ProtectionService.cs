@@ -25,20 +25,18 @@ public sealed class ProtectionService : IDisposable
 
     public void Approve(Request request)
     {
-        lock (_pending) _pending.Complete(request.Process.Id);
+        int[] processIds;
+        lock (_pending) processIds = _pending.Complete(request.Path);
+        if (processIds.Length == 0) processIds = [request.Process.Id];
         lock (_grants)
         {
-            _grants.Approve(request.Path, request.Process.Id,
+            _grants.Approve(request.Path, processIds,
                 _settings.Value.GraceMinutes, DateTimeOffset.Now);
         }
         try
         {
-            if (!request.Process.HasExited) EnumWindows((window, _) =>
-            {
-                GetWindowThreadProcessId(window, out var pid);
-                if (pid == request.Process.Id) ShowWindow(window, 9);
-                return true;
-            }, IntPtr.Zero);
+            if (processIds.Any(IsProcessLiving))
+                foreach (var processId in processIds) Show(processId);
             else Process.Start(new ProcessStartInfo(request.Path) { UseShellExecute = true });
         }
         catch { }
@@ -48,7 +46,14 @@ public sealed class ProtectionService : IDisposable
     public void Deny(Request request)
     {
         // The app is only asked to close after authentication is cancelled, never before.
-        try { if (!request.Process.HasExited) request.Process.CloseMainWindow(); }
+        try
+        {
+            int[] processIds;
+            lock (_pending) processIds = _pending.Members(request.Path);
+            foreach (var processId in processIds)
+                try { using var process = Process.GetProcessById(processId); process.CloseMainWindow(); }
+                catch { }
+        }
         catch { }
         finally { request.Process.Dispose(); }
     }
@@ -65,7 +70,7 @@ public sealed class ProtectionService : IDisposable
                 var path = ExecutablePath(process);
                 if (path is null || path.Equals(Environment.ProcessPath, StringComparison.OrdinalIgnoreCase)
                     || !_settings.Value.ProtectedExecutables.Contains(path) || IsGranted(path, process)) { process.Dispose(); continue; }
-                lock (_pending) if (!_pending.Begin(process.Id)) { Hide(process); process.Dispose(); continue; }
+                lock (_pending) if (!_pending.Begin(path, process.Id)) { Hide(process); process.Dispose(); continue; }
                 Hide(process);
                 Blocked?.Invoke(new Request(process, path));
             }
@@ -109,13 +114,15 @@ public sealed class ProtectionService : IDisposable
         catch { }
     }
 
+    private static void Show(int processId) =>
+        EnumWindows((window, _) => { GetWindowThreadProcessId(window, out var pid); if (pid == processId) ShowWindow(window, 9); return true; }, IntPtr.Zero);
+
     public void Dispose()
     {
         _timer.Dispose();
         int[] pending;
         lock (_pending) pending = _pending.Drain();
-        foreach (var processId in pending)
-            EnumWindows((window, _) => { GetWindowThreadProcessId(window, out var pid); if (pid == processId) ShowWindow(window, 9); return true; }, IntPtr.Zero);
+        foreach (var processId in pending) Show(processId);
     }
     private delegate bool EnumWindowsProc(IntPtr window, IntPtr parameter);
     [DllImport("user32.dll")] private static extern bool EnumWindows(EnumWindowsProc callback, IntPtr parameter);
