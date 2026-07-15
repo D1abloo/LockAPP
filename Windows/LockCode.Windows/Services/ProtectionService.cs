@@ -12,6 +12,7 @@ public sealed class ProtectionService : IDisposable
     private readonly System.Threading.Timer _timer;
     private readonly PendingRequestState _pending = new();
     private readonly AccessGrantState _grants = new();
+    private readonly HiddenWindowState _hiddenWindows = new();
     private int _checking;
     public event Action<Request>? Blocked;
 
@@ -36,7 +37,7 @@ public sealed class ProtectionService : IDisposable
         try
         {
             if (processIds.Any(IsProcessLiving))
-                foreach (var processId in processIds) Show(processId);
+                Restore(processIds);
             else Process.Start(new ProcessStartInfo(request.Path) { UseShellExecute = true });
         }
         catch { }
@@ -64,7 +65,9 @@ public sealed class ProtectionService : IDisposable
         try
         {
             var processes = Process.GetProcesses();
-            lock (_pending) _pending.Retain(processes.Select(process => process.Id).ToHashSet());
+            var living = processes.Select(process => process.Id).ToHashSet();
+            lock (_pending) _pending.Retain(living);
+            lock (_hiddenWindows) _hiddenWindows.Retain(living);
             foreach (var process in processes)
             {
                 var rawPath = ExecutablePath(process);
@@ -72,8 +75,11 @@ public sealed class ProtectionService : IDisposable
                 var path = ExecutablePathPolicy.Normalize(rawPath);
                 if (path.Equals(Environment.ProcessPath, StringComparison.OrdinalIgnoreCase)
                     || !_settings.Value.ProtectedExecutables.Contains(path) || IsGranted(path, process)) { process.Dispose(); continue; }
-                lock (_pending) if (!_pending.Begin(path, process.Id)) { Hide(process); process.Dispose(); continue; }
-                Hide(process);
+                bool first;
+                lock (_pending) first = _pending.Begin(path, process.Id);
+                var hidden = Hide(process);
+                lock (_hiddenWindows) _hiddenWindows.Remember(process.Id, hidden);
+                if (!first) { process.Dispose(); continue; }
                 Blocked?.Invoke(new Request(process, path));
             }
         }
@@ -107,28 +113,45 @@ public sealed class ProtectionService : IDisposable
         }
     }
 
-    private static void Hide(Process process)
+    private static nint[] Hide(Process process)
     {
+        var hidden = new List<nint>();
         try
         {
-            EnumWindows((window, _) => { GetWindowThreadProcessId(window, out var pid); if (pid == process.Id) ShowWindow(window, 0); return true; }, IntPtr.Zero);
+            EnumWindows((window, _) =>
+            {
+                GetWindowThreadProcessId(window, out var pid);
+                if (pid == process.Id && IsWindowVisible(window))
+                {
+                    hidden.Add(window);
+                    ShowWindow(window, 0);
+                }
+                return true;
+            }, IntPtr.Zero);
         }
         catch { }
+        return hidden.ToArray();
     }
 
-    private static void Show(int processId) =>
-        EnumWindows((window, _) => { GetWindowThreadProcessId(window, out var pid); if (pid == processId) ShowWindow(window, 9); return true; }, IntPtr.Zero);
+    private void Restore(IEnumerable<int> processIds)
+    {
+        nint[] windows;
+        lock (_hiddenWindows) windows = _hiddenWindows.Take(processIds);
+        foreach (var window in windows) ShowWindow(window, 9);
+    }
 
     public void Dispose()
     {
         _timer.Dispose();
-        int[] pending;
-        lock (_pending) pending = _pending.Drain();
-        foreach (var processId in pending) Show(processId);
+        lock (_pending) _pending.Drain();
+        nint[] windows;
+        lock (_hiddenWindows) windows = _hiddenWindows.Drain();
+        foreach (var window in windows) ShowWindow(window, 9);
     }
     private delegate bool EnumWindowsProc(IntPtr window, IntPtr parameter);
     [DllImport("user32.dll")] private static extern bool EnumWindows(EnumWindowsProc callback, IntPtr parameter);
     [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out int processId);
+    [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr window);
     [DllImport("user32.dll")] private static extern bool ShowWindow(IntPtr window, int command);
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern bool QueryFullProcessImageName(

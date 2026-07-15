@@ -41,6 +41,11 @@ var cyclePassed = pending.Begin("multi.exe", 30) && !pending.Begin("multi.exe", 
     && pending.Members("multi.exe").Order().SequenceEqual([30, 31]);
 pending.Complete("multi.exe"); cyclePassed = cyclePassed && pending.Begin("multi.exe", 32);
 Console.WriteLine($"{(cyclePassed ? "PASS" : "FAIL")} una solicitud por aplicación multiproceso");
+var hiddenWindows = new HiddenWindowState();
+hiddenWindows.Remember(30, [101, 102]); hiddenWindows.Remember(31, [201]);
+var windowsPassed = hiddenWindows.Take([30]).Order().SequenceEqual([101, 102])
+    && hiddenWindows.Drain().SequenceEqual([201]);
+Console.WriteLine($"{(windowsPassed ? "PASS" : "FAIL")} restaura solo ventanas visibles recordadas");
 var manual = new AppSettings { ManualExecutables = new(StringComparer.OrdinalIgnoreCase) { @"C:\Apps\Private.exe" } };
 var restored = JsonSerializer.Deserialize<AppSettings>(JsonSerializer.Serialize(manual));
 var manualPassed = restored?.ManualExecutables.Contains(@"C:\Apps\Private.exe") == true;
@@ -79,4 +84,4 @@ var installerInfo = UpdateService.InstallerStartInfo(Path.Combine(Path.GetTempPa
 var installerPassed = !installerInfo.UseShellExecute && installerInfo.ArgumentList.SequenceEqual(["/S"]);
 Console.WriteLine($"{(installerPassed ? "PASS" : "FAIL")} instalador ejecutado directamente sin navegador");
 return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed && resetPassed
-    && cyclePassed && manualPassed && packagePassed && browserPassed && updatePassed && installerPassed ? 0 : 1;
+    && cyclePassed && windowsPassed && manualPassed && packagePassed && browserPassed && updatePassed && installerPassed ? 0 : 1;

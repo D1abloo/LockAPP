@@ -115,3 +115,34 @@ public sealed class PendingRequestState
         return result;
     }
 }
+
+public sealed class HiddenWindowState
+{
+    private readonly Dictionary<int, HashSet<nint>> _windows = [];
+    public void Remember(int processId, IEnumerable<nint> windows)
+    {
+        var visible = windows.ToArray();
+        if (visible.Length == 0) return;
+        if (!_windows.TryGetValue(processId, out var remembered))
+            _windows[processId] = remembered = [];
+        remembered.UnionWith(visible);
+    }
+    public nint[] Take(IEnumerable<int> processIds)
+    {
+        var result = new HashSet<nint>();
+        foreach (var processId in processIds)
+            if (_windows.Remove(processId, out var windows)) result.UnionWith(windows);
+        return result.ToArray();
+    }
+    public void Retain(ISet<int> living)
+    {
+        foreach (var processId in _windows.Keys.Where(processId => !living.Contains(processId)).ToArray())
+            _windows.Remove(processId);
+    }
+    public nint[] Drain()
+    {
+        var result = _windows.Values.SelectMany(windows => windows).Distinct().ToArray();
+        _windows.Clear();
+        return result;
+    }
+}
