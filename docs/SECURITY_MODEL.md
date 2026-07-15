@@ -26,6 +26,7 @@ Una persona con acceso físico temporal a una sesión de macOS ya iniciada, sin 
 - Los intentos fallidos activan esperas progresivas en memoria.
 - Las concesiones de acceso viven solo en memoria.
 - Las concesiones se borran al solicitarlo y ante eventos de suspensión/cambio de sesión observables.
+- En el modo inmediato, Core Graphics detecta la desaparición de la última ventana visible y revoca la concesión aunque el proceso de macOS continúe en ejecución. La siguiente ventana vuelve a requerir autenticación.
 - Al arrancar el monitor se ocultan las aplicaciones protegidas que ya estén ejecutándose; una aplicación se vuelve a ocultar ante activaciones repetidas mientras su autenticación está pendiente.
 - Un supervisor comprueba cada 50 ms todas las aplicaciones protegidas en ejecución y vuelve a ocultar cualquiera que no tenga una concesión válida. En el arranque se solicita además el cierre normal de las aplicaciones protegidas restauradas.
 - Durante la autenticación se colocan ventanas opacas por encima de las aplicaciones en todos los monitores. Al cancelar, permanecen hasta confirmar que el proceso protegido está oculto o terminado.
@@ -33,6 +34,7 @@ Una persona con acceso físico temporal a una sesión de macOS ya iniciada, sin 
 - El registro local conserva únicamente tipo de evento, fecha y un UUID aleatorio; no contiene el código, el resultado detallado de Touch ID, bundle identifiers ni nombres de aplicaciones.
 - Las actualizaciones solo aceptan assets HTTPS del repositorio oficial, exigen el SHA-256 publicado por GitHub y validan la firma del paquete macOS antes de sustituir la aplicación.
 - El MVP no fuerza la terminación de apps ya abiertas para evitar pérdida de datos.
+- No se recopila telemetría. La única conexión automática de LockCode es la consulta de releases oficiales de GitHub; correo y PayPal solo se abren por acción del usuario.
 
 ## Riesgos aceptados
 
@@ -42,6 +44,11 @@ Una persona con acceso físico temporal a una sesión de macOS ya iniciada, sin 
 4. LockCode puede ser terminado externamente.
 5. `SMAppService` requiere aprobación del usuario en determinados estados.
 6. El registro local es informativo y borrable; no es un registro forense resistente a manipulación.
+7. Minimizar, ocultar o mover la última ventana fuera del espacio visible puede revocar antes el acceso inmediato; es un comportamiento conservador de privacidad.
+
+## Política de uso
+
+La gratuidad no convierte el bloqueo en una garantía de seguridad. El usuario conserva la responsabilidad sobre copias de seguridad, uso legítimo y protección de su sesión. Las condiciones completas de uso, privacidad, distribución, garantías y soporte están en [`USAGE_POLICY.md`](../USAGE_POLICY.md).
 
 ## Camino a una edición reforzada
 

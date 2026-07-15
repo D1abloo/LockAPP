@@ -17,8 +17,9 @@
 5. Mantener TextEdit abierto, cambiar a Finder y volver; debe respetar el periodo de gracia.
 6. Pulsar “Bloquear ahora”, cambiar a Finder y volver; debe pedir autenticación.
 7. Cancelar; TextEdit debe permanecer oculto o cerrado.
-8. Seleccionar «Al cerrar la aplicación», cerrar TextEdit y volver a abrirlo; debe pedir autenticación.
+8. Seleccionar «Al cerrar la aplicación», cerrar la última ventana de TextEdit sin usar Cmd-Q y comprobar que el proceso continúa en el Dock. Al crear otra ventana, debe pedir autenticación de nuevo.
 9. Seleccionar minutos personalizados y comprobar que la autorización expira en el tiempo indicado.
+   Cerrar y reabrir una ventana antes de expirar: no debe pedir autenticación hasta cumplir el intervalo.
 10. Con el panel de autenticación abierto, intentar activar otra vez TextEdit; debe volver a ocultarse y no debe aparecer un segundo panel.
 11. Dejar una aplicación protegida abierta, reiniciar LockCode y verificar que se oculta inmediatamente. Al volver a activarla debe pedir código o Touch ID.
 12. Dejar una aplicación abierta, marcarla como protegida y comprobar que se oculta sin esperar a otro reinicio.
@@ -45,6 +46,15 @@
 5. Publicar una release de prueba y verificar que se muestra su versión, notas y enlace.
 6. Reiniciar LockCode con una release posterior publicada y comprobar la notificación con «Sí, actualizar» y «No ahora».
 7. Elegir «Sí, actualizar» y comprobar descarga, SHA-256, sustitución de la app, reinicio y mensaje de actualización completada.
+8. Verificar que una release exclusiva de otra plataforma no se ofrece como actualización incompatible.
+
+## Política de uso y privacidad
+
+1. Verificar que README, instaladores y ayuda indican que LockCode es gratuito y que donar es opcional.
+2. Comprobar que se informa del modelo *best effort* y no se promete bloqueo previo a la ejecución.
+3. Confirmar que no existe telemetría y que el registro no contiene aplicaciones, códigos ni datos biométricos.
+4. Comprobar que el enlace a `USAGE_POLICY.md` funciona desde la documentación de cada plataforma.
+5. Verificar autoría, soporte, actualización oficial, desinstalación y límites de responsabilidad.
 
 ## Registro
 

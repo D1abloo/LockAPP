@@ -1,5 +1,7 @@
 # Validación Linux 0.4.5
 
+Estado publicado vigente para Debian/Ubuntu y RPM. La posterior versión macOS 0.4.6 no modifica Linux. Condiciones generales: [`USAGE_POLICY.md`](../USAGE_POLICY.md).
+
 - 15 de julio de 2026: 14 pruebas unitarias correctas (incluyen selector manual persistente, metadatos seguros de actualización, progreso de APT/DNF, identidad de credencial por instalación, catálogo de Terminal y migración de inicio).
 - `compileall`: correcto.
 - Paquete Debian inspeccionado: metadatos, permisos, dependencia obligatoria del indicador, icono, entrada de escritorio, unidad systemd y scripts `postinst`, `prerm` y `postrm` correctos.

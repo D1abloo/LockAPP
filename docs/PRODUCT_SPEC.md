@@ -16,13 +16,14 @@ Un usuario comparte o deja temporalmente su Mac desbloqueado y quiere impedir el
 2. Como usuario, veo las aplicaciones instaladas y activo la protección por aplicación.
 3. Como usuario, cuando alguien abre una aplicación protegida, LockCode solicita el código.
 4. Como usuario con Touch ID, la autenticación biométrica comienza automáticamente sin pulsar otro botón.
-5. Como usuario, elijo si la autorización termina al cerrar la aplicación o después de un número de minutos.
+5. Como usuario, elijo si la autorización termina al cerrar la última ventana visible —aunque macOS mantenga vivo el proceso— o después de un número de minutos.
 6. Como usuario, invalido todas las autorizaciones con “Bloquear ahora”.
 7. Como usuario, hago que LockCode se inicie con mi sesión.
 8. Como propietario, debo autenticarme antes de cambiar la configuración o salir normalmente.
 9. Como usuario, consulto ayuda, soporte y futuras actualizaciones desde la propia aplicación.
 10. Como usuario, consulto un registro local de desbloqueos e intentos fallidos sin exponer qué aplicación estaba usando.
 11. Como usuario, recibo una notificación cuando existe una versión nueva y decido si abrir su página oficial.
+12. Como usuario, busco aplicaciones por nombre o identificador y puedo añadir manualmente una aplicación no catalogada.
 
 ## Fuera de alcance del MVP
 
@@ -40,5 +41,7 @@ Un usuario comparte o deja temporalmente su Mac desbloqueado y quiere impedir el
 - Menos de un segundo entre evento observado y presentación del panel en un Mac moderno.
 - Cero almacenamiento del código fuera de Keychain.
 - Todas las rutas de cancelación dejan la app privada oculta o cerrada.
+- El modo inmediato no conserva acceso después de cerrar la última ventana visible; el modo temporizado sí lo conserva hasta su vencimiento.
 - Al restaurarse LockCode, las aplicaciones protegidas que ya estén en ejecución se ocultan antes de admitir nuevas activaciones.
 - Las URL de actualización se limitan a HTTPS y al repositorio oficial.
+- La interfaz y la documentación distinguen claramente gratuidad, privacidad, soporte y límites conforme a [`USAGE_POLICY.md`](../USAGE_POLICY.md).

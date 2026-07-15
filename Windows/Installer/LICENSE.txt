@@ -1,15 +1,23 @@
 CONDICIONES DE USO DE LOCKCODE PARA WINDOWS
 
-1. LockCode es software gratuito. No es necesario realizar ninguna donación para instalarlo o utilizarlo.
+Última actualización: 15 de julio de 2026.
 
-2. LockCode proporciona una protección de privacidad de tipo «best effort». No garantiza impedir por completo la ejecución de procesos ni sustituye los controles de seguridad del sistema operativo.
+1. GRATUIDAD. LockCode puede utilizarse gratuitamente para fines personales o profesionales legítimos. No es necesario comprar, suscribirse ni donar. Una donación no desbloquea funciones ni cambia el soporte.
 
-3. El código configurado no se almacena en texto plano. La credencial derivada se conserva mediante Windows Credential Manager. Los datos biométricos son gestionados exclusivamente por Windows Hello.
+2. PERMISO Y AUTORÍA. Se concede un permiso gratuito, no exclusivo e intransferible para instalar y usar los binarios oficiales. Copyright © 2026 Isaac Silva Jiménez. Salvo autorización escrita o permiso legal, no se autoriza vender, sublicenciar, atribuirse la obra ni redistribuir versiones modificadas con el nombre o logotipo LockCode.
 
-4. El usuario es responsable de guardar su trabajo. LockCode solicita el cierre normal de aplicaciones protegidas y no usa terminación forzada, pero el comportamiento final depende de cada aplicación y de Windows.
+3. FINALIDAD. LockCode proporciona una protección local de privacidad de tipo «best effort». No garantiza impedir completamente la ejecución de procesos ni sustituye el bloqueo de sesión, cifrado, copias de seguridad, controles parentales o herramientas corporativas.
 
-5. El software se proporciona sin garantías, dentro de los límites permitidos por la legislación aplicable. Puedes rechazar estas condiciones y cancelar la instalación sin modificar el equipo.
+4. PRIVACIDAD. El código no se almacena en texto plano. La credencial derivada se conserva mediante Windows Credential Manager; Windows Hello gestiona los datos biométricos. No hay telemetría ni envío de la lista de aplicaciones protegidas. El registro local no contiene códigos, biometría ni nombres de aplicaciones. La comprobación de actualizaciones contacta con GitHub.
 
-6. Copyright © 2026 Isaac Silva Jiménez. Soporte: isaaccoria46@gmail.com
+5. RESPONSABILIDAD DEL USUARIO. Guarda tu trabajo y mantén copias de seguridad. No uses LockCode para acceder sin autorización a dispositivos, cuentas o información ajena ni para vulnerar leyes o derechos de terceros.
+
+6. ACTUALIZACIONES. Instala únicamente paquetes oficiales de https://github.com/D1abloo/LockAPP/releases y comprueba su SHA-256. El instalador de Windows aún puede mostrar una advertencia de SmartScreen si no está firmado públicamente.
+
+7. GARANTÍAS. El software se entrega en su estado actual, sin prometer disponibilidad, compatibilidad universal o protección infalible. Dentro de los límites legales, el autor no responde por pérdidas causadas por uso inadecuado o por ignorar las limitaciones documentadas. Nada excluye derechos o responsabilidades que legalmente no puedan limitarse.
+
+8. SOPORTE. Se ofrece de buena fe y sin plazo garantizado en isaaccoria46@gmail.com. Nunca envíes códigos, contraseñas, biometría ni información privada.
+
+9. Puedes rechazar estas condiciones y cancelar la instalación sin modificar el equipo. También puedes dejar de usar LockCode y desinstalarlo en cualquier momento.
 
 Al marcar «Acepto las condiciones» y continuar, confirmas que has leído y aceptas este texto.

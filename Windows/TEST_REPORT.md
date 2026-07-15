@@ -1,5 +1,7 @@
 # Validación Windows 0.4.5
 
+Estado publicado vigente para Windows. La posterior versión macOS 0.4.6 no modifica esta edición. Condiciones generales: [`USAGE_POLICY.md`](../USAGE_POLICY.md).
+
 - 15 de julio de 2026: 15 comprobaciones correctas (incluyen catálogo AppX/MSIX, actualización oficial validada, aplicación manual persistente, código y símbolos, credencial derivada, penalización, gracia, bloqueo al cerrar y prevención de ciclos).
 - Compilación `net8.0-windows10.0.19041.0`: correcta, 0 errores y 0 advertencias.
 - Publicación `win-x64` autocontenida y de archivo único: correcta.

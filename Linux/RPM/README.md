@@ -2,6 +2,8 @@
 
 Instalador independiente para Fedora 42 o posterior y CentOS Stream 9/10. CentOS requiere EPEL porque el indicador Ayatana se distribuye allí.
 
+Versión publicada: **0.4.5**. Uso gratuito sujeto a la [Política de uso](../../USAGE_POLICY.md).
+
 ## Fedora
 
 ```bash
@@ -30,6 +32,8 @@ sudo dnf remove lockcode-linux
 ```
 
 El RPM de prueba publicado no está firmado con GPG; por eso la instalación manual usa `--nogpgcheck`. LockCode sí exige que la descarga automática coincida con el SHA-256 publicado por GitHub. Para distribución estable debe firmarse el RPM con una clave de publicación.
+
+No hay telemetría. La comprobación de actualizaciones contacta con GitHub y solo ofrece releases que incluyan un RPM compatible.
 
 Soporte: `isaaccoria46@gmail.com`. No envíes códigos, contraseñas ni información privada.
 

@@ -1,28 +1,19 @@
-# Tarea para el agente Codex
+# Estado de mantenimiento
 
-Abre este repositorio en un Mac con Xcode 15 o posterior y completa el MVP de LockCode.
+LockCode tiene ediciones independientes para macOS, Windows y Linux.
 
-## Resultado esperado
+| Plataforma | Versión publicada |
+| --- | --- |
+| macOS | 0.4.6 |
+| Windows | 0.4.5 |
+| Debian/Ubuntu | 0.4.5 |
+| Fedora/CentOS RPM | 0.4.5 |
 
-Una aplicación macOS 13+ compilable y firmable que permita elegir aplicaciones instaladas y proteger su lanzamiento/activación con PIN o Touch ID.
+## Reglas para futuras entregas
 
-## Trabajo requerido
-
-1. Ejecuta `xcodegen generate` y compila el esquema `LockCode`.
-2. Corrige diferencias de firma de APIs provocadas por la versión exacta del SDK, especialmente `SMAppService.unregister()` y los métodos async de LocalAuthentication.
-3. Ejecuta los tests y añade pruebas para:
-   - validación de PIN;
-   - concesión y expiración del periodo de gracia;
-   - deduplicación de solicitudes pendientes;
-   - exclusión del bundle de LockCode y procesos críticos.
-4. Prueba manualmente los escenarios de `docs/ACCEPTANCE_TESTS.md`.
-5. Mantén el bloqueo como *best effort*. No uses `forceTerminate()` ni APIs privadas.
-6. Documenta en el PR cualquier limitación que no pueda corregirse sin Endpoint Security.
-
-## Entregables
-
-- Proyecto Xcode generado y compilable.
-- Tests verdes.
-- Capturas del onboarding, listado, ajustes y panel de desbloqueo.
-- Notas de prueba en Apple Silicon y, cuando sea posible, Intel.
-- Lista concreta de tareas para la futura System Extension.
+1. Mantener el código fuera de archivos, preferencias y logs; solo se guarda una credencial derivada en el almacén seguro del sistema.
+2. Mantener la descripción *best effort* y no prometer bloqueo previo a la ejecución.
+3. Probar modo inmediato, periodo de gracia, cancelación, reinicio e inicio automático.
+4. Ejecutar las pruebas y construir el instalador de cada plataforma modificada.
+5. Publicar SHA-256 y actualizar los informes de prueba.
+6. Respetar la [Política de uso](USAGE_POLICY.md), la privacidad y la autoría.

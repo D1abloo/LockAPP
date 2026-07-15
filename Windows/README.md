@@ -2,6 +2,8 @@
 
 Proyecto independiente para Windows 10 2004 o posterior. No usa archivos ni configuración de la edición macOS.
 
+Versión publicada: **0.4.5**. Uso gratuito sujeto a la [Política de uso general](../USAGE_POLICY.md) y a las condiciones mostradas por el instalador.
+
 ## Funciones
 
 - Código de 4–64 caracteres con símbolos, derivado con PBKDF2-HMAC-SHA256 y guardado en Windows Credential Manager.
@@ -54,7 +56,7 @@ dotnet run --project .\LockCode.Windows.Tests\LockCode.Windows.Tests.csproj
 
 Windows Hello se inicia automáticamente cuando está habilitado y disponible. Si no está configurado o se cancela, se muestra el campo de código.
 
-La sección **Actualizaciones** muestra la edición, versión instalada y versión disponible. Al aceptar, descarga el instalador oficial, verifica su SHA-256, cierra LockCode, actualiza silenciosamente y vuelve a iniciarlo. Cada publicación coordinada incluye todas las plataformas con el mismo número de versión.
+La sección **Actualizaciones** muestra la edición, versión instalada y versión disponible. Al aceptar, descarga el instalador oficial, verifica su SHA-256, cierra LockCode, actualiza silenciosamente y vuelve a iniciarlo. Las ediciones pueden tener versiones distintas; Windows ignora releases que no incluyan su instalador.
 
 ## Comprobaciones recomendadas
 
@@ -119,6 +121,8 @@ Usa **Configuración > Aplicaciones > Aplicaciones instaladas > LockCode > Desin
 ## Limitación
 
 Es un bloqueo de privacidad *best effort*. El orden de inicio lo decide Windows; un servicio/driver firmado sería necesario para impedir la ejecución antes de la sesión. La aplicación no bloquea apagado ni reinicio.
+
+No hay telemetría. La configuración, credencial derivada y registro permanecen en el equipo; comprobar actualizaciones contacta con GitHub. Consulta gratuidad, privacidad, distribución, garantías y soporte en la [Política de uso](../USAGE_POLICY.md).
 
 Soporte: `isaaccoria46@gmail.com`. No envíes códigos, contraseñas ni información privada.
 

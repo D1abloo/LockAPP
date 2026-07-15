@@ -2,6 +2,8 @@
 
 Proyecto independiente para Debian 12, Ubuntu 22.04 o distribuciones compatibles. No usa archivos ni configuración de macOS o Windows.
 
+Versión publicada: **0.4.5**. LockCode es gratuito, no requiere donación y se distribuye conforme a la [Política de uso](../USAGE_POLICY.md).
+
 ## Funciones
 
 - Código de 4–64 caracteres con símbolos, derivado mediante PBKDF2-HMAC-SHA256; solo la credencial derivada se guarda en Secret Service/libsecret.
@@ -70,6 +72,8 @@ Rutas que pertenecen al paquete y que `apt purge` elimina: `/usr/lib/lockcode`, 
 ## Limitaciones
 
 Es una protección *best effort*. Linux no ofrece una API universal para impedir la ejecución de otra aplicación en X11 y Wayland. Un módulo LSM o una política del sistema sería necesario para control previo a ejecución y requeriría administración específica de cada distribución.
+
+No hay telemetría. La configuración, credencial derivada y registro permanecen en el equipo; comprobar actualizaciones contacta con GitHub. Las ediciones pueden tener versiones distintas y Linux ignora releases que no incluyan un paquete compatible. Consulta la [Política de uso](../USAGE_POLICY.md).
 
 Soporte: `isaaccoria46@gmail.com`.
 
