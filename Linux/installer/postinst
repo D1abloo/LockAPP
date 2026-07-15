@@ -21,6 +21,10 @@ if [ -n "$user" ] && command -v runuser >/dev/null 2>&1; then
     DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
     systemctl --user reenable lockcode.service 2>/dev/null || true
   if [ -n "${2:-}" ]; then
+    install -d -m 700 -o "$user" -g "$(id -gn "$user")" "$home/.config/lockcode"
+    printf '%s\n' "$2" > "$home/.config/lockcode/update-complete"
+    chown "$user:$(id -gn "$user")" "$home/.config/lockcode/update-complete"
+    chmod 600 "$home/.config/lockcode/update-complete"
     runuser -u "$user" -- env \
       XDG_RUNTIME_DIR="/run/user/$uid" \
       DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \

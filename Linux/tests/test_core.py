@@ -10,7 +10,7 @@ from lockcode.policy import AttemptLimiter, GrantState, PendingRequestState, val
 from lockcode.settings import SettingsStore
 from lockcode.secure_store import SecretStore, derive_credential, verify_credential
 from lockcode.startup import set_enabled
-from lockcode.updates import _apt_progress, _parse_release, is_newer
+from lockcode.updates import _apt_progress, _parse_release, _rpm_progress, is_newer
 
 
 class PolicyTests(unittest.TestCase):
@@ -24,6 +24,15 @@ class PolicyTests(unittest.TestCase):
         self.assertEqual(release.version, "0.1.4")
         self.assertTrue(is_newer("0.1.4", "0.1.3"))
         self.assertEqual(_apt_progress("pmstatus:lockcode:75:Instalando"), (0.75, "Instalando"))
+        self.assertEqual(_rpm_progress("Actualizando: lockcode  2/4"),
+                         (0.5, "Instalando paquete RPM…"))
+        rpm = _parse_release({"tag_name": "v0.1.4", "assets": [{
+            "name": "lockcode-linux-0.1.4-1.noarch.rpm",
+            "browser_download_url": "https://github.com/D1abloo/LockAPP/releases/download/v0.1.4/lockcode.rpm",
+            "digest": "sha256:" + "b" * 64,
+            "size": 100,
+        }]}, ".rpm")
+        self.assertEqual(rpm.name, "lockcode-linux-0.1.4-1.noarch.rpm")
         self.assertIsNone(_parse_release({"tag_name": "v0.1.4", "assets": [{
             "name": "lockcode-linux.deb", "browser_download_url": "https://example.com/fake.deb",
             "digest": "sha256:" + "a" * 64,

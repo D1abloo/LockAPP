@@ -7,6 +7,7 @@ import subprocess
 import threading
 import webbrowser
 from datetime import datetime
+from pathlib import Path
 
 import gi
 
@@ -57,6 +58,7 @@ class LockCodeApplication(Gtk.Application):
             return
         self._refresh_apps()
         self._refresh_audit()
+        self._show_completed_update()
         if self.background:
             self.background = False
             threading.Thread(target=self._background_update_check, daemon=True).start()
@@ -125,6 +127,9 @@ class LockCodeApplication(Gtk.Application):
         notebook.append_page(audit_box, Gtk.Label(label="Registro"))
 
         update_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, margin=18)
+        version = Gtk.Label(xalign=0); version.set_markup(
+            f"<b>LockCode</b>\nVersión instalada: {html.escape(__version__)}"
+        ); update_box.pack_start(version, False, False, 0)
         self.update_check = Gtk.Button(label="Buscar actualización"); self.update_check.connect("clicked", self._check_update); update_box.pack_start(self.update_check, False, False, 0)
         self.update_status = Gtk.Label(label="", xalign=0); update_box.pack_start(self.update_status, False, False, 0)
         notebook.append_page(update_box, Gtk.Label(label="Actualizaciones"))
@@ -274,7 +279,9 @@ class LockCodeApplication(Gtk.Application):
         self.update_checking = False
         self.update_check.set_sensitive(True)
         if release and updates.is_newer(release.version):
-            self.update_status.set_text(f"Versión {release.version} disponible")
+            self.update_status.set_text(
+                f"LockCode {__version__} · actualización {release.version} disponible"
+            )
             self._offer_update(release)
         else:
             self.update_status.set_text("LockCode está actualizado" if release else "No se pudo consultar GitHub")
@@ -295,7 +302,8 @@ class LockCodeApplication(Gtk.Application):
         dialog = Gtk.MessageDialog(
             transient_for=self.window, modal=True, message_type=Gtk.MessageType.QUESTION,
             buttons=Gtk.ButtonsType.YES_NO,
-            text=f"Hay una actualización {html.escape(release.version)}. ¿Descargar e instalar ahora?",
+            text=(f"LockCode {html.escape(__version__)} puede actualizarse a la versión "
+                  f"{html.escape(release.version)}. ¿Descargar e instalar ahora?"),
         )
         response = dialog.run(); dialog.destroy()
         if response == Gtk.ResponseType.YES: self._install_update(release)
@@ -330,6 +338,24 @@ class LockCodeApplication(Gtk.Application):
     @staticmethod
     def _set_update_progress(progress: Gtk.ProgressBar, value: float, text: str) -> bool:
         progress.set_fraction(max(0.0, min(value, 1.0))); progress.set_text(text); return False
+
+    def _show_completed_update(self) -> None:
+        marker = Path.home() / ".config" / "lockcode" / "update-complete"
+        try:
+            previous = marker.read_text(encoding="utf-8").strip()
+            marker.unlink()
+        except OSError:
+            return
+        if previous == "unknown":
+            self.update_status.set_text(f"LockCode se actualizó correctamente a {__version__}")
+        else:
+            self.update_status.set_text(
+                f"LockCode se actualizó correctamente de {previous} a {__version__}"
+            )
+        GLib.idle_add(
+            self._message,
+            f"LockCode se ha actualizado correctamente a la versión {__version__}.",
+        )
 
     def _message(self, text: str, kind: Gtk.MessageType = Gtk.MessageType.INFO) -> None:
         dialog = Gtk.MessageDialog(transient_for=self.window, modal=True, message_type=kind, buttons=Gtk.ButtonsType.OK, text=text)
