@@ -66,5 +66,8 @@ var release = UpdateService.Parse(updateJson, new Version(0, 4, 0));
 var updatePassed = release?.Version == new Version(0, 4, 7)
     && UpdateService.Parse(updateJson.Replace("github.com", "example.com"), new Version(0, 4, 0)) is null;
 Console.WriteLine($"{(updatePassed ? "PASS" : "FAIL")} actualización oficial validada");
+var installerInfo = UpdateService.InstallerStartInfo(Path.Combine(Path.GetTempPath(), "LockCode-Windows-0.4.7-Setup.exe"));
+var installerPassed = !installerInfo.UseShellExecute && installerInfo.ArgumentList.SequenceEqual(["/S"]);
+Console.WriteLine($"{(installerPassed ? "PASS" : "FAIL")} instalador ejecutado directamente sin navegador");
 return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed && resetPassed
-    && cyclePassed && manualPassed && packagePassed && updatePassed ? 0 : 1;
+    && cyclePassed && manualPassed && packagePassed && updatePassed && installerPassed ? 0 : 1;

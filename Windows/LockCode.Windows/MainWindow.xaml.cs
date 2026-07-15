@@ -24,6 +24,7 @@ public partial class MainWindow : Window
     private bool _loading;
     private bool _allowClose;
     private bool _managementAuthorized;
+    private int _updateInProgress;
     private static readonly Version CurrentVersion = typeof(MainWindow).Assembly.GetName().Version
         ?? new Version(0, 4, 7);
 
@@ -240,6 +241,7 @@ public partial class MainWindow : Window
 
     private async Task InstallUpdateAsync(UpdateRelease release)
     {
+        if (Interlocked.Exchange(ref _updateInProgress, 1) != 0) return;
         UpdateProgress.Visibility = Visibility.Visible;
         UpdateProgress.Value = 0;
         UpdateStatusText.Text = $"Descargando LockCode {release.Version.ToString(3)}…";
@@ -248,13 +250,14 @@ public partial class MainWindow : Window
             var progress = new Progress<double>(value => UpdateProgress.Value = value * 100);
             var installer = await UpdateService.DownloadAsync(release, progress);
             UpdateStatusText.Text = "Descarga verificada. Abriendo el instalador…";
-            Process.Start(new ProcessStartInfo(installer) { UseShellExecute = true, Arguments = "/S" });
+            Process.Start(UpdateService.InstallerStartInfo(installer));
             AllowSystemExit();
             DisposeServices();
             System.Windows.Application.Current.Shutdown();
         }
         catch (Exception error)
         {
+            Volatile.Write(ref _updateInProgress, 0);
             UpdateProgress.Visibility = Visibility.Collapsed;
             UpdateStatusText.Text = $"La actualización no se instaló: {error.Message}";
             System.Windows.MessageBox.Show(UpdateStatusText.Text, "LockCode", MessageBoxButton.OK, MessageBoxImage.Error);

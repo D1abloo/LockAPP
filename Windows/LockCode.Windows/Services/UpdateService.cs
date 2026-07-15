@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 
@@ -9,6 +10,21 @@ public sealed record UpdateRelease(Version Version, string Name, Uri DownloadUrl
 
 public static class UpdateService
 {
+    public static ProcessStartInfo InstallerStartInfo(string installer)
+    {
+        var path = Path.GetFullPath(installer);
+        if (!Path.GetExtension(path).Equals(".exe", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException("El instalador de Windows no es un ejecutable válido.");
+        var startInfo = new ProcessStartInfo(path)
+        {
+            UseShellExecute = false,
+            WorkingDirectory = Path.GetDirectoryName(path)!,
+            CreateNoWindow = true
+        };
+        startInfo.ArgumentList.Add("/S");
+        return startInfo;
+    }
+
     public static UpdateRelease? Parse(string json, Version currentVersion)
     {
         using var document = JsonDocument.Parse(json);
