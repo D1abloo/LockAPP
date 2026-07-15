@@ -3,4 +3,5 @@
   <ItemGroup><Compile Include="../LockCode.Windows/Services/CredentialStore.cs" Link="CredentialStore.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../LockCode.Windows/Models/AppSettings.cs" Link="AppSettings.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../LockCode.Windows/Services/UpdateService.cs" Link="UpdateService.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="../LockCode.Windows/Services/PackageManifestCatalog.cs" Link="PackageManifestCatalog.cs" /></ItemGroup>
 </Project>

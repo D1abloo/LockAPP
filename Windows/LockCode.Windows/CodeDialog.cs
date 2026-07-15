@@ -24,6 +24,7 @@ public sealed class CodeDialog : Window
         if (_confirmation is not null) { panel.Children.Add(new TextBlock { Text = "Confirmar código:" }); panel.Children.Add(_confirmation); }
         panel.Children.Add(_error);
         var button = new System.Windows.Controls.Button { Content = "Continuar", Margin = new Thickness(0, 14, 0, 0), Padding = new Thickness(12, 5, 12, 5), IsDefault = true };
+        button.SetResourceReference(StyleProperty, "AccentButton");
         button.Click += (_, _) => Submit(); panel.Children.Add(button); Content = panel;
         Loaded += (_, _) => _code.Focus();
     }

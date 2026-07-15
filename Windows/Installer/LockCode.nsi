@@ -3,7 +3,7 @@ Unicode True
 !include "LogicLib.nsh"
 
 !define APP_NAME "LockCode"
-!define APP_VERSION "0.4.3"
+!define APP_VERSION "0.4.4"
 !define APP_PUBLISHER "Isaac Silva Jiménez"
 !define APP_URL "https://github.com/D1abloo/LockAPP"
 !define MUI_ICON "..\LockCode.Windows\Assets\LockCode.ico"
@@ -30,7 +30,7 @@ SetCompressor /SOLID lzma
 BrandingText "LockCode — protección de privacidad"
 Icon "..\LockCode.Windows\Assets\LockCode.ico"
 WindowIcon On
-VIProductVersion 0.4.3.0
+VIProductVersion 0.4.4.0
 VIAddVersionKey /LANG=1034 "ProductName" "LockCode para Windows"
 VIAddVersionKey /LANG=1034 "CompanyName" "${APP_PUBLISHER}"
 VIAddVersionKey /LANG=1034 "FileDescription" "Instalador de LockCode"

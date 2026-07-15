@@ -15,10 +15,10 @@ final class GitHubReleaseTests: XCTestCase {
             URL(string: "https://example.com/D1abloo/LockAPP/releases/tag/v0.3.0")!
         ))
         XCTAssertTrue(UpdateService.isTrustedAssetURL(
-            URL(string: "https://github.com/D1abloo/LockAPP/releases/download/v0.4.3/LockCode-macOS-0.4.3.zip")!
+            URL(string: "https://github.com/D1abloo/LockAPP/releases/download/v0.4.4/LockCode-macOS-0.4.4.zip")!
         ))
         XCTAssertFalse(UpdateService.isTrustedAssetURL(
-            URL(string: "https://example.com/D1abloo/LockAPP/releases/download/v0.4.3/LockCode.zip")!
+            URL(string: "https://example.com/D1abloo/LockAPP/releases/download/v0.4.4/LockCode.zip")!
         ))
     }
 

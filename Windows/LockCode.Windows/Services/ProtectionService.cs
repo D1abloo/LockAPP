@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using LockCode.Windows.Models;
 
 namespace LockCode.Windows.Services;
@@ -46,8 +47,10 @@ public sealed class ProtectionService : IDisposable
 
     public void Deny(Request request)
     {
-        // Keep this PID pending and concealed. A fresh launch receives a new PID and request.
-        request.Process.Dispose();
+        // The app is only asked to close after authentication is cancelled, never before.
+        try { if (!request.Process.HasExited) request.Process.CloseMainWindow(); }
+        catch { }
+        finally { request.Process.Dispose(); }
     }
 
     private void Check()
@@ -59,8 +62,7 @@ public sealed class ProtectionService : IDisposable
             lock (_pending) _pending.Retain(processes.Select(process => process.Id).ToHashSet());
             foreach (var process in processes)
             {
-                string? path;
-                try { path = process.MainModule?.FileName; } catch { process.Dispose(); continue; }
+                var path = ExecutablePath(process);
                 if (path is null || path.Equals(Environment.ProcessPath, StringComparison.OrdinalIgnoreCase)
                     || !_settings.Value.ProtectedExecutables.Contains(path) || IsGranted(path, process)) { process.Dispose(); continue; }
                 lock (_pending) if (!_pending.Begin(process.Id)) { Hide(process); process.Dispose(); continue; }
@@ -82,12 +84,27 @@ public sealed class ProtectionService : IDisposable
         catch { return false; }
     }
 
+    private static string? ExecutablePath(Process process)
+    {
+        try { return process.MainModule?.FileName; }
+        catch
+        {
+            try
+            {
+                var path = new StringBuilder(32_768);
+                var length = (uint)path.Capacity;
+                return QueryFullProcessImageName(process.Handle, 0, path, ref length)
+                    ? path.ToString() : null;
+            }
+            catch { return null; }
+        }
+    }
+
     private static void Hide(Process process)
     {
         try
         {
             EnumWindows((window, _) => { GetWindowThreadProcessId(window, out var pid); if (pid == process.Id) ShowWindow(window, 0); return true; }, IntPtr.Zero);
-            process.CloseMainWindow(); // Normal close only; never Kill().
         }
         catch { }
     }
@@ -104,4 +121,10 @@ public sealed class ProtectionService : IDisposable
     [DllImport("user32.dll")] private static extern bool EnumWindows(EnumWindowsProc callback, IntPtr parameter);
     [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out int processId);
     [DllImport("user32.dll")] private static extern bool ShowWindow(IntPtr window, int command);
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool QueryFullProcessImageName(
+        IntPtr process,
+        uint flags,
+        StringBuilder executableName,
+        ref uint size);
 }

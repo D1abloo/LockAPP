@@ -40,11 +40,26 @@ var manual = new AppSettings { ManualExecutables = new(StringComparer.OrdinalIgn
 var restored = JsonSerializer.Deserialize<AppSettings>(JsonSerializer.Serialize(manual));
 var manualPassed = restored?.ManualExecutables.Contains(@"C:\Apps\Private.exe") == true;
 Console.WriteLine($"{(manualPassed ? "PASS" : "FAIL")} aplicación manual persistente");
+var packageDirectory = Path.Combine(Path.GetTempPath(), $"lockcode-package-{Guid.NewGuid():N}");
+Directory.CreateDirectory(packageDirectory);
+var packageExecutable = Path.Combine(packageDirectory, "Calculator.exe");
+File.WriteAllBytes(packageExecutable, []);
+File.WriteAllText(Path.Combine(packageDirectory, "AppxManifest.xml"), """
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10">
+  <Applications><Application Id="App" Executable="Calculator.exe" DisplayName="Calculadora" /></Applications>
+</Package>
+""");
+var packageEntries = PackageManifestCatalog.Load(packageDirectory, "Paquete de Windows");
+var packagePassed = packageEntries.Count == 1 && packageEntries[0].Name == "Calculadora"
+    && packageEntries[0].ExecutablePath == packageExecutable;
+Directory.Delete(packageDirectory, true);
+Console.WriteLine($"{(packagePassed ? "PASS" : "FAIL")} aplicaciones integradas de Windows");
 var updateJson = """
-{"tag_name":"v0.4.3","assets":[{"name":"LockCode-Windows-0.4.3-Setup.exe","browser_download_url":"https://github.com/D1abloo/LockAPP/releases/download/v0.4.3/LockCode-Windows-0.4.3-Setup.exe","digest":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","size":123}]}
+{"tag_name":"v0.4.4","assets":[{"name":"LockCode-Windows-0.4.4-Setup.exe","browser_download_url":"https://github.com/D1abloo/LockAPP/releases/download/v0.4.4/LockCode-Windows-0.4.4-Setup.exe","digest":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","size":123}]}
 """;
 var release = UpdateService.Parse(updateJson, new Version(0, 4, 0));
-var updatePassed = release?.Version == new Version(0, 4, 3)
+var updatePassed = release?.Version == new Version(0, 4, 4)
     && UpdateService.Parse(updateJson.Replace("github.com", "example.com"), new Version(0, 4, 0)) is null;
 Console.WriteLine($"{(updatePassed ? "PASS" : "FAIL")} actualización oficial validada");
-return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed && cyclePassed && manualPassed && updatePassed ? 0 : 1;
+return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed
+    && cyclePassed && manualPassed && packagePassed && updatePassed ? 0 : 1;

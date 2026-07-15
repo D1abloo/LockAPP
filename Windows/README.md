@@ -1,4 +1,4 @@
-# LockCode para Windows 0.4.3
+# LockCode para Windows 0.4.4
 
 Proyecto independiente para Windows 10 2004 o posterior. No usa archivos ni configuración de la edición macOS.
 
@@ -6,8 +6,8 @@ Proyecto independiente para Windows 10 2004 o posterior. No usa archivos ni conf
 
 - Código de 4–64 caracteres con símbolos, derivado con PBKDF2-HMAC-SHA256 y guardado en Windows Credential Manager.
 - Windows Hello automático cuando está disponible.
-- Aplicaciones instaladas obtenidas del registro de desinstalación y selector manual de ejecutables `.exe`.
-- Monitor de procesos, ocultado y cierre normal; nunca usa `Process.Kill()`.
+- Aplicaciones clásicas, rutas `App Paths`, paquetes AppX/MSIX integrados de Windows y selector manual de ejecutables `.exe`.
+- Monitor de procesos que oculta la ventana antes de autenticar y solo la restaura o reabre tras aprobar; nunca usa `Process.Kill()`.
 - Periodo de gracia, bloqueo inmediato, registro local anónimo, actualizaciones y área de notificación.
 - Inicio temprano de sesión mediante `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`.
 
@@ -27,7 +27,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\build.ps1
 ```
 
-El instalador moderno se crea en `Installer\output\LockCode-Windows-0.4.3-Setup.exe`. Incluye:
+El instalador moderno se crea en `Installer\output\LockCode-Windows-0.4.4-Setup.exe`. Incluye:
 
 - icono rojo de LockCode en el instalador, ejecutable, ventanas, bandeja, menú Inicio, escritorio y desinstalación;
 - presentación y descripción del producto;
@@ -44,7 +44,7 @@ dotnet run --project .\LockCode.Windows.Tests\LockCode.Windows.Tests.csproj
 
 ## Instalación y primer inicio
 
-1. Ejecuta `LockCode-Windows-0.4.3-Setup.exe`.
+1. Ejecuta `LockCode-Windows-0.4.4-Setup.exe`.
 2. Lee las condiciones. Si no las aceptas, cancela: no se instalará la aplicación.
 3. Conserva la carpeta propuesta o elige otra y termina el asistente.
 4. Crea un código de 4–64 caracteres. Admite letras, números, espacios y símbolos.
@@ -74,6 +74,8 @@ dotnet run --project .\LockCode.Windows.Tests\LockCode.Windows.Tests.csproj -c R
 ```
 
 Prueba una aplicación sin documentos abiertos: protégela, ciérrala y ábrela. Debe ocultarse y solicitar Windows Hello o el código. Después verifica bloqueo inmediato, periodo de gracia, salida autenticada y reinicio de sesión. Apagar o reiniciar Windows no debe solicitar autenticación de LockCode.
+
+Comprueba también una aplicación integrada, como Calculadora, Bloc de notas, Paint, Terminal o PowerShell. Si figura en el catálogo y se marca, debe permanecer oculta mientras se muestra la autenticación; no debe cerrarse antes de solicitarla.
 
 ## Si LockCode no inicia
 

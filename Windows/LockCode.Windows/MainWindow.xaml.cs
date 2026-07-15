@@ -18,12 +18,13 @@ public partial class MainWindow : Window
     private readonly ProtectionService _protection;
     private readonly ObservableCollection<InstalledApp> _apps = [];
     private readonly AttemptLimiter _limiter = new();
+    private readonly SemaphoreSlim _authenticationGate = new(1, 1);
     private readonly Task _initialization;
     private bool _loading;
     private bool _allowClose;
     private bool _managementAuthorized;
     private static readonly Version CurrentVersion = typeof(MainWindow).Assembly.GetName().Version
-        ?? new Version(0, 4, 2);
+        ?? new Version(0, 4, 4);
 
     public MainWindow()
     {
@@ -39,7 +40,7 @@ public partial class MainWindow : Window
     {
         if (!_credentials.HasCode)
         {
-            var setup = new CodeDialog("Crear código", true) { Owner = IsVisible ? this : null };
+            var setup = CreateCodeDialog("Crear código", true);
             if (setup.ShowDialog() != true) return;
             _credentials.SetCode(setup.Code);
         }
@@ -54,22 +55,27 @@ public partial class MainWindow : Window
 
     private async Task AuthenticateRequestAsync(ProtectionService.Request request)
     {
-        var approved = _settings.Value.BiometricsEnabled
-            && await BiometricService.AuthenticateAsync("Desbloquear aplicación protegida con LockCode");
-        if (!approved && _limiter.CanAttempt(DateTimeOffset.Now))
+        await _authenticationGate.WaitAsync();
+        try
         {
-            var dialog = new CodeDialog("Aplicación protegida", false) { Owner = this };
-            if (dialog.ShowDialog() == true) approved = _credentials.Verify(dialog.Code);
+            var approved = _settings.Value.BiometricsEnabled
+                && await BiometricService.AuthenticateAsync("Desbloquear aplicación protegida con LockCode");
+            if (!approved && _limiter.CanAttempt(DateTimeOffset.Now))
+            {
+                var dialog = CreateCodeDialog("Aplicación protegida", false);
+                if (dialog.ShowDialog() == true) approved = _credentials.Verify(dialog.Code);
+            }
+            if (approved) { _limiter.Succeeded(); _audit.Record("Desbloqueo correcto"); _protection.Approve(request); }
+            else { _limiter.Failed(DateTimeOffset.Now); _audit.Record("Intento fallido o cancelado"); _protection.Deny(request); }
+            RefreshAudit();
         }
-        if (approved) { _limiter.Succeeded(); _audit.Record("Desbloqueo correcto"); _protection.Approve(request); }
-        else { _limiter.Failed(DateTimeOffset.Now); _audit.Record("Intento fallido o cancelado"); _protection.Deny(request); }
-        RefreshAudit();
+        finally { _authenticationGate.Release(); }
     }
 
     public async Task<bool> AuthorizeExitAsync()
     {
         if (_settings.Value.BiometricsEnabled && await BiometricService.AuthenticateAsync("Confirmar salida de LockCode")) return true;
-        var dialog = new CodeDialog("Salir de LockCode", false) { Owner = this };
+        var dialog = CreateCodeDialog("Salir de LockCode", false);
         return dialog.ShowDialog() == true && _credentials.Verify(dialog.Code);
     }
 
@@ -81,7 +87,7 @@ public partial class MainWindow : Window
             && await BiometricService.AuthenticateAsync("Acceder a la configuración de LockCode");
         if (!approved)
         {
-            var dialog = new CodeDialog("Acceder a LockCode", false) { Owner = IsVisible ? this : null };
+            var dialog = CreateCodeDialog("Acceder a LockCode", false);
             approved = dialog.ShowDialog() == true && _credentials.Verify(dialog.Code);
         }
         if (!approved) _audit.Record("Intento fallido");
@@ -159,9 +165,9 @@ public partial class MainWindow : Window
 
     private void ChangeCode_Click(object sender, RoutedEventArgs e)
     {
-        var current = new CodeDialog("Código actual", false) { Owner = this };
+        var current = CreateCodeDialog("Código actual", false);
         if (current.ShowDialog() != true || !_credentials.Verify(current.Code)) { _audit.Record("Intento fallido"); return; }
-        var next = new CodeDialog("Nuevo código", true) { Owner = this };
+        var next = CreateCodeDialog("Nuevo código", true);
         if (next.ShowDialog() == true) _credentials.SetCode(next.Code);
     }
 
@@ -175,6 +181,18 @@ public partial class MainWindow : Window
         new ProcessStartInfo("https://www.paypal.com/paypalme/kin_coriano14") { UseShellExecute = true });
     private void SupportEmail_Click(object sender, RoutedEventArgs e) => Process.Start(
         new ProcessStartInfo("mailto:isaaccoria46@gmail.com") { UseShellExecute = true });
+
+    private CodeDialog CreateCodeDialog(string title, bool confirm)
+    {
+        var dialog = new CodeDialog(title, confirm);
+        if (IsVisible)
+        {
+            dialog.Owner = this;
+            dialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        }
+        else dialog.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        return dialog;
+    }
 
     private async Task CheckUpdateAsync(bool interactive)
     {

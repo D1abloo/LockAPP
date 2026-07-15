@@ -10,6 +10,7 @@ Proyecto independiente para Debian 12, Ubuntu 22.04 o distribuciones compatibles
 - Monitor `/proc`: pausa inmediatamente el proceso con `SIGSTOP`; al autorizar usa `SIGCONT`, y al cancelar solicita cierre normal con `SIGTERM`. Nunca usa `SIGKILL`.
 - Periodo de gracia, bloqueo inmediato, penalización progresiva, registro anónimo y actualizaciones confirmadas.
 - Inicio automático mediante un único servicio systemd de usuario ligado a la sesión gráfica; indicador de bandeja con el icono de LockCode.
+- Interfaz GTK con botones de acción, iconos y estados visuales de foco, pulsación y selección.
 
 ## Crear e instalar el paquete Debian
 
@@ -18,7 +19,7 @@ sudo apt install python3 python3-gi gir1.2-gtk-3.0 libsecret-tools fprintd \
   gir1.2-ayatanaappindicator3-0.1 dpkg-dev
 chmod +x installer/build-deb.sh
 ./installer/build-deb.sh
-sudo apt install ./installer/output/lockcode-linux_0.4.3_all.deb
+sudo apt install ./installer/output/lockcode-linux_0.4.4_all.deb
 ```
 
 Para Fedora y CentOS Stream usa el instalador RPM independiente y sus instrucciones en [`RPM/README.md`](RPM/README.md). Los paquetes `.deb` y `.rpm` no se mezclan.
@@ -41,7 +42,7 @@ Abre **Actualizaciones > Buscar actualización**. Si aparece una versión nueva,
 También puedes actualizar manualmente con:
 
 ```bash
-sudo apt install ./installer/output/lockcode-linux_0.4.3_all.deb
+sudo apt install ./installer/output/lockcode-linux_0.4.4_all.deb
 ```
 
 Una actualización conserva el código, las aplicaciones protegidas y el registro. El instalador reinicia el servicio y el icono vuelve a la bandeja automáticamente.

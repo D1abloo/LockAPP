@@ -10,9 +10,9 @@
 ## Comprobaciones completadas
 
 - `xcodegen generate`: correcto; genera `LockCode.xcodeproj` y el esquema compartido `LockCode` con `LockCodeTests`.
-- Fuentes 0.4.3 comprobadas con Swift 6.3.3, concurrencia completa y warnings como errores: type-check correcto; la suite XCTest no puede ejecutarse sin Xcode completo.
+- Fuentes 0.4.4 comprobadas con Swift 6.3.3, concurrencia completa y warnings como errores: type-check correcto; la suite XCTest no puede ejecutarse sin Xcode completo.
 - Selector manual `.app`: valida paquete, bundle identifier y exclusión de LockCode; persiste la ruta y activa la protección. Sus pruebas XCTest se compilan dentro del proyecto generado.
-- Bundle universal 0.4.3 para Intel y Apple Silicon enlazado, firmado con `LockCode Local Signing`, verificado con `codesign` y empaquetado en `macOS/Installer/output/LockCode-macOS-0.4.3.zip` (SHA-256 `2843907eded28ab94839daf77a23b599c57ab24fb4a8e1cef092e5042f511a10`).
+- Bundle universal 0.4.4 para Intel y Apple Silicon enlazado, firmado con `LockCode Local Signing`, verificado con `codesign` y empaquetado en `macOS/Installer/output/LockCode-macOS-0.4.4.zip` (SHA-256 `e15342f3c1978542b8d09b880bfe55ce0472db585b4a9ebe8b6ac75681965c9c`).
 - El elemento de Keychain usa el nombre visible `LockCode`. La credencial derivada histórica solo se migra si Keychain permite leerla sin interfaz; si no, se solicita crear otro código dentro de LockCode y nunca se muestra el diálogo técnico anterior.
 - Actualizador macOS: asset HTTPS oficial, digest SHA-256, firma de código, sustitución segura, relanzamiento y confirmación posterior implementados; queda pendiente recorrer el reemplazo real con una versión futura instalada en `/Applications`.
 - Type-check de todas las fuentes con Swift 6, concurrencia estricta y warnings como errores: correcto para `x86_64` y `arm64`, con deployment target macOS 13.

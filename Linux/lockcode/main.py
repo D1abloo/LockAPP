@@ -12,7 +12,7 @@ from pathlib import Path
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import GLib, Gtk  # noqa: E402
+from gi.repository import Gdk, GLib, Gtk  # noqa: E402
 
 from . import __version__, biometrics, updates
 from .audit import AuditStore
@@ -42,6 +42,7 @@ class LockCodeApplication(Gtk.Application):
 
     def do_startup(self) -> None:
         Gtk.Application.do_startup(self)
+        self._apply_theme()
         self.hold()
         self.protection.start()
         set_enabled(self.settings.value.start_with_linux)
@@ -95,17 +96,24 @@ class LockCodeApplication(Gtk.Application):
 
     def _build_window(self) -> Gtk.ApplicationWindow:
         window = Gtk.ApplicationWindow(application=self, title="LockCode para Linux")
-        window.set_default_size(900, 620)
+        window.set_default_size(960, 660)
         window.connect("delete-event", self._hide_window)
         outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, margin=16)
         title = Gtk.Label(); title.set_markup('<span foreground="#c62828" size="xx-large">🔒</span>  <span size="xx-large"><b>LockCode</b></span>')
         title.set_xalign(0); outer.pack_start(title, False, False, 0)
         notebook = Gtk.Notebook(); outer.pack_start(notebook, True, True, 0)
 
+        def action_button(label: str, icon: str, style: str | None = None) -> Gtk.Button:
+            button = Gtk.Button(label=label)
+            button.set_image(Gtk.Image.new_from_icon_name(icon, Gtk.IconSize.BUTTON))
+            button.set_always_show_image(True)
+            if style: button.get_style_context().add_class(style)
+            return button
+
         apps_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin=10)
         app_actions = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        refresh = Gtk.Button(label="Actualizar lista"); refresh.connect("clicked", lambda *_: self._refresh_apps()); app_actions.pack_start(refresh, False, False, 0)
-        add = Gtk.Button(label="Añadir aplicación manualmente…"); add.connect("clicked", self._add_app); app_actions.pack_start(add, False, False, 0)
+        refresh = action_button("Actualizar lista", "view-refresh-symbolic"); refresh.connect("clicked", lambda *_: self._refresh_apps()); app_actions.pack_start(refresh, False, False, 0)
+        add = action_button("Añadir aplicación manualmente…", "list-add-symbolic", "suggested-action"); add.connect("clicked", self._add_app); app_actions.pack_start(add, False, False, 0)
         apps_box.pack_start(app_actions, False, False, 0)
         tree = Gtk.TreeView(model=self.store); toggle = Gtk.CellRendererToggle(); toggle.connect("toggled", self._toggle_app)
         tree.append_column(Gtk.TreeViewColumn("Proteger", toggle, active=0)); tree.append_column(Gtk.TreeViewColumn("Aplicación", Gtk.CellRendererText(), text=1))
@@ -120,20 +128,20 @@ class LockCodeApplication(Gtk.Application):
         for widget in (self.protection_check, self.bio_check, self.start_check): widget.connect("toggled", self._save_settings); settings_box.pack_start(widget, False, False, 0)
         settings_box.pack_start(Gtk.Label(label="Minutos de desbloqueo (0 = hasta cerrar la aplicación)", xalign=0), False, False, 0)
         self.minutes.connect("value-changed", self._save_settings); settings_box.pack_start(self.minutes, False, False, 0)
-        lock_now = Gtk.Button(label="Bloquear ahora"); lock_now.connect("clicked", lambda *_: self.protection.lock_now()); settings_box.pack_start(lock_now, False, False, 0)
-        change = Gtk.Button(label="Cambiar código"); change.connect("clicked", self._change_code); settings_box.pack_start(change, False, False, 0)
+        lock_now = action_button("Bloquear ahora", "system-lock-screen-symbolic", "destructive-action"); lock_now.connect("clicked", lambda *_: self.protection.lock_now()); settings_box.pack_start(lock_now, False, False, 0)
+        change = action_button("Cambiar código", "dialog-password-symbolic", "suggested-action"); change.connect("clicked", self._change_code); settings_box.pack_start(change, False, False, 0)
         notebook.append_page(settings_box, Gtk.Label(label="Ajustes"))
 
         audit_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin=10)
         self.audit_list = Gtk.ListBox(); audit_scroll = Gtk.ScrolledWindow(); audit_scroll.add(self.audit_list); audit_box.pack_start(audit_scroll, True, True, 0)
-        clear = Gtk.Button(label="Borrar registro"); clear.connect("clicked", self._clear_audit); audit_box.pack_start(clear, False, False, 0)
+        clear = action_button("Borrar registro", "edit-clear-all-symbolic", "destructive-action"); clear.connect("clicked", self._clear_audit); audit_box.pack_start(clear, False, False, 0)
         notebook.append_page(audit_box, Gtk.Label(label="Registro"))
 
         update_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, margin=18)
         version = Gtk.Label(xalign=0); version.set_markup(
             f"<b>LockCode</b>\nVersión instalada: {html.escape(__version__)}"
         ); update_box.pack_start(version, False, False, 0)
-        self.update_check = Gtk.Button(label="Buscar actualización"); self.update_check.connect("clicked", self._check_update); update_box.pack_start(self.update_check, False, False, 0)
+        self.update_check = action_button("Buscar actualización", "software-update-available-symbolic", "suggested-action"); self.update_check.connect("clicked", self._check_update); update_box.pack_start(self.update_check, False, False, 0)
         self.update_status = Gtk.Label(label="", xalign=0); update_box.pack_start(self.update_status, False, False, 0)
         notebook.append_page(update_box, Gtk.Label(label="Actualizaciones"))
 
@@ -166,10 +174,34 @@ class LockCodeApplication(Gtk.Application):
             "Proyecto y donación",
             "LockCode es gratuito y todas sus funciones pueden utilizarse sin donar. Si deseas apoyar voluntariamente su mantenimiento y futuras mejoras, puedes hacerlo mediante PayPal ;)",
         )
-        donate = Gtk.Button(label="Donación voluntaria con PayPal"); donate.connect("clicked", lambda *_: webbrowser.open("https://www.paypal.com/paypalme/kin_coriano14")); project.pack_start(donate, False, False, 0)
+        donate = action_button("Donación voluntaria con PayPal", "emblem-favorite-symbolic", "suggested-action"); donate.connect("clicked", lambda *_: webbrowser.open("https://www.paypal.com/paypalme/kin_coriano14")); project.pack_start(donate, False, False, 0)
         project.pack_start(Gtk.Label(label="Copyright © 2026 Isaac Silva Jiménez.", xalign=0), False, False, 0)
         notebook.append_page(help_box, Gtk.Label(label="Ayuda y soporte"))
         window.add(outer); outer.show_all(); return window
+
+    def _apply_theme(self) -> None:
+        provider = Gtk.CssProvider()
+        provider.load_from_data(b"""
+            window { background-color: #f5f5f7; }
+            button {
+                border-radius: 8px;
+                padding: 7px 12px;
+                transition: 140ms ease-in-out;
+            }
+            button:hover { box-shadow: 0 2px 7px alpha(#000, 0.18); }
+            button:active { box-shadow: inset 0 1px 3px alpha(#000, 0.24); }
+            button.suggested-action { background: #c62828; border-color: #a91f1f; color: white; }
+            button.suggested-action:hover { background: #d73535; }
+            frame { border-radius: 8px; background-color: #ffffff; padding: 4px; }
+            notebook > header > tabs > tab { padding: 8px 12px; }
+            treeview { padding: 4px; }
+        """)
+        screen = Gdk.Screen.get_default()
+        if screen is not None:
+            Gtk.StyleContext.add_provider_for_screen(
+                screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+            )
+        self.theme_provider = provider
 
     def _setup_code(self) -> bool:
         first = self._code_dialog("Crear código", "Código (4–64 caracteres, admite símbolos)")

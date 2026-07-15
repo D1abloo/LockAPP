@@ -1,11 +1,11 @@
 <Window x:Class="LockCode.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="LockCode para Windows" Icon="Assets/LockCode.png" Width="900" Height="620" MinWidth="720" MinHeight="480">
+        Title="LockCode para Windows" Icon="Assets/LockCode.png" Width="960" Height="660" MinWidth="760" MinHeight="520" Background="#F5F5F7">
   <DockPanel Margin="18">
     <DockPanel DockPanel.Dock="Top" Margin="0,0,0,14">
       <Image DockPanel.Dock="Left" Source="Assets/LockCode.png" Width="48" Height="48" Margin="0,0,10,0"/>
-      <Button DockPanel.Dock="Right" Content="Bloquear ahora" Margin="10,4,0,4" Padding="14,6" Click="LockNow_Click"/>
+      <Button DockPanel.Dock="Right" Content="🔒  Bloquear ahora" Style="{StaticResource AccentButton}" Margin="10,4,0,4" Click="LockNow_Click"/>
       <StackPanel><TextBlock Text="LockCode" FontSize="26" FontWeight="SemiBold"/><TextBlock Text="Protección de privacidad para Windows"/></StackPanel>
     </DockPanel>
     <TabControl>
@@ -13,7 +13,7 @@
         <DockPanel Margin="10">
           <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
             <Button Content="Actualizar lista" Padding="12,5" Click="Refresh_Click"/>
-            <Button Content="Añadir aplicación manualmente…" Padding="12,5" Margin="8,0,0,0" Click="AddApp_Click"/>
+            <Button Content="＋  Añadir aplicación manualmente…" Style="{StaticResource AccentButton}" Margin="8,0,0,0" Click="AddApp_Click"/>
           </StackPanel>
           <ListView x:Name="AppsList"><ListView.ItemTemplate><DataTemplate>
             <CheckBox IsChecked="{Binding IsProtected}" Content="{Binding Name}" ToolTip="{Binding ExecutablePath}" Checked="ProtectionChanged" Unchecked="ProtectionChanged" Padding="4"/>
@@ -27,13 +27,13 @@
           <CheckBox x:Name="StartupEnabled" Content="Iniciar LockCode con Windows" Margin="0,6" Click="SettingsChanged"/>
           <TextBlock Text="Volver a bloquear después de estos minutos (0 = al cerrar la aplicación):" Margin="0,14,0,4"/>
           <TextBox x:Name="GraceMinutes" Width="90" HorizontalAlignment="Left" LostFocus="SettingsChanged"/>
-          <Button Content="Cambiar código" Padding="12,5" HorizontalAlignment="Left" Margin="0,18,0,0" Click="ChangeCode_Click"/>
+          <Button Content="Cambiar código" Style="{StaticResource AccentButton}" HorizontalAlignment="Left" Margin="0,18,0,0" Click="ChangeCode_Click"/>
         </StackPanel>
       </TabItem>
       <TabItem Header="Registro">
         <DockPanel Margin="10"><Button DockPanel.Dock="Bottom" Content="Borrar registro" Padding="10,5" HorizontalAlignment="Left" Click="ClearAudit_Click"/><ListBox x:Name="AuditList"/></DockPanel>
       </TabItem>
-      <TabItem Header="Actualizaciones"><StackPanel Margin="18"><TextBlock Text="LockCode para Windows" FontSize="18" FontWeight="SemiBold"/><TextBlock x:Name="CurrentVersionText" Margin="0,4,0,0"/><TextBlock x:Name="UpdateStatusText" Text="Busca versiones publicadas en el repositorio oficial." Margin="0,8,0,0" TextWrapping="Wrap"/><ProgressBar x:Name="UpdateProgress" Visibility="Collapsed" Height="8" Margin="0,12,0,0" Minimum="0" Maximum="100"/><Button x:Name="UpdateButton" Content="Buscar actualización" Padding="12,5" HorizontalAlignment="Left" Margin="0,12" Click="Updates_Click"/></StackPanel></TabItem>
+      <TabItem Header="Actualizaciones"><StackPanel Margin="18"><TextBlock Text="LockCode para Windows" FontSize="18" FontWeight="SemiBold"/><TextBlock x:Name="CurrentVersionText" Margin="0,4,0,0"/><TextBlock x:Name="UpdateStatusText" Text="Busca versiones publicadas en el repositorio oficial." Margin="0,8,0,0" TextWrapping="Wrap"/><ProgressBar x:Name="UpdateProgress" Visibility="Collapsed" Height="8" Margin="0,12,0,0" Minimum="0" Maximum="100"/><Button x:Name="UpdateButton" Content="↻  Buscar actualización" Style="{StaticResource AccentButton}" HorizontalAlignment="Left" Margin="0,12" Click="Updates_Click"/></StackPanel></TabItem>
       <TabItem Header="Ayuda y soporte">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
           <StackPanel Margin="18" MaxWidth="700" HorizontalAlignment="Left">
