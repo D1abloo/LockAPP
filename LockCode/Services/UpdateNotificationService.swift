@@ -8,20 +8,22 @@ final class UpdateNotificationService: NSObject, UNUserNotificationCenterDelegat
         static let category = "LOCKCODE_UPDATE_AVAILABLE"
         static let open = "LOCKCODE_UPDATE_YES"
         static let dismiss = "LOCKCODE_UPDATE_NO"
-        static let releaseURL = "releaseURL"
         static let lastNotifiedTag = "lastNotifiedUpdateTag"
         static let lastNotifiedAt = "lastNotifiedUpdateDate"
     }
 
     private let center: UNUserNotificationCenter
     private let defaults: UserDefaults
+    private let installUpdate: @MainActor @Sendable () async -> Void
 
     init(
         center: UNUserNotificationCenter = .current(),
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = .standard,
+        installUpdate: @escaping @MainActor @Sendable () async -> Void
     ) {
         self.center = center
         self.defaults = defaults
+        self.installUpdate = installUpdate
         super.init()
         center.delegate = self
 
@@ -61,11 +63,9 @@ final class UpdateNotificationService: NSObject, UNUserNotificationCenterDelegat
 
             let content = UNMutableNotificationContent()
             content.title = "Actualización de LockCode disponible"
-            content.body = "Está disponible la versión \(release.tagName). ¿Quieres abrir la página para actualizar?"
+            content.body = "Está disponible la versión \(release.tagName). ¿Quieres descargarla e instalarla?"
             content.sound = .default
             content.categoryIdentifier = Identifier.category
-            content.userInfo = [Identifier.releaseURL: release.htmlURL.absoluteString]
-
             try await center.add(UNNotificationRequest(
                 identifier: "lockcode-update-\(release.tagName)",
                 content: content,
@@ -92,18 +92,11 @@ final class UpdateNotificationService: NSObject, UNUserNotificationCenterDelegat
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         let actionIdentifier = response.actionIdentifier
-        let urlString = response.notification.request.content.userInfo[Identifier.releaseURL]
-            as? String
         completionHandler()
 
-        guard actionIdentifier == Identifier.open,
-              let urlString,
-              let url = URL(string: urlString),
-              UpdateService.isTrustedReleaseURL(url) else {
-            return
-        }
+        guard actionIdentifier == Identifier.open else { return }
         Task { @MainActor in
-            NSWorkspace.shared.open(url)
+            await installUpdate()
         }
     }
 }

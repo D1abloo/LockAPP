@@ -18,11 +18,12 @@ public partial class MainWindow : Window
     private readonly ProtectionService _protection;
     private readonly ObservableCollection<InstalledApp> _apps = [];
     private readonly AttemptLimiter _limiter = new();
+    private readonly Task _initialization;
     private bool _loading;
     private bool _allowClose;
     private bool _managementAuthorized;
     private static readonly Version CurrentVersion = typeof(MainWindow).Assembly.GetName().Version
-        ?? new Version(0, 4, 0);
+        ?? new Version(0, 4, 1);
 
     public MainWindow()
     {
@@ -30,15 +31,15 @@ public partial class MainWindow : Window
         AppsList.ItemsSource = _apps;
         _protection = new ProtectionService(_settings);
         _protection.Blocked += request => Dispatcher.BeginInvoke(async () => await AuthenticateRequestAsync(request));
-        Loaded += async (_, _) => await InitializeAsync();
         Closing += OnClosing;
+        _initialization = InitializeAsync();
     }
 
     private async Task InitializeAsync()
     {
         if (!_credentials.HasCode)
         {
-            var setup = new CodeDialog("Crear código", true) { Owner = this };
+            var setup = new CodeDialog("Crear código", true) { Owner = IsVisible ? this : null };
             if (setup.ShowDialog() != true) return;
             _credentials.SetCode(setup.Code);
         }
@@ -74,6 +75,7 @@ public partial class MainWindow : Window
 
     public async Task<bool> AuthorizeManagementAsync()
     {
+        await _initialization;
         if (!_credentials.HasCode || _managementAuthorized) return true;
         var approved = _settings.Value.BiometricsEnabled
             && await BiometricService.AuthenticateAsync("Acceder a la configuración de LockCode");
@@ -175,27 +177,52 @@ public partial class MainWindow : Window
     private async Task CheckUpdateAsync(bool interactive)
     {
         UpdateStatusText.Text = $"LockCode {CurrentVersion.ToString(3)} · buscando actualización…";
+        UpdateButton.IsEnabled = false;
         try
         {
             using var client = new HttpClient();
             client.DefaultRequestHeaders.UserAgent.ParseAdd($"LockCode-Windows/{CurrentVersion.ToString(3)}");
             var json = await client.GetStringAsync("https://api.github.com/repos/D1abloo/LockAPP/releases/latest");
-            using var document = System.Text.Json.JsonDocument.Parse(json);
-            var hasWindowsInstaller = document.RootElement.GetProperty("assets").EnumerateArray()
-                .Any(asset => asset.GetProperty("name").GetString() is string name
-                    && name.Contains("Windows", StringComparison.OrdinalIgnoreCase)
-                    && name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
-            if (!hasWindowsInstaller) { UpdateStatusText.Text = "La versión publicada no incluye LockCode para Windows."; if (interactive) System.Windows.MessageBox.Show(UpdateStatusText.Text, "LockCode"); return; }
-            var tag = document.RootElement.GetProperty("tag_name").GetString()?.TrimStart('v');
-            if (Version.TryParse(tag, out var remote) && remote > CurrentVersion)
+            var release = UpdateService.Parse(json, CurrentVersion);
+            if (release is not null)
             {
-                UpdateStatusText.Text = $"LockCode {CurrentVersion.ToString(3)} · versión {remote.ToString(3)} disponible";
-                if (System.Windows.MessageBox.Show($"LockCode {CurrentVersion.ToString(3)} puede actualizarse a {remote.ToString(3)}. ¿Abrir la descarga?", "LockCode", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                    Process.Start(new ProcessStartInfo("https://github.com/D1abloo/LockAPP/releases") { UseShellExecute = true });
+                UpdateStatusText.Text = $"LockCode {CurrentVersion.ToString(3)} · versión {release.Version.ToString(3)} disponible";
+                if (System.Windows.MessageBox.Show(
+                    $"¿Descargar e instalar LockCode {release.Version.ToString(3)} ahora?",
+                    "Actualización de LockCode", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                    await InstallUpdateAsync(release);
             }
             else { UpdateStatusText.Text = "LockCode está actualizado."; if (interactive) System.Windows.MessageBox.Show(UpdateStatusText.Text, "LockCode"); }
         }
-        catch { UpdateStatusText.Text = "No se pudo comprobar la actualización."; if (interactive) System.Windows.MessageBox.Show(UpdateStatusText.Text, "LockCode"); }
+        catch (Exception error)
+        {
+            UpdateStatusText.Text = $"No se pudo comprobar la actualización: {error.Message}";
+            if (interactive) System.Windows.MessageBox.Show(UpdateStatusText.Text, "LockCode");
+        }
+        finally { UpdateButton.IsEnabled = true; }
+    }
+
+    private async Task InstallUpdateAsync(UpdateRelease release)
+    {
+        UpdateProgress.Visibility = Visibility.Visible;
+        UpdateProgress.Value = 0;
+        UpdateStatusText.Text = $"Descargando LockCode {release.Version.ToString(3)}…";
+        try
+        {
+            var progress = new Progress<double>(value => UpdateProgress.Value = value * 100);
+            var installer = await UpdateService.DownloadAsync(release, progress);
+            UpdateStatusText.Text = "Descarga verificada. Abriendo el instalador…";
+            Process.Start(new ProcessStartInfo(installer) { UseShellExecute = true, Arguments = "/S" });
+            AllowSystemExit();
+            DisposeServices();
+            System.Windows.Application.Current.Shutdown();
+        }
+        catch (Exception error)
+        {
+            UpdateProgress.Visibility = Visibility.Collapsed;
+            UpdateStatusText.Text = $"La actualización no se instaló: {error.Message}";
+            System.Windows.MessageBox.Show(UpdateStatusText.Text, "LockCode", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void ShowCompletedUpdate()

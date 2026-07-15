@@ -25,7 +25,7 @@ LockCode es un MVP nativo para macOS que protege la apertura o activación de ap
 - Salida normal de LockCode protegida por autenticación.
 - Esperas progresivas tras varios códigos incorrectos.
 - Registro local de desbloqueos e intentos fallidos, sin nombres de aplicaciones ni datos de autenticación, con borrado manual y límite de 200 eventos.
-- Comprobación automática de GitHub Releases y notificación de macOS con «Sí, actualizar» y «No ahora».
+- Comprobación automática de GitHub Releases, notificación con «Sí, actualizar» y descarga e instalación verificadas tras confirmar.
 - Ayuda y soporte accesibles al final del sidebar, correo de contacto y donación voluntaria sin mostrar la cuenta asociada a PayPal.
 
 ## Requisitos
@@ -75,7 +75,7 @@ xcodebuild \
 
 ## Instalación y prueba funcional
 
-1. Copia `LockCode.app` a `/Applications` y ejecútala desde allí.
+1. Genera el ZIP con `./macOS/Installer/build.sh`, descomprímelo, copia `LockCode.app` a `/Applications` y ejecútala desde allí.
 2. Conserva el Hardened Runtime y firma la app; Keychain y `SMAppService.mainApp` deben validarse con una copia firmada.
 3. LockCode solicita registrar el inicio automático en la primera ejecución. Si macOS muestra que requiere aprobación, abre **Ajustes de LockCode > Inicio de sesión > Abrir Ítems de inicio** y permite LockCode en **Ajustes del Sistema > General > Ítems de inicio**.
 4. Reinicia la sesión o el Mac. LockCode debe aparecer en la barra de menús sin que tengas que abrirlo manualmente. El ajuste queda guardado y puede desactivarse desde LockCode.
@@ -119,6 +119,7 @@ No cambies la identidad de firma entre actualizaciones: la autorización del ele
 - `LockCode/Services`: Keychain, autenticación, catálogo, protección e inicio de sesión.
 - `LockCode/Views`: interfaz SwiftUI y panel de desbloqueo.
 - `LockCodeTests`: pruebas unitarias de reglas puras.
+- `macOS/Installer`: proceso y salida del instalador ZIP de macOS.
 - `docs`: especificación funcional y modelo de seguridad.
 - `AGENTS.md`: instrucciones para el agente Codex.
 - `CODEX_TASK.md`: tarea priorizada lista para entregar al agente.
@@ -141,8 +142,8 @@ Consulta `docs/SECURITY_MODEL.md` antes de prometer un nivel de protección come
 
 ## Ediciones independientes
 
-- `Windows/`: aplicación WPF, pruebas, publicación autocontenida e instalador NSIS propios.
-- [`Linux/`](Linux/README.md): aplicación GTK, pruebas, actualización, desinstalación limpia e instalador Debian propios.
+- [`Windows/`](Windows/README.md): aplicación WPF, pruebas, publicación autocontenida e instalador en `Windows/Installer/output`.
+- [`Linux/`](Linux/README.md): aplicación GTK, pruebas y paquetes en `Linux/installer/output` y `Linux/RPM/output`.
 
 Cada edición mantiene su configuración, almacén seguro, inicio automático y sistema biométrico. No se mezclan binarios ni instaladores con la edición macOS.
 
@@ -151,7 +152,7 @@ Las versiones se publican de forma coordinada: una actualización funcional se a
 ## Ayuda, actualizaciones y donaciones
 
 - La aplicación incluye una guía de uso y soporte redactada en español.
-- Las actualizaciones se consultan automáticamente desde `https://github.com/D1abloo/LockAPP/releases`. Solo se aceptan enlaces HTTPS del repositorio oficial; LockCode no descarga ni instala código sin confirmación.
+- Las actualizaciones se consultan automáticamente desde `https://github.com/D1abloo/LockAPP/releases`. Solo se aceptan descargas HTTPS del repositorio oficial con SHA-256 publicado; nunca se instalan sin confirmación.
 - El correo de soporte se muestra en Ayuda y soporte. La dirección asociada al botón de donación no se presenta en la interfaz.
 - LockCode es gratuito y no requiere donación. Quien quiera apoyar voluntariamente el proyecto puede usar el enlace de PayPal incluido en la sección Ayuda y soporte.
 - Software realizado por Isaac Silva Jiménez.

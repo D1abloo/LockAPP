@@ -40,4 +40,11 @@ var manual = new AppSettings { ManualExecutables = new(StringComparer.OrdinalIgn
 var restored = JsonSerializer.Deserialize<AppSettings>(JsonSerializer.Serialize(manual));
 var manualPassed = restored?.ManualExecutables.Contains(@"C:\Apps\Private.exe") == true;
 Console.WriteLine($"{(manualPassed ? "PASS" : "FAIL")} aplicación manual persistente");
-return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed && cyclePassed && manualPassed ? 0 : 1;
+var updateJson = """
+{"tag_name":"v0.4.1","assets":[{"name":"LockCode-Windows-0.4.1-Setup.exe","browser_download_url":"https://github.com/D1abloo/LockAPP/releases/download/v0.4.1/LockCode-Windows-0.4.1-Setup.exe","digest":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","size":123}]}
+""";
+var release = UpdateService.Parse(updateJson, new Version(0, 4, 0));
+var updatePassed = release?.Version == new Version(0, 4, 1)
+    && UpdateService.Parse(updateJson.Replace("github.com", "example.com"), new Version(0, 4, 0)) is null;
+Console.WriteLine($"{(updatePassed ? "PASS" : "FAIL")} actualización oficial validada");
+return checks.All(x => x.Passed) && credentialPassed && limiterPassed && gracePassed && closePassed && cyclePassed && manualPassed && updatePassed ? 0 : 1;

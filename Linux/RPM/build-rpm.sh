@@ -2,10 +2,10 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VERSION="0.4.0"
+VERSION="0.4.1"
 TOPDIR="$ROOT/build/rpm"
 SOURCE="$TOPDIR/SOURCES/lockcode-linux-$VERSION"
-OUTPUT="$ROOT/build/lockcode-linux_${VERSION}_noarch.rpm"
+OUTPUT="$ROOT/RPM/output/lockcode-linux_${VERSION}_noarch.rpm"
 
 command -v rpmbuild >/dev/null || {
   echo "Falta rpmbuild. Instálalo con: sudo dnf install rpm-build" >&2
@@ -15,6 +15,7 @@ command -v rpmbuild >/dev/null || {
 cd "$ROOT"
 python3 -m unittest discover -s tests -v
 rm -rf "$TOPDIR"
+mkdir -p "$(dirname "$OUTPUT")"
 mkdir -p "$TOPDIR"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS} "$SOURCE"
 cp -R lockcode lockcode.py assets "$SOURCE/"
 find "$SOURCE" -type d -name __pycache__ -prune -exec rm -rf {} +

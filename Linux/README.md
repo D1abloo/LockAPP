@@ -18,7 +18,7 @@ sudo apt install python3 python3-gi gir1.2-gtk-3.0 libsecret-tools fprintd \
   gir1.2-ayatanaappindicator3-0.1 dpkg-dev
 chmod +x installer/build-deb.sh
 ./installer/build-deb.sh
-sudo apt install ./build/lockcode-linux_0.4.0_all.deb
+sudo apt install ./installer/output/lockcode-linux_0.4.1_all.deb
 ```
 
 Para Fedora y CentOS Stream usa el instalador RPM independiente y sus instrucciones en [`RPM/README.md`](RPM/README.md). Los paquetes `.deb` y `.rpm` no se mezclan.
@@ -41,7 +41,7 @@ Abre **Actualizaciones > Buscar actualización**. Si aparece una versión nueva,
 También puedes actualizar manualmente con:
 
 ```bash
-sudo apt install ./lockcode-linux_0.4.0_all.deb
+sudo apt install ./installer/output/lockcode-linux_0.4.1_all.deb
 ```
 
 Una actualización conserva el código, las aplicaciones protegidas y el registro. El instalador reinicia el servicio y el icono vuelve a la bandeja automáticamente.

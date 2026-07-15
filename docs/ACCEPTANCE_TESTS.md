@@ -43,7 +43,7 @@
 4. Abrir Actualizaciones y comprobar la respuesta cuando no existen releases.
 5. Publicar una release de prueba y verificar que se muestra su versión, notas y enlace.
 6. Reiniciar LockCode con una release posterior publicada y comprobar la notificación con «Sí, actualizar» y «No ahora».
-7. Elegir «Sí, actualizar» y comprobar que solo abre una URL HTTPS bajo `github.com/D1abloo/LockAPP/`.
+7. Elegir «Sí, actualizar» y comprobar descarga, SHA-256, sustitución de la app, reinicio y mensaje de actualización completada.
 
 ## Registro
 

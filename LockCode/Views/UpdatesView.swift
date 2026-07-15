@@ -9,6 +9,7 @@ struct UpdatesView: View {
 }
 
 private struct UpdatesContent: View {
+    @EnvironmentObject private var model: AppModel
     @ObservedObject var updateService: UpdateService
 
     private let releasesURL = URL(string: "https://github.com/D1abloo/LockAPP/releases")!
@@ -51,8 +52,24 @@ private struct UpdatesContent: View {
                             }
                             .disabled(updateService.isChecking)
 
+                            if updateService.updateAvailable {
+                                Button("Descargar e instalar") {
+                                    Task { await model.installAvailableUpdate() }
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .disabled(updateService.isInstalling)
+                            }
+
                             if let release = updateService.latestRelease {
                                 Link("Ver \(release.tagName) en GitHub", destination: release.htmlURL)
+                            }
+                        }
+
+                        if updateService.isInstalling {
+                            if let progress = updateService.installationProgress {
+                                ProgressView(value: progress)
+                            } else {
+                                ProgressView("Descargando actualización…")
                             }
                         }
                     }
@@ -83,7 +100,7 @@ private struct UpdatesContent: View {
 
                 GroupBox("Canal de actualizaciones") {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Las futuras versiones y mejoras se publicarán en GitHub Releases. LockCode solo comprueba la versión y abre la página oficial; nunca instala código sin tu confirmación.")
+                        Text("Las futuras versiones y mejoras se publicarán en GitHub Releases. LockCode solo descarga el paquete oficial, verifica su SHA-256 y lo instala después de tu confirmación.")
                         Text("Cuando exista una versión posterior, macOS mostrará una notificación con «Sí, actualizar» y «No ahora». El aviso de una misma versión se limita a una vez cada 24 horas.")
                         Link("Ver todas las versiones", destination: releasesURL)
                     }

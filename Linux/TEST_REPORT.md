@@ -1,12 +1,12 @@
-# Validación Linux 0.4.0
+# Validación Linux 0.4.1
 
 - 15 de julio de 2026: 14 pruebas unitarias correctas (incluyen selector manual persistente, metadatos seguros de actualización, progreso de APT/DNF, identidad de credencial por instalación, catálogo de Terminal y migración de inicio).
 - `compileall`: correcto.
 - Paquete Debian inspeccionado: metadatos, permisos, dependencia obligatoria del indicador, icono, entrada de escritorio, unidad systemd y scripts `postinst`, `prerm` y `postrm` correctos.
-- Instalador Debian: `build/lockcode-linux_0.4.0_all.deb`.
-- Instalador RPM: `build/lockcode-linux_0.4.0_noarch.rpm`.
-- SHA-256 DEB: `2992805ed92176bf10ce82f6fee156dcaecbf703a5fb04b03c25dbde8536e112`.
-- SHA-256 RPM: `8118223c7b7e5fe4728ff7e9b97485bd9c96747a589c03f5eb4843e23aa137bd`.
+- Instalador Debian: `installer/output/lockcode-linux_0.4.1_all.deb`.
+- Instalador RPM: `RPM/output/lockcode-linux_0.4.1_noarch.rpm`.
+- SHA-256 DEB: `3b84bb46dbba48583588772634045b470969688130c933f8d7e911d5e6d83a51`.
+- SHA-256 RPM: `b6bdd855584a4cc8a0aea20a14141832398445ba0016711a5d3587ad62fdd853`.
 - Actualización 0.1.1 → 0.1.2 comprobada en Ubuntu: configuración conservada, servicio activo y una sola instancia.
 - `apt purge` comprobado: servicio, configuración, registro, caché y archivos del paquete eliminados.
 - Instalación nueva comprobada sin variables de `sudo`: servicio activo, una sola instancia, onboarding nuevo pendiente e indicador Ayatana `Active` con el icono `com.lockcode.Linux`.

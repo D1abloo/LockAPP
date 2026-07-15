@@ -10,9 +10,10 @@
 ## Comprobaciones completadas
 
 - `xcodegen generate`: correcto; genera `LockCode.xcodeproj` y el esquema compartido `LockCode` con `LockCodeTests`.
-- Fuentes 0.4.0 comprobadas con Swift 6.3.3: type-check correcto; la suite XCTest no puede ejecutarse sin Xcode completo.
+- Fuentes 0.4.1 comprobadas con Swift 6.3.3, concurrencia completa y warnings como errores: type-check correcto; la suite XCTest no puede ejecutarse sin Xcode completo.
 - Selector manual `.app`: valida paquete, bundle identifier y exclusión de LockCode; persiste la ruta y activa la protección. Sus pruebas XCTest se compilan dentro del proyecto generado.
-- Bundle universal 0.4.0 para Intel y Apple Silicon enlazado, firmado con `LockCode Local Signing`, verificado con `codesign` y empaquetado como `LockCode-macOS-0.4.0.zip`.
+- Bundle universal 0.4.1 para Intel y Apple Silicon enlazado, firmado con `LockCode Local Signing`, verificado con `codesign` y empaquetado en `macOS/Installer/output/LockCode-macOS-0.4.1.zip` (SHA-256 `c2c70716677015f77275e374ba86faa9eef5a3bb667d3340099573a296f46816`).
+- Actualizador macOS: asset HTTPS oficial, digest SHA-256, firma de código, sustitución segura, relanzamiento y confirmación posterior implementados; queda pendiente recorrer el reemplazo real con una versión futura instalada en `/Applications`.
 - Type-check de todas las fuentes con Swift 6, concurrencia estricta y warnings como errores: correcto para `x86_64` y `arm64`, con deployment target macOS 13.
 - Enlace directo con `swiftc` del ejecutable completo: correcto en `x86_64` y `arm64`.
 - Verificador ejecutable de reglas de dominio: 28 comprobaciones correctas para código con símbolos, credencial PBKDF2 sin texto plano, penalizaciones, bloqueo al terminar, expiración por minutos, solicitud pendiente, deduplicación, inicio automático, registro persistente/borrable y validación de URL de actualización.

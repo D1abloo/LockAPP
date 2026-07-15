@@ -2,14 +2,15 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VERSION="0.4.0"
+VERSION="0.4.1"
 STAGE="$ROOT/build/lockcode_${VERSION}_all"
-OUTPUT="$ROOT/build/lockcode-linux_${VERSION}_all.deb"
+OUTPUT="$ROOT/installer/output/lockcode-linux_${VERSION}_all.deb"
 
 cd "$ROOT"
 python3 -m unittest discover -s tests -v
 python3 -m compileall -q lockcode
 rm -rf "$STAGE"
+mkdir -p "$(dirname "$OUTPUT")"
 install -d "$STAGE/DEBIAN" "$STAGE/usr/lib/lockcode" "$STAGE/usr/bin"
 install -d "$STAGE/usr/share/applications" "$STAGE/usr/share/icons/hicolor/scalable/apps"
 install -d "$STAGE/usr/lib/systemd/user"

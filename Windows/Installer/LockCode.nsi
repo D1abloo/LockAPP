@@ -3,7 +3,7 @@ Unicode True
 !include "LogicLib.nsh"
 
 !define APP_NAME "LockCode"
-!define APP_VERSION "0.4.0"
+!define APP_VERSION "0.4.1"
 !define APP_PUBLISHER "Isaac Silva Jiménez"
 !define APP_URL "https://github.com/D1abloo/LockAPP"
 !define MUI_ICON "..\LockCode.Windows\Assets\LockCode.ico"
@@ -30,7 +30,7 @@ SetCompressor /SOLID lzma
 BrandingText "LockCode — protección de privacidad"
 Icon "..\LockCode.Windows\Assets\LockCode.ico"
 WindowIcon On
-VIProductVersion 0.4.0.0
+VIProductVersion 0.4.1.0
 VIAddVersionKey /LANG=1034 "ProductName" "LockCode para Windows"
 VIAddVersionKey /LANG=1034 "CompanyName" "${APP_PUBLISHER}"
 VIAddVersionKey /LANG=1034 "FileDescription" "Instalador de LockCode"
@@ -50,6 +50,7 @@ VIAddVersionKey /LANG=1034 "LegalCopyright" "Copyright © 2026 ${APP_PUBLISHER}"
 
 Section "LockCode (obligatorio)" SecMain
   SectionIn RO
+  Sleep 1500
   ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LockCode" "DisplayVersion"
   ${If} $0 != ""
   ${AndIf} $0 != "${APP_VERSION}"
@@ -69,6 +70,8 @@ Section "LockCode (obligatorio)" SecMain
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LockCode" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LockCode" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LockCode" "NoRepair" 1
+  IfSilent 0 +2
+    Exec '"$INSTDIR\LockCode.exe" --background'
 SectionEnd
 
 Section /o "Acceso directo en el escritorio" SecDesktop

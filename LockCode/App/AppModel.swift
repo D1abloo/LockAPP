@@ -21,7 +21,9 @@ final class AppModel: ObservableObject {
     private let catalogService = AppCatalogService()
     private let protectionService: AppProtectionService
     private let unlockPanelController = UnlockPanelController()
-    private lazy var updateNotificationService = UpdateNotificationService()
+    private lazy var updateNotificationService = UpdateNotificationService { [weak self] in
+        await self?.installAvailableUpdate()
+    }
     private var queuedRequests: [AccessRequest] = []
     private var isStarted = false
     private var isQuitAuthorized = false
@@ -200,6 +202,26 @@ final class AppModel: ObservableObject {
     func setLaunchAtLoginEnabled(_ enabled: Bool) async {
         settings.launchAtLoginEnabled = enabled
         await launchAtLoginService.setEnabled(enabled)
+    }
+
+    func installAvailableUpdate() async {
+        if !updateService.updateAvailable {
+            await updateService.checkForUpdates()
+        }
+        guard let applicationURL = await updateService.installAvailableUpdate() else { return }
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = true
+        NSWorkspace.shared.openApplication(at: applicationURL, configuration: configuration) {
+            [weak self] _, error in
+            Task { @MainActor in
+                if let error {
+                    self?.errorMessage = "La actualización se instaló, pero no pudo reiniciarse: \(error.localizedDescription)"
+                    return
+                }
+                self?.isQuitAuthorized = true
+                NSApp.terminate(nil)
+            }
+        }
     }
 
     func requestQuit() {

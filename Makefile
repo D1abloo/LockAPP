@@ -1,4 +1,4 @@
-.PHONY: generate build run test archive clean
+.PHONY: generate build run test archive package clean
 
 DERIVED_DATA ?= .build/DerivedData
 ARCHIVE_PATH ?= .build/LockCode.xcarchive
@@ -18,5 +18,8 @@ test: generate
 archive: generate
 	xcodebuild -project LockCode.xcodeproj -scheme LockCode -configuration Release -destination 'generic/platform=macOS' -derivedDataPath '$(DERIVED_DATA)' -archivePath '$(ARCHIVE_PATH)' archive
 
+package:
+	./macOS/Installer/build.sh
+
 clean:
-	rm -rf LockCode.xcodeproj .build
+	rm -rf .build macOS/Installer/output

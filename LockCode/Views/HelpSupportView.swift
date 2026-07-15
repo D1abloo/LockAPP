@@ -38,7 +38,7 @@ struct HelpSupportView: View {
 
                 HelpCard(title: "Actualizaciones", systemImage: "arrow.triangle.2.circlepath") {
                     Text("LockCode comprueba GitHub Releases al iniciarse. Si existe una versión posterior, macOS mostrará una notificación con las opciones «Sí, actualizar» y «No ahora».")
-                    Text("Al aceptar se abre la página oficial de la versión. La aplicación nunca sustituye archivos ni instala una descarga sin tu intervención.")
+                    Text("Al aceptar, LockCode descarga el ZIP oficial, verifica su SHA-256, sustituye la copia instalada y se reinicia. Nunca instala una descarga sin tu intervención.")
                 }
 
                 HelpCard(title: "Ayuda y soporte", systemImage: "questionmark.bubble") {
